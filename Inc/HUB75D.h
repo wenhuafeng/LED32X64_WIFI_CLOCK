@@ -1,9 +1,9 @@
 #ifndef HUB75D_H
 #define HUB75D_H
 
-#include "TypeDefine.h"
+#include "type_define.h"
 #include "gpio_bit_ctrl.h"
-#include "RTC_software.h"
+#include "time.h"
 
 #define HUB_A   PBout(13)
 #define HUB_B   PBout(14)
@@ -29,8 +29,8 @@ typedef enum { _DISP_OFF_, _DISP_ON_ } HUB75D_DispOnOffFlag;
 //void Scan_Mode(void);
 void HUB75D_DispScan(void);
 
-void HUB75D_CalcClock(rtc_counter_value_t *time);
-void HUB75D_CalcYinli(rtc_counter_value_t *time);
+void HUB75D_CalculateClock(struct TimeType *time);
+void HUB75D_CalculateLunarCalendar(struct TimeType *time);
 void HUB75D_CtrDec(void);
 
 void HUB75D_DispOnOff(HUB75D_DispOnOffFlag F_tmp);

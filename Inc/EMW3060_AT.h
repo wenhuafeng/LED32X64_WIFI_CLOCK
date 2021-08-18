@@ -1,8 +1,8 @@
 #ifndef _EMW3060_AT_H_
 #define _EMW3060_AT_H_
 
+#include "type_define.h"
 #include "gpio_bit_ctrl.h"
-#include "TypeDefine.h"
 
 enum PowerFlag {
     POWER_OFF,

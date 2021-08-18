@@ -1,8 +1,8 @@
 #ifndef ESP8266_AT_H
 #define ESP8266_AT_H
 
+#include "type_define.h"
 #include "gpio_bit_ctrl.h"
-#include "TypeDefine.h"
 
 enum PowerFlag {
     POWER_OFF,

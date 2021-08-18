@@ -7,7 +7,7 @@
   ******************************************************************************
   ** This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
-  * USER CODE END. Other portions of this file, whether 
+  * USER CODE END. Other portions of this file, whether
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
@@ -52,7 +52,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "RTC_software.h"
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -120,8 +120,7 @@ void Error_Handler(void);
 #define HTU21D_SDA_Pin GPIO_PIN_7
 #define HTU21D_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-void GetClock(rtc_counter_value_t *time);
-void SetClock(rtc_counter_value_t *time);
+
 void EnterStandbyMode(void);
 /* USER CODE END Private defines */
 

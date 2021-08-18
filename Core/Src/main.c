@@ -47,7 +47,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "TypeDefine.h"
+#include <stdio.h>
 #include "HUB75D.h"
 #include "HTU21D.h"
 #if (WIFI_MODULE==WIFI_ESP8266)
@@ -55,7 +55,6 @@
 #elif (WIFI_MODULE==WIFI_EMW3060)
 #include "EMW3060_AT.h"
 #endif
-#include "RTC_software.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,8 +70,8 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 //##############################################################################
-#warning message "Software_Version: <V204>"
-#warning message "Software_Date:    2021/08/15"
+#warning message "Software_Version: <V206>"
+#warning message "Software_Date:    2021/08/18"
 #warning message "Software_Project: CLOCK_WIFI"
 #warning message "Software_MCU:     STM32F103C8T6"
 #warning message "Main_OSC:         EXT_8M=IXT_72MHz"
@@ -137,7 +136,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HTU21D_I2cInit();
   HAL_RTCEx_SetSecond_IT(&hrtc);
-  GetClock(&TIME);
+  GetClock();
   HAL_Delay(200);
   //TH init
   HTU21D_Init();
@@ -171,20 +170,17 @@ int main(void)
       UsartType1.receive_flag = 0;
       WIFI_ReceiveProcess(UsartType1.usartDMA_rxBuf);
       HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVELEN);
-      if (WIFI_GetTimeDataFlag() != 0x00) {
-          WIFI_SetTimeDataFlag(0x00);
-          SetClock(&TIME);
-          GetClock(&TIME);
-      }
     }
 
-    if (F_1000MS) {
-      F_1000MS = 0;
+    if (Get1sFlag() == true) {
+      Set1sFlag(false);
       HUB75D_CtrDec();
       WIFI_CtrDec();
       HTU21D_Sampling();
-      RTC_Time_Deal(&TIME);
-      HUB75D_CalcClock(&TIME);
+      if (ClockRun() == true) {
+        HUB75D_CalculateLunarCalendar(GetTimeData());
+      }
+      HUB75D_CalculateClock(GetTimeData());
     }
   }
   /* USER CODE END 3 */
@@ -263,60 +259,17 @@ static void MX_NVIC_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void GetClock(rtc_counter_value_t *time)
-{
-  RTC_TimeTypeDef sTime;
-  RTC_DateTypeDef sDate;
-
-  HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-  HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-
-  time->sec = sTime.Seconds;
-  time->min = sTime.Minutes;
-  time->hour = sTime.Hours;
-
-  time->day = sDate.Date;
-  time->month = sDate.Month;
-  time->week = sDate.WeekDay;
-  time->year = (sDate.Year+2000);
-
-  HUB75D_CalcClock(time);
-  HUB75D_CalcYinli(time);
-}
-
-void SetClock(rtc_counter_value_t *time)
-{
-  RTC_TimeTypeDef sTime;
-  RTC_DateTypeDef sDate;
-
-  sTime.Seconds = time->sec;
-  sTime.Minutes = time->min;
-  sTime.Hours = time->hour;
-
-  sDate.Date = time->day;
-  sDate.Month = time->month;
-  sDate.WeekDay = time->week;
-  sDate.Year = (time->year%100);
-
-  HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-  HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-}
-
 void EnterStandbyMode(void)
 {
-  printf("Time: %d-%d-%d   %02d:%02d:%02d \r\n", TIME.year, \
-                   TIME.month, TIME.day,\
-                   TIME.hour, TIME.min, TIME.sec);
   printf("Enter_Stop_Mode\n\r");
 
-  //wifi off
+  /* wifi off */
   WIFI_PowerOnOff(POWER_OFF);
-  //display off
+  /* display off */
   HUB75D_DispOnOff(_DISP_OFF_);
-  //LED off
+  /* LED off */
   HAL_GPIO_WritePin(WORK_LED_GPIO_Port, WORK_LED_Pin, GPIO_PIN_SET);
 
-  //Stop
   HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
 
   HAL_Init();
@@ -325,22 +278,20 @@ void EnterStandbyMode(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  //MX_RTC_Init();
   MX_USART1_UART_Init();
   /* Initialize interrupts */
   MX_NVIC_Init();
-  //HTU21D init
   HTU21D_I2cInit();
   HAL_RTCEx_SetSecond_IT(&hrtc);
-  GetClock(&TIME);
+  GetClock();
   HAL_Delay(200);
-  //TH init
+  /* TH init */
   HTU21D_Init();
   HAL_Delay(10);
   HTU21D_Reset();
   HAL_Delay(100);
   HTU21D_GetData();
-  //UART WIFI init
+  /* wifi init */
   WIFI_PowerOnOff(POWER_ON);
   HAL_Delay(100);
   WIFI_Init();
@@ -353,9 +304,6 @@ void EnterStandbyMode(void)
   HAL_TIM_Base_Start(&htim4);
   HAL_TIM_Base_Start_IT(&htim4);
 
-  printf("Time: %d-%d-%d   %02d:%02d:%02d \r\n", TIME.year, \
-         TIME.month, TIME.day,\
-         TIME.hour, TIME.min, TIME.sec);
   printf("Exit_Stop_Mode\n\r");
 }
 

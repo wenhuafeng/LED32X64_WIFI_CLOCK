@@ -39,9 +39,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usart.h"
-#include "TypeDefine.h"
-#include "RTC_software.h"
+#include "type_define.h"
 #include "HUB75D.h"
+#include "time.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,7 +51,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
- 
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -231,7 +231,7 @@ void RTC_IRQHandler(void)
   HAL_RTCEx_RTCIRQHandler(&hrtc);
   /* USER CODE BEGIN RTC_IRQn 1 */
   HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_12);
-  F_1000MS = 1;
+  Set1sFlag(true);
   /* USER CODE END RTC_IRQn 1 */
 }
 

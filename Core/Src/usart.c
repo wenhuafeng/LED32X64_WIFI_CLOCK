@@ -21,6 +21,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
+#include <stdio.h>
 USART_RECEIVETYPE UsartType1;
 /* USER CODE END 0 */
 
@@ -167,7 +168,6 @@ PUTCHAR_PROTOTYPE
   return ch;
 }
 
-//DMA?送函?  
 void Usart1SendData_DMA(uint8_t *pdata, uint16_t Length)
 {
   while(UsartType1.dmaSend_flag == USART_DMA_SENDING);
@@ -175,7 +175,6 @@ void Usart1SendData_DMA(uint8_t *pdata, uint16_t Length)
   HAL_UART_Transmit_DMA(&huart1, pdata, Length);
 }
 
-//DMA?送完成中?回?函?  
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
   __HAL_DMA_DISABLE(huart->hdmatx);
@@ -183,7 +182,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
     UsartType1.dmaSend_flag = USART_DMA_SENDOVER;
 }
 
-//串口接收空?中?  
 void UsartReceive_IDLE(UART_HandleTypeDef *huart)
 {
   uint32_t temp;

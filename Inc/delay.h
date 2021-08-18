@@ -1,7 +1,7 @@
 #ifndef DELAY_H
 #define DELAY_H
 
-#include "TypeDefine.h"
+#include "type_define.h"
 
 void delay_init(u8 SYSCLK);
 void delay_ms(u16 nms);

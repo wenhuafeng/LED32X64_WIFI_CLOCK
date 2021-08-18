@@ -3,10 +3,10 @@
 #include <string.h>
 #include <stdint.h>
 #include "stm32f1xx_hal.h"
-#include "TypeDefine.h"
+#include "type_define.h"
 #include "main.h"
-#include "RTC_software.h"
 #include "usart.h"
+#include "time.h"
 
 #if (WIFI_MODULE == WIFI_ESP8266)
 
@@ -31,21 +31,10 @@
 #define NOV 0x004e6f76
 #define DEC 0x00446563
 
-#define _GET_TIME_1S_ (1)
-#define _GET_TIME_2S_ (2)
-#define _GET_TIME_3S_ (3)
-#define _GET_TIME_4S_ (4)
-#define _GET_TIME_5S_ (5)
-#define _GET_TIME_6S_ (6)
-#define _GET_TIME_7S_ (7)
-#define _GET_TIME_8S_ (8)
-#define _GET_TIME_9S_ (9)
-#define _GET_TIME_10S_ (10)
-#define _GET_TIME_11S_ (11)
-#define _GET_TIME_12S_ (12)
-#define _GET_TIME_13S_ (13)
-#define _GET_TIME_14S_ (14)
-#define _GET_TIME_15S_ (15)
+#define GET_TIME_6S     (6)
+#define GET_TIME_8S     (8)
+#define GET_TIME_10S    (10)
+#define GET_TIME_14S    (14)
 
 enum ConnectFlag {
     DISCONNECT,
@@ -120,12 +109,13 @@ uint8_t GetMonth(uint32_t monthString)
     return i;
 }
 
-static u8 ESP8266_AT_ProcessClock(char *cRxBuf)
+static u8 ProcessClock(char *cRxBuf)
 {
     u16 year;
     u8 month, day, week, hour, minute, second;
     u32 i;
-    BOOLEAN F_tmp = 1;
+    struct TimeType time;
+    bool status = true;
 
     i = cRxBuf[13];
     i = i << 16;
@@ -142,37 +132,35 @@ static u8 ESP8266_AT_ProcessClock(char *cRxBuf)
     minute = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
     second = AscToHex(cRxBuf[30]) * 10 + AscToHex(cRxBuf[31]);
     year = AscToHex(cRxBuf[33]) * 1000 + AscToHex(cRxBuf[34]) * 100 +
-         AscToHex(cRxBuf[35]) * 10 + AscToHex(cRxBuf[36]);
+           AscToHex(cRxBuf[35]) * 10 + AscToHex(cRxBuf[36]);
 
     if (year == 1970) {
-        F_tmp = 0;
+        status = false;
     } else {
         if ((year < 2000) || (year > 2099) || (month == 0) || (month > 12) ||
             (day == 0) || (day > 31) || (hour > 23) || (minute > 59) || (second > 59)) {
-            F_tmp = 0;
+            status = false;
         }
     }
 
-    if (F_tmp != 0x00) {
-        TIME.year = year;
-        TIME.month = month;
-        TIME.day = day;
-        TIME.week = week;
-        TIME.hour = hour;
-        TIME.min = minute;
-        TIME.sec = second;
+    if (status == true) {
+        time.year = year;
+        time.month = month;
+        time.day = day;
+        time.week = week;
+        time.hour = hour;
+        time.min = minute;
+        time.sec = second;
 
         HAL_UART_DeInit(&huart1);
         g_powerOffCtr = 0x00;
         ESP8266_AT_POWER_PIN_LOW();
-
-        printf("\r\nTime: %d-%d-%d   %02d:%02d:%02d \r\n", TIME.year,
-               TIME.month, TIME.day, TIME.hour, TIME.min, TIME.sec);
+        SetClock(&time);
     } else {
-        g_getTimeCtr = _GET_TIME_10S_;
+        g_getTimeCtr = GET_TIME_10S;
     }
 
-    return F_tmp;
+    return status;
 }
 
 static void ESP8266_AT_GetTime(void)
@@ -226,11 +214,11 @@ void WIFI_CtrDec(void)
 
     if (g_getTimeCtr) {
         g_getTimeCtr--;
-        if (g_getTimeCtr == _GET_TIME_10S_) {
+        if (g_getTimeCtr == GET_TIME_10S) {
             ESP8266_AT_SNTP_CFG();
-        } else if (g_getTimeCtr == _GET_TIME_8S_) {
+        } else if (g_getTimeCtr == GET_TIME_8S) {
             ESP8266_AT_GetTime();
-        } else if (g_getTimeCtr == _GET_TIME_6S_) {
+        } else if (g_getTimeCtr == GET_TIME_6S) {
             ESP8266_AT_GetTime();
         } else if (g_getTimeCtr == 0x00) {
             ESP8266_AT_GetTime();
@@ -261,7 +249,7 @@ void WIFI_ReceiveProcess(u8 *buf)
     str = "WIFI CON"; /* WIFI CONNECTED */
     if (strstr((char *)buf, str) != NULL) {
         g_connect = CONNECT;
-        g_getTimeCtr = _GET_TIME_14S_;
+        g_getTimeCtr = GET_TIME_14S;
     }
     str = "WIFI DIS"; /* WIFI DISCONNECT */
     if (strstr((char *)buf, str) != NULL) {
@@ -277,7 +265,7 @@ void WIFI_ReceiveProcess(u8 *buf)
         str = "+CIPSNTPTIME:";
         strPosition = strstr((char *)buf, str);
         if (strPosition != NULL) {
-            ESP8266_AT_ProcessClock(strPosition);
+            ProcessClock(strPosition);
             g_timeDataOkFlag = 1;
         }
     }

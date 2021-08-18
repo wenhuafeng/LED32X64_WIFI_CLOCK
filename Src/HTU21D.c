@@ -1,33 +1,32 @@
 #include <stdio.h>
-#include "TypeDefine.h"
+#include "type_define.h"
 #include "stm32f1xx_hal.h"
-#include "RTC_software.h"
 #include "HTU21D.h"
 #include "main.h"
 
-#define Write 0
-#define Read 1
+#define Write   0
+#define Read    1
 
-#define HIGH 1
-#define LOW 0
+#define HIGH    1
+#define LOW     0
 
-#define TRUE 1
-#define FALSE 0
+#define TRUE    1
+#define FALSE   0
 
 #define _HTU21D_I2C_DELAY_ 2
 
-#define SlaveAddr 0x80
-#define resolution 0
+#define SlaveAddr   0x80
+#define resolution  0
 
-#define TEM_HOLD 0xe3
-#define TEM_NO 0xf3
+#define TEM_HOLD    0xe3
+#define TEM_NO      0xf3
 
-#define HUM_HOLD 0xe5
-#define HUM_NO 0xf5
+#define HUM_HOLD    0xe5
+#define HUM_NO      0xf5
 
-#define WRSR 0xe6
-#define RDSR 0xe7
-#define HT_RST 0xfe
+#define WRSR    0xe6
+#define RDSR    0xe7
+#define HT_RST  0xfe
 
 typedef enum {
     _HTU21D_SDA_OUTPUT_,
@@ -61,9 +60,19 @@ typedef enum {
                           GPIO_PIN_RESET);                      \
     } while (0)
 
-s16 Temperature;
-u16 Humidity;
-u8 flag_i2c_fial;
+s16 g_temperature;
+u16 g_humidity;
+u8 g_i2cFial;
+
+s16 GetTemperature(void)
+{
+    return g_temperature;
+}
+
+u16 GetHumidity(void)
+{
+    return g_humidity;
+}
 
 static void DelayUs(u8 j)
 {
@@ -250,7 +259,7 @@ u8 HTU21D_GetData(void)
     NoAckBus();
     StopBus();
     htu = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0);
-    Humidity = (u16)htu * 10;
+    g_humidity = (u16)htu * 10;
 
     HAL_Delay(10);
 
@@ -274,20 +283,18 @@ u8 HTU21D_GetData(void)
     NoAckBus();
     StopBus();
     temp = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
-    Temperature = (s16)temp;
+    g_temperature = (s16)temp;
 
-    printf("\r\nHumi: %d \r\n", Humidity);
-    printf("Temp: %d \r\n", Temperature);
-    printf("Time: %d-%d-%d   %02d:%02d:%02d \r\n", TIME.year, TIME.month,
-           TIME.day, TIME.hour, TIME.min, TIME.sec);
-    flag_i2c_fial = 0;
+    printf("\r\nHumi: %d \r\n", g_humidity);
+    printf("Temp: %d \r\n", g_temperature);
+    g_i2cFial = 0;
     return TRUE;
 
 i2c_fail:
-    Temperature = 0x00;
-    Humidity = 0x00;
+    g_temperature = 0x00;
+    g_humidity = 0x00;
     printf("\r\nTemp test fail. \r\n");
-    flag_i2c_fial = 1;
+    g_i2cFial = 1;
     return FALSE;
 }
 
@@ -323,13 +330,13 @@ u8 HTU21D_Init(void)
         goto i2c_fail;
     StopBus();
 
-    flag_i2c_fial = 0;
+    g_i2cFial = 0;
     printf("\r\nHTU21D Init OK\r\n");
     return TRUE;
 
 i2c_fail:
     printf("\r\nHTU21D Init NG\r\n");
-    flag_i2c_fial = 1;
+    g_i2cFial = 1;
     return FALSE;
 }
 
@@ -337,8 +344,8 @@ void HTU21D_Sampling(void)
 {
     static u8 count;
 
-    if (flag_i2c_fial) {
-        flag_i2c_fial = 0;
+    if (g_i2cFial) {
+        g_i2cFial = 0;
         count = 0x00;
         HTU21D_Init();
         HTU21D_Reset();
@@ -350,9 +357,6 @@ void HTU21D_Sampling(void)
         count = 0;
         HTU21D_GetData();
     }
-    //else if (i > 26) {
-    //  //Read_TH();
-    //}
 }
 
 u8 HTU21D_Reset(void)
@@ -369,82 +373,12 @@ u8 HTU21D_Reset(void)
     StopBus();
     HAL_Delay(15);
 
-    flag_i2c_fial = 0;
+    g_i2cFial = 0;
     printf("\r\nHTU21D Reset OK\r\n");
     return TRUE;
 
 error:
     printf("\r\nHTU21D Reset NG\r\n");
-    flag_i2c_fial = 1;
+    g_i2cFial = 1;
     return FALSE;
 }
-
-#if 0
-void TEMP_READ(void)
-{
-    u16 temp_data;
-    float temp;
-
-    StartBus();
-    WriteByte(SlaveAddr | Write);
-    WriteByte(TEM_HOLD);
-
-    StartBus();
-    WriteByte(SlaveAddr | Read);
-    HAL_Delay(60);
-    temp_data = ReadByte();
-    temp_data = temp_data << 8;
-    AckBus();
-    temp_data += ReadByte();
-    NoAckBus();
-    StopBus();
-    temp = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85);
-    Temperature = temp * 10;
-}
-
-void ReadTH(void)
-{
-    u16 temp_data;
-    FP32 temp;
-
-    u16 htu_data;
-    FP32 htu;
-    static u8 i;
-
-    if (i == _READ_TEMP_1_) {
-        StartBus();
-        WriteByte(SlaveAddr | Write);
-        WriteByte(TEM_HOLD);
-        StartBus();
-        WriteByte(SlaveAddr | Read);
-        i = _READ_TEMP_2_;
-    } else if (i == _READ_TEMP_2_) {
-        temp_data = ReadByte();
-        temp_data = temp_data << 8;
-        AckBus();
-        temp_data += ReadByte();
-        NoAckBus();
-        StopBus();
-        temp = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85);
-        Temperature = temp * 10;
-        i = _READ_HUMI_1_;
-    } else if (i == _READ_HUMI_1_) {
-        StartBus();
-        WriteByte(SlaveAddr | Write);
-        WriteByte(HUM_HOLD);
-        StartBus();
-        WriteByte(SlaveAddr | Read);
-        i = _READ_HUMI_2_;
-    } else if (i == _READ_HUMI_2_) {
-        htu_data = ReadByte();
-        htu_data = htu_data << 8;
-        AckBus();
-        htu_data += ReadByte();
-        NoAckBus();
-        StopBus();
-        htu = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0);
-        Humidy = htu * 10;
-        i = _READ_TEMP_1_;
-    }
-}
-#endif
