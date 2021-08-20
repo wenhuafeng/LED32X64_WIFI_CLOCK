@@ -18,7 +18,7 @@ enum ConnectFlag {
     CONNECT
 };
 
-#define _WIFI_OFF_TIME_ (2 * 60) //2min
+#define _WIFI_OFF_TIME_ (2 * 60) /* 2min */
 #define EMW3060_AT_POWER_PIN_HIGH()                                            \
     do {                                                                       \
         HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, GPIO_PIN_SET); \

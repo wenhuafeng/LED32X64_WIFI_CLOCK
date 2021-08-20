@@ -275,7 +275,7 @@ u8 HTU21D_GetData(void)
     err = WriteByte(SlaveAddr | Read);
     if (err == 0)
         goto i2c_fail;
-    HAL_Delay(60); //must 58ms the above
+    HAL_Delay(60); /* must 58ms the above */
     temp_data = ReadByte();
     temp_data = temp_data << 8;
     AckBus();

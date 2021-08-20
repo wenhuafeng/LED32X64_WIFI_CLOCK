@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "esp8266_at.h": "c",
-        "htu21d.h": "c",
-        "hub75d.h": "c",
-        "emw3060_at.h": "c"
-    }
-}
