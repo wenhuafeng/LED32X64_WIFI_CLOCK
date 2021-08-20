@@ -1,8 +1,7 @@
-#include "ESP8266_AT.h"
+#include "esp8266_at.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include "stm32f1xx_hal.h"
 #include "type_define.h"
 #include "main.h"
 #include "usart.h"

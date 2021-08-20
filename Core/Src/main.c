@@ -48,12 +48,13 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include "HUB75D.h"
-#include "HTU21D.h"
+#include "hub75d.h"
+#include "htu21d.h"
+#include "lunar_calendar.h"
 #if (WIFI_MODULE==WIFI_ESP8266)
-#include "ESP8266_AT.h"
+#include "esp8266_at.h"
 #elif (WIFI_MODULE==WIFI_EMW3060)
-#include "EMW3060_AT.h"
+#include "emw3060_at.h"
 #endif
 /* USER CODE END Includes */
 
@@ -70,8 +71,8 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 //##############################################################################
-#warning message "Software_Version: <V206>"
-#warning message "Software_Date:    2021/08/18"
+#warning message "Software_Version: <V207>"
+#warning message "Software_Date:    2021/08/20"
 #warning message "Software_Project: CLOCK_WIFI"
 #warning message "Software_MCU:     STM32F103C8T6"
 #warning message "Main_OSC:         EXT_8M=IXT_72MHz"
@@ -152,7 +153,7 @@ int main(void)
   HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVELEN);
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
   //DISP power on
-  HUB75D_DispOnOff(_DISP_ON_);
+  HUB75D_DispOnOff(DISP_TIME_5MIN);
   HAL_Delay(10);
   MX_TIM4_Init();
   HAL_TIM_Base_Start(&htim4);
@@ -178,9 +179,9 @@ int main(void)
       WIFI_CtrDec();
       HTU21D_Sampling();
       if (ClockRun() == true) {
-        HUB75D_CalculateLunarCalendar(GetTimeData());
+        CalculationLunarCalendar(GetTimeData());
       }
-      HUB75D_CalculateClock(GetTimeData());
+      HUB75D_CalculateCalendar(GetTimeData());
     }
   }
   /* USER CODE END 3 */
@@ -266,7 +267,7 @@ void EnterStandbyMode(void)
   /* wifi off */
   WIFI_PowerOnOff(POWER_OFF);
   /* display off */
-  HUB75D_DispOnOff(_DISP_OFF_);
+  HUB75D_DispOnOff(DISP_TIME_OFF);
   /* LED off */
   HAL_GPIO_WritePin(WORK_LED_GPIO_Port, WORK_LED_Pin, GPIO_PIN_SET);
 
@@ -298,7 +299,7 @@ void EnterStandbyMode(void)
   HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVELEN);
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
   //DISP power on
-  HUB75D_DispOnOff(_DISP_ON_);
+  HUB75D_DispOnOff(DISP_TIME_5MIN);
   HAL_Delay(100);
   MX_TIM4_Init();
   HAL_TIM_Base_Start(&htim4);
@@ -309,9 +310,8 @@ void EnterStandbyMode(void)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  //renew set 5min
   if (GPIO_Pin == GPIO_PIN_0) {
-    HUB75D_DispOffCtr = _DISP_OFF_TIME_5MIN_;
+    HUB75D_SetDispOffCtr(DISP_TIME_5MIN);
     //asm("nop");
   }
 }

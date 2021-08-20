@@ -1,7 +1,6 @@
-#include "EMW3060_AT.h"
+#include "emw3060_at.h"
 #include <stdio.h>
 #include <string.h>
-#include "stm32f1xx_hal.h"
 #include "type_define.h"
 #include "main.h"
 #include "usart.h"
@@ -204,15 +203,5 @@ void WIFI_ReceiveProcess(u8 *buf)
         }
     }
 }
-
-//BOOLEAN WIFI_GetTimeDataFlag(void)
-//{
-//    return g_timeDataOkFlag;
-//}
-//
-//void WIFI_SetTimeDataFlag(BOOLEAN value)
-//{
-//    g_timeDataOkFlag = value;
-//}
 
 #endif

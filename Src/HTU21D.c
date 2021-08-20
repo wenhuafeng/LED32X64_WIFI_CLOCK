@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "type_define.h"
 #include "stm32f1xx_hal.h"
-#include "HTU21D.h"
+#include "htu21d.h"
 #include "main.h"
 
 #define Write   0

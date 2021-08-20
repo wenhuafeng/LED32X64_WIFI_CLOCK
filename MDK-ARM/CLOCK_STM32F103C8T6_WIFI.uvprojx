@@ -536,24 +536,29 @@
               <FilePath>..\Src\delay.c</FilePath>
             </File>
             <File>
-              <FileName>EMW3060_AT.c</FileName>
+              <FileName>emw3060_at.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\EMW3060_AT.c</FilePath>
+              <FilePath>..\Src\emw3060_at.c</FilePath>
             </File>
             <File>
-              <FileName>ESP8266_AT.c</FileName>
+              <FileName>esp8266_at.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\ESP8266_AT.c</FilePath>
+              <FilePath>..\Src\esp8266_at.c</FilePath>
             </File>
             <File>
-              <FileName>HTU21D.c</FileName>
+              <FileName>htu21d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\HTU21D.c</FilePath>
+              <FilePath>..\Src\htu21d.c</FilePath>
             </File>
             <File>
-              <FileName>HUB75D.c</FileName>
+              <FileName>hub75d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\HUB75D.c</FilePath>
+              <FilePath>..\Src\hub75d.c</FilePath>
+            </File>
+            <File>
+              <FileName>lunar_calendar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\lunar_calendar.c</FilePath>
             </File>
             <File>
               <FileName>time.c</FileName>

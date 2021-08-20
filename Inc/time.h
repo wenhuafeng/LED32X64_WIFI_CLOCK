@@ -1,18 +1,17 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include <stdint.h>
 #include <stdbool.h>
 #include "type_define.h"
 
 struct TimeType {
-    uint8_t sec;
-    uint8_t min;
-    uint8_t hour;
-    uint8_t day;
-    uint8_t week;
-    uint8_t month;
-    uint16_t year;
+    u8 sec;
+    u8 min;
+    u8 hour;
+    u8 day;
+    u8 week;
+    u8 month;
+    u16 year;
 };
 
 bool Get1sFlag(void);
