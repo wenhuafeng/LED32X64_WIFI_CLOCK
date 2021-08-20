@@ -2,7 +2,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "rtc.h"
-#include "HUB75D.h"
+#include "hub75d.h"
+#include "lunar_calendar.h"
 
 struct TimeType g_time;
 bool g_1sFlag;
@@ -122,8 +123,8 @@ void GetClock(void)
     g_time.week = sDate.WeekDay;
     g_time.year = (sDate.Year + 2000);
 
-    HUB75D_CalculateClock(&g_time);
-    HUB75D_CalculateLunarCalendar(&g_time);
+    HUB75D_CalculateCalendar(&g_time);
+    CalculationLunarCalendar(&g_time);
 
     printf("\r\nTime: %d-%d-%d %02d:%02d:%02d \r\n",
            g_time.year, g_time.month, g_time.day,
