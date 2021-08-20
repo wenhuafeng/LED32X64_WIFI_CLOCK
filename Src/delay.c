@@ -1,53 +1,53 @@
 #include "stm32f10x.h"
 #include "delay.h"
 
-static u8  fac_us=0;//usÑÓÊ±±¶³ËÊý
-static u16 fac_ms=0;//msÑÓÊ±±¶³ËÊý
+static u8  fac_us = 0;//usï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+static u16 fac_ms = 0;//msï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-//³õÊ¼»¯ÑÓ³Ùº¯Êý
-//SYSTICKµÄÊ±ÖÓ¹Ì¶¨ÎªHCLKÊ±ÖÓµÄ1/8
-//SYSCLK:ÏµÍ³Ê±ÖÓ
+//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ó³Ùºï¿½ï¿½ï¿½
+//SYSTICKï¿½ï¿½Ê±ï¿½Ó¹Ì¶ï¿½ÎªHCLKÊ±ï¿½Óµï¿½1/8
+//SYSCLK:ÏµÍ³Ê±ï¿½ï¿½
 void delay_init(u8 SYSCLK)
 {
-  SysTick->CTRL&=0xfffffffb;//bit2Çå¿Õ,Ñ¡ÔñÍâ²¿Ê±ÖÓ  HCLK/8
+  SysTick->CTRL&=0xfffffffb;//bit2ï¿½ï¿½ï¿½,Ñ¡ï¿½ï¿½ï¿½â²¿Ê±ï¿½ï¿½  HCLK/8
   fac_us=SYSCLK/8;
   fac_ms=(u16)fac_us*1000;
 }
 
-//ÑÓÊ±nms
-//×¢ÒânmsµÄ·¶Î§
-//SysTick->LOADÎª24Î»¼Ä´æÆ÷,ËùÒÔ,×î´óÑÓÊ±Îª:
+//ï¿½ï¿½Ê±nms
+//×¢ï¿½ï¿½nmsï¿½Ä·ï¿½Î§
+//SysTick->LOADÎª24Î»ï¿½Ä´ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Ê±Îª:
 //nms<=0xffffff*8*1000/SYSCLK
-//SYSCLKµ¥Î»ÎªHz,nmsµ¥Î»Îªms
-//¶Ô72MÌõ¼þÏÂ,nms<=1864 
+//SYSCLKï¿½ï¿½Î»ÎªHz,nmsï¿½ï¿½Î»Îªms
+//ï¿½ï¿½72Mï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,nms<=1864
 void delay_ms(u16 nms)
 {
   u32 temp;
-  SysTick->LOAD=(u32)nms*fac_ms;//Ê±¼ä¼ÓÔØ(SysTick->LOADÎª24bit)
-  SysTick->VAL =0x00;           //Çå¿Õ¼ÆÊýÆ÷
-  SysTick->CTRL=0x01 ;          //¿ªÊ¼µ¹Êý  
+  SysTick->LOAD=(u32)nms*fac_ms;//Ê±ï¿½ï¿½ï¿½ï¿½ï¿½(SysTick->LOADÎª24bit)
+  SysTick->VAL =0x00;           //ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½
+  SysTick->CTRL=0x01 ;          //ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
   do
   {
      temp=SysTick->CTRL;
   }
-  while(temp&0x01&&!(temp&(1<<16)));//µÈ´ýÊ±¼äµ½´ï
-  SysTick->CTRL=0x00;       //¹Ø±Õ¼ÆÊýÆ÷
-  SysTick->VAL =0X00;       //Çå¿Õ¼ÆÊýÆ÷
+  while(temp&0x01&&!(temp&(1<<16)));//ï¿½È´ï¿½Ê±ï¿½äµ½ï¿½ï¿½
+  SysTick->CTRL=0x00;       //ï¿½Ø±Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½
+  SysTick->VAL =0X00;       //ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½
 }
 
-//ÑÓÊ±nus
-//nusÎªÒªÑÓÊ±µÄusÊý.
+//ï¿½ï¿½Ê±nus
+//nusÎªÒªï¿½ï¿½Ê±ï¿½ï¿½usï¿½ï¿½.
 void delay_us(u32 nus)
 {
     u32 temp;
-    SysTick->LOAD=nus*fac_us; //Ê±¼ä¼ÓÔØ
-    SysTick->VAL=0x00;        //Çå¿Õ¼ÆÊýÆ÷
-    SysTick->CTRL=0x01 ;      //¿ªÊ¼µ¹Êý
+    SysTick->LOAD=nus*fac_us; //Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
+    SysTick->VAL=0x00;        //ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½
+    SysTick->CTRL=0x01 ;      //ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
     do
     {
         temp=SysTick->CTRL;
     }
-    while(temp&0x01&&!(temp&(1<<16)));//µÈ´ýÊ±¼äµ½´ï
+    while(temp&0x01&&!(temp&(1<<16)));//ï¿½È´ï¿½Ê±ï¿½äµ½ï¿½ï¿½
     SysTick->CTRL=0x00;
     SysTick->VAL =0X00;
 }

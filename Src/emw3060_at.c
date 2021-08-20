@@ -141,7 +141,6 @@ void WIFI_CtrDec(void)
     if (g_powerOffCtr) {
         g_powerOffCtr--;
         if (g_powerOffCtr == 0x00) {
-            //off wifi. 5min rx time fail.
             WIFI_PowerOnOff(POWER_OFF);
         }
     }
@@ -199,7 +198,6 @@ void WIFI_ReceiveProcess(u8 *buf)
         strPosition = strstr((char *)buf, str);
         if (strPosition != NULL) {
             ProcessClock(strPosition);
-            //g_timeDataOkFlag = 1;
         }
     }
 }
