@@ -71,8 +71,8 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 //##############################################################################
-#warning message "Software_Version: <V207>"
-#warning message "Software_Date:    2021/08/20"
+#warning message "Software_Version: <V208>"
+#warning message "Software_Date:    2021/08/21"
 #warning message "Software_Project: CLOCK_WIFI"
 #warning message "Software_MCU:     STM32F103C8T6"
 #warning message "Main_OSC:         EXT_8M=IXT_72MHz"
@@ -175,13 +175,15 @@ int main(void)
 
     if (Get1sFlag() == true) {
       Set1sFlag(false);
-      HUB75D_CtrDec();
       WIFI_CtrDec();
       HTU21D_Sampling();
       if (ClockRun() == true) {
         CalculationLunarCalendar(GetTimeData());
       }
       HUB75D_CalculateCalendar(GetTimeData());
+      if (HUB75D_CtrDec() == true) {
+        EnterStandbyMode();
+      }
     }
   }
   /* USER CODE END 3 */
