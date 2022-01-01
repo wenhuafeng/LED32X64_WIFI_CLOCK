@@ -1,0 +1,1378 @@
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"time.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.Get1sFlag,"ax",%progbits
+  18              		.align	1
+  19              		.p2align 2,,3
+  20              		.global	Get1sFlag
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	Get1sFlag:
+  26              	.LFB69:
+  27              		.file 1 "user/src/time.c"
+   1:user/src/time.c **** #include "time.h"
+   2:user/src/time.c **** #include <stdbool.h>
+   3:user/src/time.c **** #include <stdio.h>
+   4:user/src/time.c **** #include "rtc.h"
+   5:user/src/time.c **** #include "hub75d.h"
+   6:user/src/time.c **** #include "lunar_calendar.h"
+   7:user/src/time.c **** 
+   8:user/src/time.c **** struct TimeType g_time;
+   9:user/src/time.c **** bool g_1sFlag;
+  10:user/src/time.c **** 
+  11:user/src/time.c **** static u8 GetMaxDay(u16 year, u8 month)
+  12:user/src/time.c **** {
+  13:user/src/time.c ****     u8 day;
+  14:user/src/time.c ****     const u8 constDays[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  15:user/src/time.c **** 
+  16:user/src/time.c ****     if (month == 2) {
+  17:user/src/time.c ****         if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
+  18:user/src/time.c ****             day = 29;
+  19:user/src/time.c ****         } else {
+  20:user/src/time.c ****             day = 28;
+  21:user/src/time.c ****         }
+  22:user/src/time.c ****     } else {
+  23:user/src/time.c ****         day = constDays[month];
+  24:user/src/time.c ****     }
+  25:user/src/time.c **** 
+  26:user/src/time.c ****     return day;
+  27:user/src/time.c **** }
+  28:user/src/time.c **** 
+  29:user/src/time.c **** bool Get1sFlag(void)
+  30:user/src/time.c **** {
+  28              		.loc 1 30 1 view -0
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 2
+
+
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  31:user/src/time.c ****     return g_1sFlag;
+  33              		.loc 1 31 5 view .LVU1
+  34              		.loc 1 31 12 is_stmt 0 view .LVU2
+  35 0000 014B     		ldr	r3, .L3
+  32:user/src/time.c **** }
+  36              		.loc 1 32 1 view .LVU3
+  37 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+  38 0004 7047     		bx	lr
+  39              	.L4:
+  40 0006 00BF     		.align	2
+  41              	.L3:
+  42 0008 00000000 		.word	.LANCHOR0
+  43              		.cfi_endproc
+  44              	.LFE69:
+  46              		.section	.text.Set1sFlag,"ax",%progbits
+  47              		.align	1
+  48              		.p2align 2,,3
+  49              		.global	Set1sFlag
+  50              		.syntax unified
+  51              		.thumb
+  52              		.thumb_func
+  54              	Set1sFlag:
+  55              	.LVL0:
+  56              	.LFB70:
+  33:user/src/time.c **** 
+  34:user/src/time.c **** void Set1sFlag(bool flag)
+  35:user/src/time.c **** {
+  57              		.loc 1 35 1 is_stmt 1 view -0
+  58              		.cfi_startproc
+  59              		@ args = 0, pretend = 0, frame = 0
+  60              		@ frame_needed = 0, uses_anonymous_args = 0
+  61              		@ link register save eliminated.
+  36:user/src/time.c ****     g_1sFlag = true;
+  62              		.loc 1 36 5 view .LVU5
+  63              		.loc 1 36 14 is_stmt 0 view .LVU6
+  64 0000 0122     		movs	r2, #1
+  65 0002 014B     		ldr	r3, .L6
+  66 0004 1A70     		strb	r2, [r3]
+  37:user/src/time.c **** }
+  67              		.loc 1 37 1 view .LVU7
+  68 0006 7047     		bx	lr
+  69              	.L7:
+  70              		.align	2
+  71              	.L6:
+  72 0008 00000000 		.word	.LANCHOR0
+  73              		.cfi_endproc
+  74              	.LFE70:
+  76              		.section	.text.GetTimeData,"ax",%progbits
+  77              		.align	1
+  78              		.p2align 2,,3
+  79              		.global	GetTimeData
+  80              		.syntax unified
+  81              		.thumb
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 3
+
+
+  82              		.thumb_func
+  84              	GetTimeData:
+  85              	.LFB71:
+  38:user/src/time.c **** 
+  39:user/src/time.c **** struct TimeType *GetTimeData(void)
+  40:user/src/time.c **** {
+  86              		.loc 1 40 1 is_stmt 1 view -0
+  87              		.cfi_startproc
+  88              		@ args = 0, pretend = 0, frame = 0
+  89              		@ frame_needed = 0, uses_anonymous_args = 0
+  90              		@ link register save eliminated.
+  41:user/src/time.c ****     return &g_time;
+  91              		.loc 1 41 5 view .LVU9
+  42:user/src/time.c **** }
+  92              		.loc 1 42 1 is_stmt 0 view .LVU10
+  93 0000 0048     		ldr	r0, .L9
+  94 0002 7047     		bx	lr
+  95              	.L10:
+  96              		.align	2
+  97              	.L9:
+  98 0004 00000000 		.word	.LANCHOR1
+  99              		.cfi_endproc
+ 100              	.LFE71:
+ 102              		.section	.text.CalculateWeek,"ax",%progbits
+ 103              		.align	1
+ 104              		.p2align 2,,3
+ 105              		.global	CalculateWeek
+ 106              		.syntax unified
+ 107              		.thumb
+ 108              		.thumb_func
+ 110              	CalculateWeek:
+ 111              	.LVL1:
+ 112              	.LFB72:
+  43:user/src/time.c **** 
+  44:user/src/time.c **** void CalculateWeek(u16 year, u8 month, u8 day, u8 *week)
+  45:user/src/time.c **** {
+ 113              		.loc 1 45 1 is_stmt 1 view -0
+ 114              		.cfi_startproc
+ 115              		@ args = 0, pretend = 0, frame = 0
+ 116              		@ frame_needed = 0, uses_anonymous_args = 0
+  46:user/src/time.c ****     s16 yearTemp = 0;
+ 117              		.loc 1 46 5 view .LVU12
+  47:user/src/time.c ****     s16 yearHigh;
+ 118              		.loc 1 47 5 view .LVU13
+  48:user/src/time.c ****     s16 yearLow;
+ 119              		.loc 1 48 5 view .LVU14
+  49:user/src/time.c ****     s8 monthTemp = 0;
+ 120              		.loc 1 49 5 view .LVU15
+  50:user/src/time.c ****     s8 wk;
+ 121              		.loc 1 50 5 view .LVU16
+  51:user/src/time.c **** 
+  52:user/src/time.c ****     if (month < 3) {
+ 122              		.loc 1 52 5 view .LVU17
+  45:user/src/time.c ****     s16 yearTemp = 0;
+ 123              		.loc 1 45 1 is_stmt 0 view .LVU18
+ 124 0000 30B5     		push	{r4, r5, lr}
+ 125              	.LCFI0:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 4
+
+
+ 126              		.cfi_def_cfa_offset 12
+ 127              		.cfi_offset 4, -12
+ 128              		.cfi_offset 5, -8
+ 129              		.cfi_offset 14, -4
+  53:user/src/time.c ****         monthTemp = month + 12;
+  54:user/src/time.c ****         yearTemp = year - 1;
+  55:user/src/time.c ****     } else {
+  56:user/src/time.c ****         monthTemp = month;
+  57:user/src/time.c ****         yearTemp = year;
+  58:user/src/time.c ****     }
+  59:user/src/time.c **** 
+  60:user/src/time.c ****     yearHigh = yearTemp / 100;
+  61:user/src/time.c ****     yearLow = yearTemp % 100;
+ 130              		.loc 1 61 13 view .LVU19
+ 131 0002 6425     		movs	r5, #100
+  52:user/src/time.c ****         monthTemp = month + 12;
+ 132              		.loc 1 52 8 view .LVU20
+ 133 0004 0229     		cmp	r1, #2
+  53:user/src/time.c ****         monthTemp = month + 12;
+ 134              		.loc 1 53 9 is_stmt 1 view .LVU21
+  53:user/src/time.c ****         monthTemp = month + 12;
+ 135              		.loc 1 53 27 is_stmt 0 view .LVU22
+ 136 0006 9CBF     		itt	ls
+ 137 0008 0C31     		addls	r1, r1, #12
+ 138              	.LVL2:
+  54:user/src/time.c ****     } else {
+ 139              		.loc 1 54 25 view .LVU23
+ 140 000a 00F1FF30 		addls	r0, r0, #-1
+ 141              	.LVL3:
+  56:user/src/time.c ****         yearTemp = year;
+ 142              		.loc 1 56 9 is_stmt 1 view .LVU24
+  56:user/src/time.c ****         yearTemp = year;
+ 143              		.loc 1 56 19 is_stmt 0 view .LVU25
+ 144 000e 4FFA81FC 		sxtb	ip, r1
+ 145              	.LVL4:
+  57:user/src/time.c ****     }
+ 146              		.loc 1 57 9 is_stmt 1 view .LVU26
+ 147              		.loc 1 61 13 is_stmt 0 view .LVU27
+ 148 0012 1A49     		ldr	r1, .L16
+  57:user/src/time.c ****     }
+ 149              		.loc 1 57 18 view .LVU28
+ 150 0014 00B2     		sxth	r0, r0
+ 151              	.LVL5:
+  60:user/src/time.c ****     yearLow = yearTemp % 100;
+ 152              		.loc 1 60 5 is_stmt 1 view .LVU29
+ 153              		.loc 1 61 5 view .LVU30
+  62:user/src/time.c **** 
+  63:user/src/time.c ****     wk = yearLow + (yearLow / 4) + (yearHigh / 4);
+  64:user/src/time.c ****     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+ 154              		.loc 1 64 66 is_stmt 0 view .LVU31
+ 155 0016 541E     		subs	r4, r2, #1
+  61:user/src/time.c **** 
+ 156              		.loc 1 61 13 view .LVU32
+ 157 0018 81FB0012 		smull	r1, r2, r1, r0
+ 158              	.LVL6:
+  61:user/src/time.c **** 
+ 159              		.loc 1 61 13 view .LVU33
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 5
+
+
+ 160 001c 4FEAE07E 		asr	lr, r0, #31
+ 161 0020 CEEB6211 		rsb	r1, lr, r2, asr #5
+ 162 0024 05FB1101 		mls	r1, r5, r1, r0
+ 163 0028 09B2     		sxth	r1, r1
+ 164              	.LVL7:
+  63:user/src/time.c ****     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+ 165              		.loc 1 63 5 is_stmt 1 view .LVU34
+ 166              		.loc 1 64 5 view .LVU35
+  65:user/src/time.c ****     wk = (wk + 140) % 7;
+ 167              		.loc 1 65 5 view .LVU36
+  66:user/src/time.c **** 
+  67:user/src/time.c ****     *week = wk;
+ 168              		.loc 1 67 5 view .LVU37
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 169              		.loc 1 64 66 is_stmt 0 view .LVU38
+ 170 002a 0C44     		add	r4, r4, r1
+ 171              	.LVL8:
+  63:user/src/time.c ****     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+ 172              		.loc 1 63 34 view .LVU39
+ 173 002c CEEBE212 		rsb	r2, lr, r2, asr #7
+  63:user/src/time.c ****     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+ 174              		.loc 1 63 18 view .LVU40
+ 175 0030 0029     		cmp	r1, #0
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 176              		.loc 1 64 66 view .LVU41
+ 177 0032 2244     		add	r2, r2, r4
+  63:user/src/time.c ****     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+ 178              		.loc 1 63 18 view .LVU42
+ 179 0034 B8BF     		it	lt
+ 180 0036 0331     		addlt	r1, r1, #3
+ 181              	.LVL9:
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 182              		.loc 1 64 66 view .LVU43
+ 183 0038 02EBA102 		add	r2, r2, r1, asr #2
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 184              		.loc 1 64 36 view .LVU44
+ 185 003c 1A21     		movs	r1, #26
+  60:user/src/time.c ****     yearLow = yearTemp % 100;
+ 186              		.loc 1 60 14 view .LVU45
+ 187 003e 0F4C     		ldr	r4, .L16
+ 188              	.LVL10:
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 189              		.loc 1 64 36 view .LVU46
+ 190 0040 0CFB0111 		mla	r1, ip, r1, r1
+  60:user/src/time.c ****     yearLow = yearTemp % 100;
+ 191              		.loc 1 60 14 view .LVU47
+ 192 0044 84FB0040 		smull	r4, r0, r4, r0
+ 193              	.LVL11:
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 194              		.loc 1 64 54 view .LVU48
+ 195 0048 0D4C     		ldr	r4, .L16+4
+  60:user/src/time.c ****     yearLow = yearTemp % 100;
+ 196              		.loc 1 60 14 view .LVU49
+ 197 004a CEEB6010 		rsb	r0, lr, r0, asr #5
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 198              		.loc 1 64 66 view .LVU50
+ 199 004e A2EB4002 		sub	r2, r2, r0, lsl #1
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 6
+
+
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 200              		.loc 1 64 54 view .LVU51
+ 201 0052 84FB0140 		smull	r4, r0, r4, r1
+ 202 0056 C917     		asrs	r1, r1, #31
+ 203 0058 C1EBA001 		rsb	r1, r1, r0, asr #2
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 204              		.loc 1 64 66 view .LVU52
+ 205 005c 0A44     		add	r2, r2, r1
+  65:user/src/time.c **** 
+ 206              		.loc 1 65 14 view .LVU53
+ 207 005e 52B2     		sxtb	r2, r2
+  65:user/src/time.c **** 
+ 208              		.loc 1 65 21 view .LVU54
+ 209 0060 0849     		ldr	r1, .L16+8
+  65:user/src/time.c **** 
+ 210              		.loc 1 65 14 view .LVU55
+ 211 0062 8C32     		adds	r2, r2, #140
+  65:user/src/time.c **** 
+ 212              		.loc 1 65 21 view .LVU56
+ 213 0064 A1FB0201 		umull	r0, r1, r1, r2
+ 214 0068 501A     		subs	r0, r2, r1
+ 215 006a 01EB5001 		add	r1, r1, r0, lsr #1
+ 216 006e 8908     		lsrs	r1, r1, #2
+ 217 0070 C1EBC101 		rsb	r1, r1, r1, lsl #3
+ 218 0074 521A     		subs	r2, r2, r1
+ 219              		.loc 1 67 11 view .LVU57
+ 220 0076 1A70     		strb	r2, [r3]
+  68:user/src/time.c **** }
+ 221              		.loc 1 68 1 view .LVU58
+ 222 0078 30BD     		pop	{r4, r5, pc}
+ 223              	.L17:
+ 224 007a 00BF     		.align	2
+ 225              	.L16:
+ 226 007c 1F85EB51 		.word	1374389535
+ 227 0080 67666666 		.word	1717986919
+ 228 0084 25499224 		.word	613566757
+ 229              		.cfi_endproc
+ 230              	.LFE72:
+ 232              		.section	.text.ClockRun,"ax",%progbits
+ 233              		.align	1
+ 234              		.p2align 2,,3
+ 235              		.global	ClockRun
+ 236              		.syntax unified
+ 237              		.thumb
+ 238              		.thumb_func
+ 240              	ClockRun:
+ 241              	.LFB73:
+  69:user/src/time.c **** 
+  70:user/src/time.c **** bool ClockRun(void)
+  71:user/src/time.c **** {
+ 242              		.loc 1 71 1 is_stmt 1 view -0
+ 243              		.cfi_startproc
+ 244              		@ args = 0, pretend = 0, frame = 16
+ 245              		@ frame_needed = 0, uses_anonymous_args = 0
+  72:user/src/time.c ****     g_time.sec++;
+ 246              		.loc 1 72 5 view .LVU60
+  71:user/src/time.c ****     g_time.sec++;
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 7
+
+
+ 247              		.loc 1 71 1 is_stmt 0 view .LVU61
+ 248 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 249              	.LCFI1:
+ 250              		.cfi_def_cfa_offset 20
+ 251              		.cfi_offset 4, -20
+ 252              		.cfi_offset 5, -16
+ 253              		.cfi_offset 6, -12
+ 254              		.cfi_offset 7, -8
+ 255              		.cfi_offset 14, -4
+ 256              		.loc 1 72 11 view .LVU62
+ 257 0002 614C     		ldr	r4, .L47
+  71:user/src/time.c ****     g_time.sec++;
+ 258              		.loc 1 71 1 view .LVU63
+ 259 0004 85B0     		sub	sp, sp, #20
+ 260              	.LCFI2:
+ 261              		.cfi_def_cfa_offset 40
+ 262              		.loc 1 72 15 view .LVU64
+ 263 0006 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 264 0008 0133     		adds	r3, r3, #1
+ 265 000a DBB2     		uxtb	r3, r3
+  73:user/src/time.c ****     if (g_time.sec < 60) {
+ 266              		.loc 1 73 5 is_stmt 1 view .LVU65
+ 267              		.loc 1 73 8 is_stmt 0 view .LVU66
+ 268 000c 3B2B     		cmp	r3, #59
+ 269 000e 66D9     		bls	.L43
+  74:user/src/time.c ****         return false;
+  75:user/src/time.c ****     }
+  76:user/src/time.c **** 
+  77:user/src/time.c ****     g_time.sec = 0;
+ 270              		.loc 1 77 5 is_stmt 1 view .LVU67
+ 271              		.loc 1 77 16 is_stmt 0 view .LVU68
+ 272 0010 0022     		movs	r2, #0
+  78:user/src/time.c ****     g_time.min++;
+ 273              		.loc 1 78 15 view .LVU69
+ 274 0012 6378     		ldrb	r3, [r4, #1]	@ zero_extendqisi2
+  77:user/src/time.c ****     g_time.min++;
+ 275              		.loc 1 77 16 view .LVU70
+ 276 0014 2270     		strb	r2, [r4]
+ 277              		.loc 1 78 5 is_stmt 1 view .LVU71
+  79:user/src/time.c ****     if (g_time.min < 60) {
+ 278              		.loc 1 79 5 view .LVU72
+  78:user/src/time.c ****     g_time.min++;
+ 279              		.loc 1 78 15 is_stmt 0 view .LVU73
+ 280 0016 0133     		adds	r3, r3, #1
+ 281 0018 DBB2     		uxtb	r3, r3
+ 282              		.loc 1 79 8 view .LVU74
+ 283 001a 3B2B     		cmp	r3, #59
+ 284 001c 5BD9     		bls	.L44
+  80:user/src/time.c ****         return false;
+  81:user/src/time.c ****     }
+  82:user/src/time.c **** 
+  83:user/src/time.c ****     g_time.min = 0;
+ 285              		.loc 1 83 5 is_stmt 1 view .LVU75
+  84:user/src/time.c ****     g_time.hour++;
+ 286              		.loc 1 84 16 is_stmt 0 view .LVU76
+ 287 001e A378     		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+  83:user/src/time.c ****     g_time.hour++;
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 8
+
+
+ 288              		.loc 1 83 16 view .LVU77
+ 289 0020 6270     		strb	r2, [r4, #1]
+ 290              		.loc 1 84 5 is_stmt 1 view .LVU78
+ 291              		.loc 1 84 16 is_stmt 0 view .LVU79
+ 292 0022 0133     		adds	r3, r3, #1
+ 293 0024 DBB2     		uxtb	r3, r3
+  85:user/src/time.c ****     if (g_time.hour < 24) {
+ 294              		.loc 1 85 5 is_stmt 1 view .LVU80
+ 295              		.loc 1 85 8 is_stmt 0 view .LVU81
+ 296 0026 172B     		cmp	r3, #23
+ 297 0028 40F28680 		bls	.L45
+  86:user/src/time.c ****         return false;
+  87:user/src/time.c ****     }
+  88:user/src/time.c **** 
+  89:user/src/time.c ****     g_time.hour = 0;
+ 298              		.loc 1 89 5 is_stmt 1 view .LVU82
+ 299              	.LBB8:
+ 300              	.LBB9:
+  14:user/src/time.c **** 
+ 301              		.loc 1 14 14 is_stmt 0 view .LVU83
+ 302 002c 6E46     		mov	r6, sp
+ 303 002e 574B     		ldr	r3, .L47+4
+ 304              	.LBE9:
+ 305              	.LBE8:
+  90:user/src/time.c ****     g_time.day++;
+ 306              		.loc 1 90 11 view .LVU84
+ 307 0030 94F803C0 		ldrb	ip, [r4, #3]	@ zero_extendqisi2
+  89:user/src/time.c ****     g_time.day++;
+ 308              		.loc 1 89 17 view .LVU85
+ 309 0034 A270     		strb	r2, [r4, #2]
+ 310              		.loc 1 90 5 is_stmt 1 view .LVU86
+ 311              	.LBB15:
+ 312              	.LBB10:
+  14:user/src/time.c **** 
+ 313              		.loc 1 14 14 is_stmt 0 view .LVU87
+ 314 0036 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 315 0038 07C6     		stmia	r6!, {r0, r1, r2}
+ 316              	.LBE10:
+ 317              	.LBE15:
+  91:user/src/time.c ****     if (g_time.day <= GetMaxDay(g_time.year, g_time.month)) {
+ 318              		.loc 1 91 23 view .LVU88
+ 319 003a 94F805E0 		ldrb	lr, [r4, #5]	@ zero_extendqisi2
+  90:user/src/time.c ****     g_time.day++;
+ 320              		.loc 1 90 15 view .LVU89
+ 321 003e 0CF10107 		add	r7, ip, #1
+ 322 0042 FFB2     		uxtb	r7, r7
+ 323              	.LBB16:
+ 324              	.LBB11:
+  16:user/src/time.c ****         if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
+ 325              		.loc 1 16 8 view .LVU90
+ 326 0044 BEF1020F 		cmp	lr, #2
+ 327              	.LBE11:
+ 328              	.LBE16:
+ 329              		.loc 1 91 23 view .LVU91
+ 330 0048 E588     		ldrh	r5, [r4, #6]
+  90:user/src/time.c ****     if (g_time.day <= GetMaxDay(g_time.year, g_time.month)) {
+ 331              		.loc 1 90 15 view .LVU92
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 9
+
+
+ 332 004a E770     		strb	r7, [r4, #3]
+ 333              		.loc 1 91 5 is_stmt 1 view .LVU93
+ 334              	.LVL12:
+ 335              	.LBB17:
+ 336              	.LBI8:
+  11:user/src/time.c **** {
+ 337              		.loc 1 11 11 view .LVU94
+ 338              	.LBB12:
+  13:user/src/time.c ****     const u8 constDays[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+ 339              		.loc 1 13 5 view .LVU95
+  14:user/src/time.c **** 
+ 340              		.loc 1 14 5 view .LVU96
+  14:user/src/time.c **** 
+ 341              		.loc 1 14 14 is_stmt 0 view .LVU97
+ 342 004c 3370     		strb	r3, [r6]
+  16:user/src/time.c ****         if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
+ 343              		.loc 1 16 5 is_stmt 1 view .LVU98
+  16:user/src/time.c ****         if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
+ 344              		.loc 1 16 8 is_stmt 0 view .LVU99
+ 345 004e 48D0     		beq	.L46
+  23:user/src/time.c ****     }
+ 346              		.loc 1 23 9 is_stmt 1 view .LVU100
+  23:user/src/time.c ****     }
+ 347              		.loc 1 23 13 is_stmt 0 view .LVU101
+ 348 0050 0EF11003 		add	r3, lr, #16
+ 349 0054 6B44     		add	r3, sp, r3
+ 350 0056 13F8103C 		ldrb	r3, [r3, #-16]	@ zero_extendqisi2
+ 351              	.LVL13:
+  26:user/src/time.c **** }
+ 352              		.loc 1 26 5 is_stmt 1 view .LVU102
+  26:user/src/time.c **** }
+ 353              		.loc 1 26 5 is_stmt 0 view .LVU103
+ 354              	.LBE12:
+ 355              	.LBE17:
+ 356              		.loc 1 91 8 view .LVU104
+ 357 005a 9F42     		cmp	r7, r3
+ 358 005c 5BD9     		bls	.L28
+ 359              	.L37:
+  92:user/src/time.c ****         goto calc_week;
+  93:user/src/time.c ****     }
+  94:user/src/time.c **** 
+  95:user/src/time.c ****     g_time.day = 1;
+ 360              		.loc 1 95 5 is_stmt 1 view .LVU105
+ 361              		.loc 1 95 16 is_stmt 0 view .LVU106
+ 362 005e 0121     		movs	r1, #1
+  96:user/src/time.c ****     g_time.month++;
+ 363              		.loc 1 96 17 view .LVU107
+ 364 0060 0EEB0103 		add	r3, lr, r1
+ 365 0064 5FFA83FE 		uxtb	lr, r3
+  97:user/src/time.c ****     if (g_time.month < 13) {
+ 366              		.loc 1 97 8 view .LVU108
+ 367 0068 BEF10C0F 		cmp	lr, #12
+  95:user/src/time.c ****     g_time.month++;
+ 368              		.loc 1 95 16 view .LVU109
+ 369 006c E170     		strb	r1, [r4, #3]
+  96:user/src/time.c ****     g_time.month++;
+ 370              		.loc 1 96 5 is_stmt 1 view .LVU110
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 10
+
+
+ 371              		.loc 1 97 5 view .LVU111
+ 372              		.loc 1 97 8 is_stmt 0 view .LVU112
+ 373 006e 4ED9     		bls	.L35
+  98:user/src/time.c ****         goto calc_week;
+  99:user/src/time.c ****     }
+ 100:user/src/time.c **** 
+ 101:user/src/time.c ****     g_time.month = 1;
+ 374              		.loc 1 101 5 is_stmt 1 view .LVU113
+ 102:user/src/time.c ****     g_time.year++;
+ 375              		.loc 1 102 16 is_stmt 0 view .LVU114
+ 376 0070 6B1C     		adds	r3, r5, #1
+ 377 0072 E380     		strh	r3, [r4, #6]	@ movhi
+ 378 0074 4FF0000C 		mov	ip, #0
+ 379 0078 2423     		movs	r3, #36
+ 101:user/src/time.c ****     g_time.year++;
+ 380              		.loc 1 101 18 view .LVU115
+ 381 007a 6171     		strb	r1, [r4, #5]
+ 382              		.loc 1 102 5 is_stmt 1 view .LVU116
+ 103:user/src/time.c **** 
+ 104:user/src/time.c **** calc_week:
+ 105:user/src/time.c ****     CalculateWeek(g_time.year, g_time.month, g_time.day, &g_time.week);
+ 383              		.loc 1 105 5 view .LVU117
+ 384              	.LVL14:
+ 385              	.LBB18:
+ 386              	.LBI18:
+  44:user/src/time.c **** {
+ 387              		.loc 1 44 6 view .LVU118
+ 388              	.LBB19:
+  46:user/src/time.c ****     s16 yearHigh;
+ 389              		.loc 1 46 5 view .LVU119
+  47:user/src/time.c ****     s16 yearLow;
+ 390              		.loc 1 47 5 view .LVU120
+  48:user/src/time.c ****     s8 monthTemp = 0;
+ 391              		.loc 1 48 5 view .LVU121
+  49:user/src/time.c ****     s8 wk;
+ 392              		.loc 1 49 5 view .LVU122
+  50:user/src/time.c **** 
+ 393              		.loc 1 50 5 view .LVU123
+  52:user/src/time.c ****         monthTemp = month + 12;
+ 394              		.loc 1 52 5 view .LVU124
+ 395              	.L30:
+  53:user/src/time.c ****         yearTemp = year - 1;
+ 396              		.loc 1 53 9 view .LVU125
+  54:user/src/time.c ****     } else {
+ 397              		.loc 1 54 9 view .LVU126
+  54:user/src/time.c ****     } else {
+ 398              		.loc 1 54 18 is_stmt 0 view .LVU127
+ 399 007c 29B2     		sxth	r1, r5
+ 400              	.LVL15:
+ 401              	.L32:
+  60:user/src/time.c ****     yearLow = yearTemp % 100;
+ 402              		.loc 1 60 5 is_stmt 1 view .LVU128
+  61:user/src/time.c **** 
+ 403              		.loc 1 61 5 view .LVU129
+  61:user/src/time.c **** 
+ 404              		.loc 1 61 13 is_stmt 0 view .LVU130
+ 405 007e 6425     		movs	r5, #100
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 11
+
+
+ 406 0080 434A     		ldr	r2, .L47+8
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 407              		.loc 1 64 66 view .LVU131
+ 408 0082 6344     		add	r3, r3, ip
+  61:user/src/time.c **** 
+ 409              		.loc 1 61 13 view .LVU132
+ 410 0084 82FB0102 		smull	r0, r2, r2, r1
+ 411 0088 4FEAE17C 		asr	ip, r1, #31
+ 412 008c CCEB6210 		rsb	r0, ip, r2, asr #5
+ 413 0090 05FB1010 		mls	r0, r5, r0, r1
+ 414 0094 00B2     		sxth	r0, r0
+ 415              	.LVL16:
+  63:user/src/time.c ****     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+ 416              		.loc 1 63 5 is_stmt 1 view .LVU133
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 417              		.loc 1 64 5 view .LVU134
+  65:user/src/time.c **** 
+ 418              		.loc 1 65 5 view .LVU135
+  67:user/src/time.c **** }
+ 419              		.loc 1 67 5 view .LVU136
+  63:user/src/time.c ****     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+ 420              		.loc 1 63 34 is_stmt 0 view .LVU137
+ 421 0096 CCEBE212 		rsb	r2, ip, r2, asr #7
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 422              		.loc 1 64 66 view .LVU138
+ 423 009a 0344     		add	r3, r3, r0
+  63:user/src/time.c ****     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+ 424              		.loc 1 63 18 view .LVU139
+ 425 009c 0028     		cmp	r0, #0
+  63:user/src/time.c ****     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+ 426              		.loc 1 63 18 view .LVU140
+ 427 009e B8BF     		it	lt
+ 428 00a0 0330     		addlt	r0, r0, #3
+ 429              	.LVL17:
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 430              		.loc 1 64 66 view .LVU141
+ 431 00a2 1344     		add	r3, r3, r2
+ 432 00a4 03EBA003 		add	r3, r3, r0, asr #2
+ 433              	.LBE19:
+ 434              	.LBE18:
+ 106:user/src/time.c ****     return true;
+ 435              		.loc 1 106 12 view .LVU142
+ 436 00a8 0120     		movs	r0, #1
+ 437              	.LVL18:
+ 438              	.LBB24:
+ 439              	.LBB20:
+  60:user/src/time.c ****     yearLow = yearTemp % 100;
+ 440              		.loc 1 60 14 view .LVU143
+ 441 00aa 394A     		ldr	r2, .L47+8
+ 442 00ac 82FB0121 		smull	r2, r1, r2, r1
+ 443 00b0 CCEB6111 		rsb	r1, ip, r1, asr #5
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 444              		.loc 1 64 66 view .LVU144
+ 445 00b4 A3EB4103 		sub	r3, r3, r1, lsl #1
+  65:user/src/time.c **** 
+ 446              		.loc 1 65 21 view .LVU145
+ 447 00b8 364A     		ldr	r2, .L47+12
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 12
+
+
+  65:user/src/time.c **** 
+ 448              		.loc 1 65 14 view .LVU146
+ 449 00ba 5BB2     		sxtb	r3, r3
+ 450 00bc 8C33     		adds	r3, r3, #140
+  65:user/src/time.c **** 
+ 451              		.loc 1 65 21 view .LVU147
+ 452 00be A2FB0312 		umull	r1, r2, r2, r3
+ 453 00c2 991A     		subs	r1, r3, r2
+ 454 00c4 02EB5102 		add	r2, r2, r1, lsr #1
+ 455 00c8 9208     		lsrs	r2, r2, #2
+ 456 00ca C2EBC202 		rsb	r2, r2, r2, lsl #3
+ 457 00ce 9B1A     		subs	r3, r3, r2
+  67:user/src/time.c **** }
+ 458              		.loc 1 67 11 view .LVU148
+ 459 00d0 2371     		strb	r3, [r4, #4]
+ 460              	.LBE20:
+ 461              	.LBE24:
+ 107:user/src/time.c **** }
+ 462              		.loc 1 107 1 view .LVU149
+ 463 00d2 05B0     		add	sp, sp, #20
+ 464              	.LCFI3:
+ 465              		.cfi_remember_state
+ 466              		.cfi_def_cfa_offset 20
+ 467              		@ sp needed
+ 468 00d4 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 469              	.L44:
+ 470              	.LCFI4:
+ 471              		.cfi_restore_state
+  78:user/src/time.c ****     if (g_time.min < 60) {
+ 472              		.loc 1 78 15 view .LVU150
+ 473 00d6 6370     		strb	r3, [r4, #1]
+ 474              	.L22:
+  74:user/src/time.c ****     }
+ 475              		.loc 1 74 16 view .LVU151
+ 476 00d8 0020     		movs	r0, #0
+ 477              		.loc 1 107 1 view .LVU152
+ 478 00da 05B0     		add	sp, sp, #20
+ 479              	.LCFI5:
+ 480              		.cfi_remember_state
+ 481              		.cfi_def_cfa_offset 20
+ 482              		@ sp needed
+ 483 00dc F0BD     		pop	{r4, r5, r6, r7, pc}
+ 484              	.L43:
+ 485              	.LCFI6:
+ 486              		.cfi_restore_state
+  72:user/src/time.c ****     if (g_time.sec < 60) {
+ 487              		.loc 1 72 15 view .LVU153
+ 488 00de 2370     		strb	r3, [r4]
+ 489 00e0 FAE7     		b	.L22
+ 490              	.LVL19:
+ 491              	.L46:
+ 492              	.LBB25:
+ 493              	.LBB13:
+  17:user/src/time.c ****             day = 29;
+ 494              		.loc 1 17 9 is_stmt 1 view .LVU154
+  17:user/src/time.c ****             day = 29;
+ 495              		.loc 1 17 12 is_stmt 0 view .LVU155
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 13
+
+
+ 496 00e2 AB07     		lsls	r3, r5, #30
+ 497 00e4 2AD0     		beq	.L41
+ 498 00e6 AB00     		lsls	r3, r5, #2
+ 499              	.L25:
+ 500 00e8 2B44     		add	r3, r3, r5
+ 501 00ea 05EBC303 		add	r3, r5, r3, lsl #3
+ 502 00ee A3EB8323 		sub	r3, r3, r3, lsl #10
+ 503 00f2 C3F30B12 		ubfx	r2, r3, #4, #12
+ 504 00f6 42EA0333 		orr	r3, r2, r3, lsl #12
+  17:user/src/time.c ****             day = 29;
+ 505              		.loc 1 17 52 view .LVU156
+ 506 00fa 9BB2     		uxth	r3, r3
+ 507 00fc A32B     		cmp	r3, #163
+ 508 00fe 2FD9     		bls	.L27
+  20:user/src/time.c ****         }
+ 509              		.loc 1 20 17 view .LVU157
+ 510 0100 1C23     		movs	r3, #28
+ 511              	.L26:
+ 512              	.LVL20:
+  26:user/src/time.c **** }
+ 513              		.loc 1 26 5 is_stmt 1 view .LVU158
+  26:user/src/time.c **** }
+ 514              		.loc 1 26 5 is_stmt 0 view .LVU159
+ 515              	.LBE13:
+ 516              	.LBE25:
+  91:user/src/time.c ****         goto calc_week;
+ 517              		.loc 1 91 8 view .LVU160
+ 518 0102 9F42     		cmp	r7, r3
+ 519 0104 3CD9     		bls	.L34
+  95:user/src/time.c ****     g_time.month++;
+ 520              		.loc 1 95 5 is_stmt 1 view .LVU161
+  95:user/src/time.c ****     g_time.month++;
+ 521              		.loc 1 95 16 is_stmt 0 view .LVU162
+ 522 0106 0123     		movs	r3, #1
+  96:user/src/time.c ****     if (g_time.month < 13) {
+ 523              		.loc 1 96 17 view .LVU163
+ 524 0108 4FF0030E 		mov	lr, #3
+  95:user/src/time.c ****     g_time.month++;
+ 525              		.loc 1 95 16 view .LVU164
+ 526 010c E370     		strb	r3, [r4, #3]
+  96:user/src/time.c ****     if (g_time.month < 13) {
+ 527              		.loc 1 96 5 is_stmt 1 view .LVU165
+  97:user/src/time.c ****         goto calc_week;
+ 528              		.loc 1 97 5 view .LVU166
+ 529              	.L35:
+  96:user/src/time.c ****     if (g_time.month < 13) {
+ 530              		.loc 1 96 17 is_stmt 0 view .LVU167
+ 531 010e 4FF0000C 		mov	ip, #0
+ 532 0112 84F805E0 		strb	lr, [r4, #5]
+ 533              	.L28:
+ 105:user/src/time.c ****     return true;
+ 534              		.loc 1 105 5 is_stmt 1 view .LVU168
+ 535              	.LVL21:
+ 536              	.LBB26:
+  44:user/src/time.c **** {
+ 537              		.loc 1 44 6 view .LVU169
+ 538              	.LBB21:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 14
+
+
+  46:user/src/time.c ****     s16 yearHigh;
+ 539              		.loc 1 46 5 view .LVU170
+  47:user/src/time.c ****     s16 yearLow;
+ 540              		.loc 1 47 5 view .LVU171
+  48:user/src/time.c ****     s8 monthTemp = 0;
+ 541              		.loc 1 48 5 view .LVU172
+  49:user/src/time.c ****     s8 wk;
+ 542              		.loc 1 49 5 view .LVU173
+  50:user/src/time.c **** 
+ 543              		.loc 1 50 5 view .LVU174
+  52:user/src/time.c ****         monthTemp = month + 12;
+ 544              		.loc 1 52 5 view .LVU175
+  52:user/src/time.c ****         monthTemp = month + 12;
+ 545              		.loc 1 52 8 is_stmt 0 view .LVU176
+ 546 0116 BEF1020F 		cmp	lr, #2
+ 547 011a 24D9     		bls	.L36
+  56:user/src/time.c ****         yearTemp = year;
+ 548              		.loc 1 56 9 is_stmt 1 view .LVU177
+ 549              	.LVL22:
+  57:user/src/time.c ****     }
+ 550              		.loc 1 57 9 view .LVU178
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 551              		.loc 1 64 36 is_stmt 0 view .LVU179
+ 552 011c 1A22     		movs	r2, #26
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 553              		.loc 1 64 49 view .LVU180
+ 554 011e 4FFA8EF3 		sxtb	r3, lr
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 555              		.loc 1 64 36 view .LVU181
+ 556 0122 03FB0222 		mla	r2, r3, r2, r2
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 557              		.loc 1 64 54 view .LVU182
+ 558 0126 1C48     		ldr	r0, .L47+16
+  57:user/src/time.c ****     }
+ 559              		.loc 1 57 18 view .LVU183
+ 560 0128 29B2     		sxth	r1, r5
+ 561              	.LVL23:
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 562              		.loc 1 64 54 view .LVU184
+ 563 012a 80FB0230 		smull	r3, r0, r0, r2
+ 564 012e D317     		asrs	r3, r2, #31
+ 565 0130 C3EBA003 		rsb	r3, r3, r0, asr #2
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 566              		.loc 1 64 30 view .LVU185
+ 567 0134 DBB2     		uxtb	r3, r3
+ 568 0136 A2E7     		b	.L32
+ 569              	.LVL24:
+ 570              	.L45:
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 571              		.loc 1 64 30 view .LVU186
+ 572              	.LBE21:
+ 573              	.LBE26:
+  84:user/src/time.c ****     if (g_time.hour < 24) {
+ 574              		.loc 1 84 16 view .LVU187
+ 575 0138 A370     		strb	r3, [r4, #2]
+ 576 013a CDE7     		b	.L22
+ 577              	.LVL25:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 15
+
+
+ 578              	.L41:
+ 579              	.LBB27:
+ 580              	.LBB14:
+  84:user/src/time.c ****     if (g_time.hour < 24) {
+ 581              		.loc 1 84 16 view .LVU188
+ 582 013c 05EB8503 		add	r3, r5, r5, lsl #2
+ 583 0140 05EBC303 		add	r3, r5, r3, lsl #3
+ 584 0144 A3EB8323 		sub	r3, r3, r3, lsl #10
+ 585 0148 C3F38D02 		ubfx	r2, r3, #2, #14
+ 586 014c 42EA8333 		orr	r3, r2, r3, lsl #14
+  17:user/src/time.c ****             day = 29;
+ 587              		.loc 1 17 30 view .LVU189
+ 588 0150 9AB2     		uxth	r2, r3
+ 589 0152 B2F5247F 		cmp	r2, #656
+ 590 0156 4FEA8503 		lsl	r3, r5, #2
+ 591 015a C5D3     		bcc	.L25
+  18:user/src/time.c ****         } else {
+ 592              		.loc 1 18 17 view .LVU190
+ 593 015c 1D23     		movs	r3, #29
+ 594 015e D0E7     		b	.L26
+ 595              	.L27:
+ 596              	.LVL26:
+  26:user/src/time.c **** }
+ 597              		.loc 1 26 5 is_stmt 1 view .LVU191
+  26:user/src/time.c **** }
+ 598              		.loc 1 26 5 is_stmt 0 view .LVU192
+ 599              	.LBE14:
+ 600              	.LBE27:
+  91:user/src/time.c ****         goto calc_week;
+ 601              		.loc 1 91 8 view .LVU193
+ 602 0160 1D2F     		cmp	r7, #29
+ 603 0162 3FF67CAF 		bhi	.L37
+ 604              	.L36:
+ 605              	.LVL27:
+ 606              	.LBB28:
+ 607              	.LBB22:
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 608              		.loc 1 64 36 view .LVU194
+ 609 0166 1A20     		movs	r0, #26
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 610              		.loc 1 64 54 view .LVU195
+ 611 0168 0A22     		movs	r2, #10
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 612              		.loc 1 64 49 view .LVU196
+ 613 016a 0EF10D03 		add	r3, lr, #13
+ 614 016e DBB2     		uxtb	r3, r3
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 615              		.loc 1 64 36 view .LVU197
+ 616 0170 00FB03F3 		mul	r3, r0, r3
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 617              		.loc 1 64 54 view .LVU198
+ 618 0174 B3FBF2F3 		udiv	r3, r3, r2
+  54:user/src/time.c ****     } else {
+ 619              		.loc 1 54 25 view .LVU199
+ 620 0178 691E     		subs	r1, r5, #1
+ 621 017a 8DB2     		uxth	r5, r1
+ 622              	.LVL28:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 16
+
+
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 623              		.loc 1 64 30 view .LVU200
+ 624 017c DBB2     		uxtb	r3, r3
+ 625 017e 7DE7     		b	.L30
+ 626              	.LVL29:
+ 627              	.L34:
+  64:user/src/time.c ****     wk = (wk + 140) % 7;
+ 628              		.loc 1 64 30 view .LVU201
+ 629              	.LBE22:
+ 630              	.LBE28:
+ 105:user/src/time.c ****     return true;
+ 631              		.loc 1 105 5 is_stmt 1 view .LVU202
+ 632              	.LBB29:
+  44:user/src/time.c **** {
+ 633              		.loc 1 44 6 view .LVU203
+ 634              	.LBB23:
+  46:user/src/time.c ****     s16 yearHigh;
+ 635              		.loc 1 46 5 view .LVU204
+  47:user/src/time.c ****     s16 yearLow;
+ 636              		.loc 1 47 5 view .LVU205
+  48:user/src/time.c ****     s8 monthTemp = 0;
+ 637              		.loc 1 48 5 view .LVU206
+  49:user/src/time.c ****     s8 wk;
+ 638              		.loc 1 49 5 view .LVU207
+  50:user/src/time.c **** 
+ 639              		.loc 1 50 5 view .LVU208
+  52:user/src/time.c ****         monthTemp = month + 12;
+ 640              		.loc 1 52 5 view .LVU209
+  54:user/src/time.c ****     } else {
+ 641              		.loc 1 54 25 is_stmt 0 view .LVU210
+ 642 0180 691E     		subs	r1, r5, #1
+ 643 0182 2723     		movs	r3, #39
+ 644 0184 8DB2     		uxth	r5, r1
+ 645              	.LVL30:
+  54:user/src/time.c ****     } else {
+ 646              		.loc 1 54 25 view .LVU211
+ 647 0186 79E7     		b	.L30
+ 648              	.L48:
+ 649              		.align	2
+ 650              	.L47:
+ 651 0188 00000000 		.word	.LANCHOR1
+ 652 018c 00000000 		.word	.LANCHOR2
+ 653 0190 1F85EB51 		.word	1374389535
+ 654 0194 25499224 		.word	613566757
+ 655 0198 67666666 		.word	1717986919
+ 656              	.LBE23:
+ 657              	.LBE29:
+ 658              		.cfi_endproc
+ 659              	.LFE73:
+ 661              		.section	.rodata.GetClock.str1.4,"aMS",%progbits,1
+ 662              		.align	2
+ 663              	.LC1:
+ 664 0000 0D0A5469 		.ascii	"\015\012Time: %d-%d-%d %02d:%02d:%02d \015\012\000"
+ 664      6D653A20 
+ 664      25642D25 
+ 664      642D2564 
+ 664      20253032 
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 17
+
+
+ 665              		.section	.text.GetClock,"ax",%progbits
+ 666              		.align	1
+ 667              		.p2align 2,,3
+ 668              		.global	GetClock
+ 669              		.syntax unified
+ 670              		.thumb
+ 671              		.thumb_func
+ 673              	GetClock:
+ 674              	.LFB74:
+ 108:user/src/time.c **** 
+ 109:user/src/time.c **** void GetClock(void)
+ 110:user/src/time.c **** {
+ 675              		.loc 1 110 1 is_stmt 1 view -0
+ 676              		.cfi_startproc
+ 677              		@ args = 0, pretend = 0, frame = 8
+ 678              		@ frame_needed = 0, uses_anonymous_args = 0
+ 111:user/src/time.c ****     RTC_TimeTypeDef sTime;
+ 679              		.loc 1 111 5 view .LVU213
+ 112:user/src/time.c ****     RTC_DateTypeDef sDate;
+ 680              		.loc 1 112 5 view .LVU214
+ 113:user/src/time.c **** 
+ 114:user/src/time.c ****     HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+ 681              		.loc 1 114 5 view .LVU215
+ 110:user/src/time.c ****     RTC_TimeTypeDef sTime;
+ 682              		.loc 1 110 1 is_stmt 0 view .LVU216
+ 683 0000 10B5     		push	{r4, lr}
+ 684              	.LCFI7:
+ 685              		.cfi_def_cfa_offset 8
+ 686              		.cfi_offset 4, -8
+ 687              		.cfi_offset 14, -4
+ 688              		.loc 1 114 5 view .LVU217
+ 689 0002 1C4C     		ldr	r4, .L51
+ 110:user/src/time.c ****     RTC_TimeTypeDef sTime;
+ 690              		.loc 1 110 1 view .LVU218
+ 691 0004 86B0     		sub	sp, sp, #24
+ 692              	.LCFI8:
+ 693              		.cfi_def_cfa_offset 32
+ 694              		.loc 1 114 5 view .LVU219
+ 695 0006 04A9     		add	r1, sp, #16
+ 696 0008 0022     		movs	r2, #0
+ 697 000a 2046     		mov	r0, r4
+ 698 000c FFF7FEFF 		bl	HAL_RTC_GetTime
+ 699              	.LVL31:
+ 115:user/src/time.c ****     HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+ 700              		.loc 1 115 5 is_stmt 1 view .LVU220
+ 701 0010 05A9     		add	r1, sp, #20
+ 702 0012 0022     		movs	r2, #0
+ 703 0014 2046     		mov	r0, r4
+ 704 0016 FFF7FEFF 		bl	HAL_RTC_GetDate
+ 705              	.LVL32:
+ 116:user/src/time.c **** 
+ 117:user/src/time.c ****     g_time.sec = sTime.Seconds;
+ 706              		.loc 1 117 5 view .LVU221
+ 707              		.loc 1 117 16 is_stmt 0 view .LVU222
+ 708 001a 174C     		ldr	r4, .L51+4
+ 118:user/src/time.c ****     g_time.min = sTime.Minutes;
+ 709              		.loc 1 118 16 view .LVU223
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 18
+
+
+ 710 001c 9DF81120 		ldrb	r2, [sp, #17]	@ zero_extendqisi2
+ 117:user/src/time.c ****     g_time.min = sTime.Minutes;
+ 711              		.loc 1 117 16 view .LVU224
+ 712 0020 9DF81210 		ldrb	r1, [sp, #18]	@ zero_extendqisi2
+ 713              		.loc 1 118 16 view .LVU225
+ 714 0024 6270     		strb	r2, [r4, #1]
+ 119:user/src/time.c ****     g_time.hour = sTime.Hours;
+ 120:user/src/time.c **** 
+ 121:user/src/time.c ****     g_time.day = sDate.Date;
+ 715              		.loc 1 121 16 view .LVU226
+ 716 0026 9DF81620 		ldrb	r2, [sp, #22]	@ zero_extendqisi2
+ 119:user/src/time.c ****     g_time.hour = sTime.Hours;
+ 717              		.loc 1 119 17 view .LVU227
+ 718 002a 9DF81000 		ldrb	r0, [sp, #16]	@ zero_extendqisi2
+ 122:user/src/time.c ****     g_time.month = sDate.Month;
+ 123:user/src/time.c ****     g_time.week = sDate.WeekDay;
+ 124:user/src/time.c ****     g_time.year = (sDate.Year + 2000);
+ 719              		.loc 1 124 25 view .LVU228
+ 720 002e 9DF81730 		ldrb	r3, [sp, #23]	@ zero_extendqisi2
+ 117:user/src/time.c ****     g_time.min = sTime.Minutes;
+ 721              		.loc 1 117 16 view .LVU229
+ 722 0032 2170     		strb	r1, [r4]
+ 118:user/src/time.c ****     g_time.hour = sTime.Hours;
+ 723              		.loc 1 118 5 is_stmt 1 view .LVU230
+ 119:user/src/time.c **** 
+ 724              		.loc 1 119 5 view .LVU231
+ 121:user/src/time.c ****     g_time.month = sDate.Month;
+ 725              		.loc 1 121 16 is_stmt 0 view .LVU232
+ 726 0034 E270     		strb	r2, [r4, #3]
+ 122:user/src/time.c ****     g_time.week = sDate.WeekDay;
+ 727              		.loc 1 122 18 view .LVU233
+ 728 0036 9DF81510 		ldrb	r1, [sp, #21]	@ zero_extendqisi2
+ 123:user/src/time.c ****     g_time.year = (sDate.Year + 2000);
+ 729              		.loc 1 123 17 view .LVU234
+ 730 003a 9DF81420 		ldrb	r2, [sp, #20]	@ zero_extendqisi2
+ 731              		.loc 1 124 31 view .LVU235
+ 732 003e 03F5FA63 		add	r3, r3, #2000
+ 119:user/src/time.c **** 
+ 733              		.loc 1 119 17 view .LVU236
+ 734 0042 A070     		strb	r0, [r4, #2]
+ 121:user/src/time.c ****     g_time.month = sDate.Month;
+ 735              		.loc 1 121 5 is_stmt 1 view .LVU237
+ 122:user/src/time.c ****     g_time.week = sDate.WeekDay;
+ 736              		.loc 1 122 5 view .LVU238
+ 125:user/src/time.c **** 
+ 126:user/src/time.c ****     HUB75D_CalculateCalendar(&g_time);
+ 737              		.loc 1 126 5 is_stmt 0 view .LVU239
+ 738 0044 2046     		mov	r0, r4
+ 122:user/src/time.c ****     g_time.week = sDate.WeekDay;
+ 739              		.loc 1 122 18 view .LVU240
+ 740 0046 6171     		strb	r1, [r4, #5]
+ 123:user/src/time.c ****     g_time.year = (sDate.Year + 2000);
+ 741              		.loc 1 123 5 is_stmt 1 view .LVU241
+ 123:user/src/time.c ****     g_time.year = (sDate.Year + 2000);
+ 742              		.loc 1 123 17 is_stmt 0 view .LVU242
+ 743 0048 2271     		strb	r2, [r4, #4]
+ 124:user/src/time.c **** 
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 19
+
+
+ 744              		.loc 1 124 5 is_stmt 1 view .LVU243
+ 124:user/src/time.c **** 
+ 745              		.loc 1 124 17 is_stmt 0 view .LVU244
+ 746 004a E380     		strh	r3, [r4, #6]	@ movhi
+ 747              		.loc 1 126 5 is_stmt 1 view .LVU245
+ 748 004c FFF7FEFF 		bl	HUB75D_CalculateCalendar
+ 749              	.LVL33:
+ 127:user/src/time.c ****     CalculationLunarCalendar(&g_time);
+ 750              		.loc 1 127 5 view .LVU246
+ 751 0050 2046     		mov	r0, r4
+ 752 0052 FFF7FEFF 		bl	CalculationLunarCalendar
+ 753              	.LVL34:
+ 128:user/src/time.c **** 
+ 129:user/src/time.c ****     printf("\r\nTime: %d-%d-%d %02d:%02d:%02d \r\n",
+ 754              		.loc 1 129 5 view .LVU247
+ 755 0056 2178     		ldrb	r1, [r4]	@ zero_extendqisi2
+ 756 0058 6278     		ldrb	r2, [r4, #1]	@ zero_extendqisi2
+ 757 005a A078     		ldrb	r0, [r4, #2]	@ zero_extendqisi2
+ 758 005c E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+ 759 005e CDE90121 		strd	r2, r1, [sp, #4]
+ 760 0062 6279     		ldrb	r2, [r4, #5]	@ zero_extendqisi2
+ 761 0064 E188     		ldrh	r1, [r4, #6]
+ 762 0066 0090     		str	r0, [sp]
+ 763 0068 0448     		ldr	r0, .L51+8
+ 764 006a FFF7FEFF 		bl	printf
+ 765              	.LVL35:
+ 130:user/src/time.c ****            g_time.year, g_time.month, g_time.day,
+ 131:user/src/time.c ****            g_time.hour, g_time.min, g_time.sec);
+ 132:user/src/time.c **** }
+ 766              		.loc 1 132 1 is_stmt 0 view .LVU248
+ 767 006e 06B0     		add	sp, sp, #24
+ 768              	.LCFI9:
+ 769              		.cfi_def_cfa_offset 8
+ 770              		@ sp needed
+ 771 0070 10BD     		pop	{r4, pc}
+ 772              	.L52:
+ 773 0072 00BF     		.align	2
+ 774              	.L51:
+ 775 0074 00000000 		.word	hrtc
+ 776 0078 00000000 		.word	.LANCHOR1
+ 777 007c 00000000 		.word	.LC1
+ 778              		.cfi_endproc
+ 779              	.LFE74:
+ 781              		.section	.rodata.SetClock.str1.4,"aMS",%progbits,1
+ 782              		.align	2
+ 783              	.LC2:
+ 784 0000 0D0A5469 		.ascii	"\015\012Time: %d-%d-%d   %02d:%02d:%02d \015\012\000"
+ 784      6D653A20 
+ 784      25642D25 
+ 784      642D2564 
+ 784      20202025 
+ 785              		.section	.text.SetClock,"ax",%progbits
+ 786              		.align	1
+ 787              		.p2align 2,,3
+ 788              		.global	SetClock
+ 789              		.syntax unified
+ 790              		.thumb
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 20
+
+
+ 791              		.thumb_func
+ 793              	SetClock:
+ 794              	.LVL36:
+ 795              	.LFB75:
+ 133:user/src/time.c **** 
+ 134:user/src/time.c **** void SetClock(struct TimeType *time)
+ 135:user/src/time.c **** {
+ 796              		.loc 1 135 1 is_stmt 1 view -0
+ 797              		.cfi_startproc
+ 798              		@ args = 0, pretend = 0, frame = 8
+ 799              		@ frame_needed = 0, uses_anonymous_args = 0
+ 136:user/src/time.c ****     RTC_TimeTypeDef sTime;
+ 800              		.loc 1 136 5 view .LVU250
+ 137:user/src/time.c ****     RTC_DateTypeDef sDate;
+ 801              		.loc 1 137 5 view .LVU251
+ 138:user/src/time.c **** 
+ 139:user/src/time.c ****     sTime.Seconds = time->sec;
+ 802              		.loc 1 139 5 view .LVU252
+ 135:user/src/time.c ****     RTC_TimeTypeDef sTime;
+ 803              		.loc 1 135 1 is_stmt 0 view .LVU253
+ 804 0000 70B5     		push	{r4, r5, r6, lr}
+ 805              	.LCFI10:
+ 806              		.cfi_def_cfa_offset 16
+ 807              		.cfi_offset 4, -16
+ 808              		.cfi_offset 5, -12
+ 809              		.cfi_offset 6, -8
+ 810              		.cfi_offset 14, -4
+ 811 0002 0446     		mov	r4, r0
+ 140:user/src/time.c ****     sTime.Minutes = time->min;
+ 141:user/src/time.c ****     sTime.Hours = time->hour;
+ 142:user/src/time.c **** 
+ 143:user/src/time.c ****     sDate.Date = time->day;
+ 144:user/src/time.c ****     sDate.Month = time->month;
+ 145:user/src/time.c ****     sDate.WeekDay = time->week;
+ 146:user/src/time.c ****     sDate.Year = (time->year % 100);
+ 812              		.loc 1 146 16 view .LVU254
+ 813 0004 4FF0640E 		mov	lr, #100
+ 814 0008 B4F806C0 		ldrh	ip, [r4, #6]
+ 139:user/src/time.c ****     sTime.Minutes = time->min;
+ 815              		.loc 1 139 19 view .LVU255
+ 816 000c 2678     		ldrb	r6, [r4]	@ zero_extendqisi2
+ 817              		.loc 1 146 16 view .LVU256
+ 818 000e 194B     		ldr	r3, .L55
+ 135:user/src/time.c ****     RTC_TimeTypeDef sTime;
+ 819              		.loc 1 135 1 view .LVU257
+ 820 0010 86B0     		sub	sp, sp, #24
+ 821              	.LCFI11:
+ 822              		.cfi_def_cfa_offset 40
+ 139:user/src/time.c ****     sTime.Minutes = time->min;
+ 823              		.loc 1 139 19 view .LVU258
+ 824 0012 8DF81260 		strb	r6, [sp, #18]
+ 140:user/src/time.c ****     sTime.Minutes = time->min;
+ 825              		.loc 1 140 5 is_stmt 1 view .LVU259
+ 826              		.loc 1 146 16 is_stmt 0 view .LVU260
+ 827 0016 A3FB0C63 		umull	r6, r3, r3, ip
+ 828 001a 5B09     		lsrs	r3, r3, #5
+ 829 001c 0EFB13C3 		mls	r3, lr, r3, ip
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 21
+
+
+ 830 0020 8DF81730 		strb	r3, [sp, #23]
+ 140:user/src/time.c ****     sTime.Minutes = time->min;
+ 831              		.loc 1 140 19 view .LVU261
+ 832 0024 6378     		ldrb	r3, [r4, #1]	@ zero_extendqisi2
+ 147:user/src/time.c **** 
+ 148:user/src/time.c ****     HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+ 833              		.loc 1 148 5 view .LVU262
+ 834 0026 144D     		ldr	r5, .L55+4
+ 140:user/src/time.c ****     sTime.Hours = time->hour;
+ 835              		.loc 1 140 19 view .LVU263
+ 836 0028 8DF81130 		strb	r3, [sp, #17]
+ 141:user/src/time.c **** 
+ 837              		.loc 1 141 5 is_stmt 1 view .LVU264
+ 141:user/src/time.c **** 
+ 838              		.loc 1 141 17 is_stmt 0 view .LVU265
+ 839 002c A378     		ldrb	r3, [r4, #2]	@ zero_extendqisi2
+ 840              		.loc 1 148 5 view .LVU266
+ 841 002e 04A9     		add	r1, sp, #16
+ 141:user/src/time.c **** 
+ 842              		.loc 1 141 17 view .LVU267
+ 843 0030 8DF81030 		strb	r3, [sp, #16]
+ 143:user/src/time.c ****     sDate.Month = time->month;
+ 844              		.loc 1 143 5 is_stmt 1 view .LVU268
+ 143:user/src/time.c ****     sDate.Month = time->month;
+ 845              		.loc 1 143 16 is_stmt 0 view .LVU269
+ 846 0034 E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+ 847              		.loc 1 148 5 view .LVU270
+ 848 0036 0022     		movs	r2, #0
+ 143:user/src/time.c ****     sDate.Month = time->month;
+ 849              		.loc 1 143 16 view .LVU271
+ 850 0038 8DF81630 		strb	r3, [sp, #22]
+ 144:user/src/time.c ****     sDate.WeekDay = time->week;
+ 851              		.loc 1 144 5 is_stmt 1 view .LVU272
+ 144:user/src/time.c ****     sDate.WeekDay = time->week;
+ 852              		.loc 1 144 17 is_stmt 0 view .LVU273
+ 853 003c 6379     		ldrb	r3, [r4, #5]	@ zero_extendqisi2
+ 854              		.loc 1 148 5 view .LVU274
+ 855 003e 2846     		mov	r0, r5
+ 856              	.LVL37:
+ 144:user/src/time.c ****     sDate.WeekDay = time->week;
+ 857              		.loc 1 144 17 view .LVU275
+ 858 0040 8DF81530 		strb	r3, [sp, #21]
+ 145:user/src/time.c ****     sDate.Year = (time->year % 100);
+ 859              		.loc 1 145 5 is_stmt 1 view .LVU276
+ 145:user/src/time.c ****     sDate.Year = (time->year % 100);
+ 860              		.loc 1 145 19 is_stmt 0 view .LVU277
+ 861 0044 2379     		ldrb	r3, [r4, #4]	@ zero_extendqisi2
+ 862 0046 8DF81430 		strb	r3, [sp, #20]
+ 146:user/src/time.c **** 
+ 863              		.loc 1 146 5 is_stmt 1 view .LVU278
+ 864              		.loc 1 148 5 view .LVU279
+ 865 004a FFF7FEFF 		bl	HAL_RTC_SetTime
+ 866              	.LVL38:
+ 149:user/src/time.c ****     HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+ 867              		.loc 1 149 5 view .LVU280
+ 868 004e 05A9     		add	r1, sp, #20
+ 869 0050 0022     		movs	r2, #0
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 22
+
+
+ 870 0052 2846     		mov	r0, r5
+ 871 0054 FFF7FEFF 		bl	HAL_RTC_SetDate
+ 872              	.LVL39:
+ 150:user/src/time.c **** 
+ 151:user/src/time.c ****     printf("\r\nTime: %d-%d-%d   %02d:%02d:%02d \r\n",
+ 873              		.loc 1 151 5 view .LVU281
+ 874 0058 2178     		ldrb	r1, [r4]	@ zero_extendqisi2
+ 875 005a 6278     		ldrb	r2, [r4, #1]	@ zero_extendqisi2
+ 876 005c A078     		ldrb	r0, [r4, #2]	@ zero_extendqisi2
+ 877 005e E378     		ldrb	r3, [r4, #3]	@ zero_extendqisi2
+ 878 0060 CDE90121 		strd	r2, r1, [sp, #4]
+ 879 0064 6279     		ldrb	r2, [r4, #5]	@ zero_extendqisi2
+ 880 0066 E188     		ldrh	r1, [r4, #6]
+ 881 0068 0090     		str	r0, [sp]
+ 882 006a 0448     		ldr	r0, .L55+8
+ 883 006c FFF7FEFF 		bl	printf
+ 884              	.LVL40:
+ 152:user/src/time.c ****            time->year, time->month, time->day,
+ 153:user/src/time.c ****            time->hour, time->min, time->sec);
+ 154:user/src/time.c **** }
+ 885              		.loc 1 154 1 is_stmt 0 view .LVU282
+ 886 0070 06B0     		add	sp, sp, #24
+ 887              	.LCFI12:
+ 888              		.cfi_def_cfa_offset 16
+ 889              		@ sp needed
+ 890 0072 70BD     		pop	{r4, r5, r6, pc}
+ 891              	.LVL41:
+ 892              	.L56:
+ 893              		.loc 1 154 1 view .LVU283
+ 894              		.align	2
+ 895              	.L55:
+ 896 0074 1F85EB51 		.word	1374389535
+ 897 0078 00000000 		.word	hrtc
+ 898 007c 00000000 		.word	.LC2
+ 899              		.cfi_endproc
+ 900              	.LFE75:
+ 902              		.global	g_1sFlag
+ 903              		.global	g_time
+ 904              		.section	.rodata
+ 905              		.align	2
+ 906              		.set	.LANCHOR2,. + 0
+ 907              	.LC0:
+ 908 0000 001F1C1F 		.ascii	"\000\037\034\037\036\037\036\037\037\036\037\036\037"
+ 908      1E1F1E1F 
+ 908      1F1E1F1E 
+ 908      1F
+ 909              		.section	.bss.g_1sFlag,"aw",%nobits
+ 910              		.set	.LANCHOR0,. + 0
+ 913              	g_1sFlag:
+ 914 0000 00       		.space	1
+ 915              		.section	.bss.g_time,"aw",%nobits
+ 916              		.align	2
+ 917              		.set	.LANCHOR1,. + 0
+ 920              	g_time:
+ 921 0000 00000000 		.space	8
+ 921      00000000 
+ 922              		.text
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 23
+
+
+ 923              	.Letext0:
+ 924              		.file 2 "user/inc/type_define.h"
+ 925              		.file 3 "user/inc/time.h"
+ 926              		.file 4 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 927              		.file 5 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 928              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 929              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 930              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h"
+ 931              		.file 9 "Core/Inc/rtc.h"
+ 932              		.file 10 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\
+ 933              		.file 11 "user/inc/hub75d.h"
+ 934              		.file 12 "user/inc/lunar_calendar.h"
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s 			page 24
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 time.c
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:18     .text.Get1sFlag:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:25     .text.Get1sFlag:00000000 Get1sFlag
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:42     .text.Get1sFlag:00000008 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:47     .text.Set1sFlag:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:54     .text.Set1sFlag:00000000 Set1sFlag
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:72     .text.Set1sFlag:00000008 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:77     .text.GetTimeData:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:84     .text.GetTimeData:00000000 GetTimeData
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:98     .text.GetTimeData:00000004 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:103    .text.CalculateWeek:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:110    .text.CalculateWeek:00000000 CalculateWeek
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:226    .text.CalculateWeek:0000007c $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:233    .text.ClockRun:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:240    .text.ClockRun:00000000 ClockRun
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:651    .text.ClockRun:00000188 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:662    .rodata.GetClock.str1.4:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:666    .text.GetClock:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:673    .text.GetClock:00000000 GetClock
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:775    .text.GetClock:00000074 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:782    .rodata.SetClock.str1.4:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:786    .text.SetClock:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:793    .text.SetClock:00000000 SetClock
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:896    .text.SetClock:00000074 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:913    .bss.g_1sFlag:00000000 g_1sFlag
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:920    .bss.g_time:00000000 g_time
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:905    .rodata:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:914    .bss.g_1sFlag:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cckyeatV.s:916    .bss.g_time:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_RTC_GetTime
+HAL_RTC_GetDate
+HUB75D_CalculateCalendar
+CalculationLunarCalendar
+printf
+hrtc
+HAL_RTC_SetTime
+HAL_RTC_SetDate

@@ -1,0 +1,3035 @@
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"emw3060_at.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.rodata.WIFI_Init.str1.4,"aMS",%progbits,1
+  18              		.align	2
+  19              	.LC0:
+  20 0000 41542B46 		.ascii	"AT+FWVER?\015\000"
+  20      57564552 
+  20      3F0D00
+  21 000b 00       		.align	2
+  22              	.LC1:
+  23 000c 41542B57 		.ascii	"AT+WFVER?\015\000"
+  23      46564552 
+  23      3F0D00
+  24 0017 00       		.align	2
+  25              	.LC2:
+  26 0018 41542B57 		.ascii	"AT+WMAC?\015\000"
+  26      4D41433F 
+  26      0D00
+  27 0022 0000     		.align	2
+  28              	.LC3:
+  29 0024 41542B57 		.ascii	"AT+WJAP=ABC,WenHuaFeng547566993\015\000"
+  29      4A41503D 
+  29      4142432C 
+  29      57656E48 
+  29      75614665 
+  30              		.section	.text.WIFI_Init,"ax",%progbits
+  31              		.align	1
+  32              		.p2align 2,,3
+  33              		.global	WIFI_Init
+  34              		.syntax unified
+  35              		.thumb
+  36              		.thumb_func
+  38              	WIFI_Init:
+  39              	.LFB72:
+  40              		.file 1 "user/src/emw3060_at.c"
+   1:user/src/emw3060_at.c **** #include "emw3060_at.h"
+   2:user/src/emw3060_at.c **** #include <stdio.h>
+   3:user/src/emw3060_at.c **** #include <string.h>
+   4:user/src/emw3060_at.c **** #include "type_define.h"
+   5:user/src/emw3060_at.c **** #include "main.h"
+   6:user/src/emw3060_at.c **** #include "usart.h"
+   7:user/src/emw3060_at.c **** #include "time.h"
+   8:user/src/emw3060_at.c **** 
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 2
+
+
+   9:user/src/emw3060_at.c **** #if (WIFI_MODULE == WIFI_EMW3060)
+  10:user/src/emw3060_at.c **** 
+  11:user/src/emw3060_at.c **** #define GET_TIME_8S     (8)
+  12:user/src/emw3060_at.c **** #define GET_TIME_10S    (10)
+  13:user/src/emw3060_at.c **** #define GET_TIME_14S    (14)
+  14:user/src/emw3060_at.c **** #define GET_TIME_16S    (16)
+  15:user/src/emw3060_at.c **** 
+  16:user/src/emw3060_at.c **** enum ConnectFlag {
+  17:user/src/emw3060_at.c ****     DISCONNECT,
+  18:user/src/emw3060_at.c ****     CONNECT
+  19:user/src/emw3060_at.c **** };
+  20:user/src/emw3060_at.c **** 
+  21:user/src/emw3060_at.c **** #define _WIFI_OFF_TIME_ (2 * 60) /* 2min */
+  22:user/src/emw3060_at.c **** #define EMW3060_AT_POWER_PIN_HIGH()                                            \
+  23:user/src/emw3060_at.c ****     do {                                                                       \
+  24:user/src/emw3060_at.c ****         HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, GPIO_PIN_SET); \
+  25:user/src/emw3060_at.c ****     } while (0)
+  26:user/src/emw3060_at.c **** #define EMW3060_AT_POWER_PIN_LOW()                              \
+  27:user/src/emw3060_at.c ****     do {                                                        \
+  28:user/src/emw3060_at.c ****         HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, \
+  29:user/src/emw3060_at.c ****                           GPIO_PIN_RESET);                      \
+  30:user/src/emw3060_at.c ****     } while (0)
+  31:user/src/emw3060_at.c **** 
+  32:user/src/emw3060_at.c **** static u8 g_powerOffCtr;
+  33:user/src/emw3060_at.c **** static u8 g_getTimeCtr;
+  34:user/src/emw3060_at.c **** static u8 g_renewInitCtr;
+  35:user/src/emw3060_at.c **** static u8 g_renewInitCtr_1;
+  36:user/src/emw3060_at.c **** 
+  37:user/src/emw3060_at.c **** static enum ConnectFlag g_connect;
+  38:user/src/emw3060_at.c **** 
+  39:user/src/emw3060_at.c **** static u8 AscToHex(u8 asc)
+  40:user/src/emw3060_at.c **** {
+  41:user/src/emw3060_at.c ****     u8 hex = asc;
+  42:user/src/emw3060_at.c **** 
+  43:user/src/emw3060_at.c ****     if ((asc >= 0x30) && (asc <= 0x39)) {
+  44:user/src/emw3060_at.c ****         hex -= 0x30;
+  45:user/src/emw3060_at.c ****     } else if ((asc >= 0x41) && (asc <= 0x46)) {
+  46:user/src/emw3060_at.c ****         hex -= 0x37;
+  47:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+  48:user/src/emw3060_at.c ****         hex -= 0x57;
+  49:user/src/emw3060_at.c ****     } else {
+  50:user/src/emw3060_at.c ****         hex = 0xff;
+  51:user/src/emw3060_at.c ****     }
+  52:user/src/emw3060_at.c **** 
+  53:user/src/emw3060_at.c ****     return hex;
+  54:user/src/emw3060_at.c **** }
+  55:user/src/emw3060_at.c **** 
+  56:user/src/emw3060_at.c **** static bool ProcessClock(char *cRxBuf)
+  57:user/src/emw3060_at.c **** {
+  58:user/src/emw3060_at.c ****     u16 year;
+  59:user/src/emw3060_at.c ****     u8 month, day, hour, minute, second;
+  60:user/src/emw3060_at.c ****     struct TimeType time;
+  61:user/src/emw3060_at.c ****     bool status = true;
+  62:user/src/emw3060_at.c **** 
+  63:user/src/emw3060_at.c ****     year = AscToHex(cRxBuf[10]) * 1000 + AscToHex(cRxBuf[11]) * 100 +
+  64:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+  65:user/src/emw3060_at.c ****     month = AscToHex(cRxBuf[15]) * 10 + AscToHex(cRxBuf[16]);
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 3
+
+
+  66:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+  67:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+  68:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+  69:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+  70:user/src/emw3060_at.c **** 
+  71:user/src/emw3060_at.c ****     if (year == 1970) {
+  72:user/src/emw3060_at.c ****         status = false;
+  73:user/src/emw3060_at.c ****     } else {
+  74:user/src/emw3060_at.c ****         if ((year < 2000) || (year > 2099) || (month == 0) || (month > 12) ||
+  75:user/src/emw3060_at.c ****             (day == 0) || (day > 31) || (hour > 23) || (minute > 59) || (second > 59)) {
+  76:user/src/emw3060_at.c ****             status = false;
+  77:user/src/emw3060_at.c ****         }
+  78:user/src/emw3060_at.c ****     }
+  79:user/src/emw3060_at.c **** 
+  80:user/src/emw3060_at.c ****     if (status == true) {
+  81:user/src/emw3060_at.c ****         time.year = year;
+  82:user/src/emw3060_at.c ****         time.month = month;
+  83:user/src/emw3060_at.c ****         time.day = day;
+  84:user/src/emw3060_at.c ****         time.hour = hour;
+  85:user/src/emw3060_at.c ****         time.min = minute;
+  86:user/src/emw3060_at.c ****         time.sec = second;
+  87:user/src/emw3060_at.c ****         CalculateWeek(time.year, time.month, time.day, &time.week);
+  88:user/src/emw3060_at.c **** 
+  89:user/src/emw3060_at.c ****         HAL_UART_DeInit(&huart1);
+  90:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+  91:user/src/emw3060_at.c ****         EMW3060_AT_POWER_PIN_LOW();
+  92:user/src/emw3060_at.c ****         SetClock(&time);
+  93:user/src/emw3060_at.c ****     } else {
+  94:user/src/emw3060_at.c ****         g_getTimeCtr = GET_TIME_10S;
+  95:user/src/emw3060_at.c ****     }
+  96:user/src/emw3060_at.c **** 
+  97:user/src/emw3060_at.c ****     return status;
+  98:user/src/emw3060_at.c **** }
+  99:user/src/emw3060_at.c **** 
+ 100:user/src/emw3060_at.c **** static void EMW3060_AT_GetTime(void)
+ 101:user/src/emw3060_at.c **** {
+ 102:user/src/emw3060_at.c ****     printf("AT+SNTPTIME\r\n");
+ 103:user/src/emw3060_at.c **** }
+ 104:user/src/emw3060_at.c **** 
+ 105:user/src/emw3060_at.c **** static void EMW3060_AT_SNTP_CFG(void)
+ 106:user/src/emw3060_at.c **** {
+ 107:user/src/emw3060_at.c ****     printf("AT+SNTPCFG=+8,cn.ntp.org.cn,pool.ntp.org\r\n");
+ 108:user/src/emw3060_at.c **** }
+ 109:user/src/emw3060_at.c **** 
+ 110:user/src/emw3060_at.c **** void WIFI_Init(void)
+ 111:user/src/emw3060_at.c **** {
+  41              		.loc 1 111 1 view -0
+  42              		.cfi_startproc
+  43              		@ args = 0, pretend = 0, frame = 0
+  44              		@ frame_needed = 0, uses_anonymous_args = 0
+ 112:user/src/emw3060_at.c ****     printf("AT+FWVER?\r\n");
+  45              		.loc 1 112 5 view .LVU1
+ 111:user/src/emw3060_at.c ****     printf("AT+FWVER?\r\n");
+  46              		.loc 1 111 1 is_stmt 0 view .LVU2
+  47 0000 08B5     		push	{r3, lr}
+  48              	.LCFI0:
+  49              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 4
+
+
+  50              		.cfi_offset 3, -8
+  51              		.cfi_offset 14, -4
+  52              		.loc 1 112 5 view .LVU3
+  53 0002 0C48     		ldr	r0, .L4
+  54 0004 FFF7FEFF 		bl	puts
+  55              	.LVL0:
+ 113:user/src/emw3060_at.c ****     HAL_Delay(1000);
+  56              		.loc 1 113 5 is_stmt 1 view .LVU4
+  57 0008 4FF47A70 		mov	r0, #1000
+  58 000c FFF7FEFF 		bl	HAL_Delay
+  59              	.LVL1:
+ 114:user/src/emw3060_at.c **** 
+ 115:user/src/emw3060_at.c ****     printf("AT+WFVER?\r\n");
+  60              		.loc 1 115 5 view .LVU5
+  61 0010 0948     		ldr	r0, .L4+4
+  62 0012 FFF7FEFF 		bl	puts
+  63              	.LVL2:
+ 116:user/src/emw3060_at.c ****     HAL_Delay(100);
+  64              		.loc 1 116 5 view .LVU6
+  65 0016 6420     		movs	r0, #100
+  66 0018 FFF7FEFF 		bl	HAL_Delay
+  67              	.LVL3:
+ 117:user/src/emw3060_at.c **** 
+ 118:user/src/emw3060_at.c ****     printf("AT+WMAC?\r\n");
+  68              		.loc 1 118 5 view .LVU7
+  69 001c 0748     		ldr	r0, .L4+8
+  70 001e FFF7FEFF 		bl	puts
+  71              	.LVL4:
+ 119:user/src/emw3060_at.c ****     HAL_Delay(100);
+  72              		.loc 1 119 5 view .LVU8
+  73 0022 6420     		movs	r0, #100
+  74 0024 FFF7FEFF 		bl	HAL_Delay
+  75              	.LVL5:
+ 120:user/src/emw3060_at.c **** 
+ 121:user/src/emw3060_at.c ****     printf("AT+WJAP=ABC,WenHuaFeng547566993\r\n");
+  76              		.loc 1 121 5 view .LVU9
+ 122:user/src/emw3060_at.c **** }
+  77              		.loc 1 122 1 is_stmt 0 view .LVU10
+  78 0028 BDE80840 		pop	{r3, lr}
+  79              	.LCFI1:
+  80              		.cfi_restore 14
+  81              		.cfi_restore 3
+  82              		.cfi_def_cfa_offset 0
+ 121:user/src/emw3060_at.c **** }
+  83              		.loc 1 121 5 view .LVU11
+  84 002c 0448     		ldr	r0, .L4+12
+  85 002e FFF7FEBF 		b	puts
+  86              	.LVL6:
+  87              	.L5:
+  88 0032 00BF     		.align	2
+  89              	.L4:
+  90 0034 00000000 		.word	.LC0
+  91 0038 0C000000 		.word	.LC1
+  92 003c 18000000 		.word	.LC2
+  93 0040 24000000 		.word	.LC3
+  94              		.cfi_endproc
+  95              	.LFE72:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 5
+
+
+  97              		.section	.text.WIFI_PowerOnOff,"ax",%progbits
+  98              		.align	1
+  99              		.p2align 2,,3
+ 100              		.global	WIFI_PowerOnOff
+ 101              		.syntax unified
+ 102              		.thumb
+ 103              		.thumb_func
+ 105              	WIFI_PowerOnOff:
+ 106              	.LVL7:
+ 107              	.LFB73:
+ 123:user/src/emw3060_at.c **** 
+ 124:user/src/emw3060_at.c **** void WIFI_PowerOnOff(enum PowerFlag flag)
+ 125:user/src/emw3060_at.c **** {
+ 108              		.loc 1 125 1 is_stmt 1 view -0
+ 109              		.cfi_startproc
+ 110              		@ args = 0, pretend = 0, frame = 0
+ 111              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126:user/src/emw3060_at.c ****     if (flag == POWER_ON) {
+ 112              		.loc 1 126 5 view .LVU13
+ 113              		.loc 1 126 8 is_stmt 0 view .LVU14
+ 114 0000 0128     		cmp	r0, #1
+ 125:user/src/emw3060_at.c ****     if (flag == POWER_ON) {
+ 115              		.loc 1 125 1 view .LVU15
+ 116 0002 38B5     		push	{r3, r4, r5, lr}
+ 117              	.LCFI2:
+ 118              		.cfi_def_cfa_offset 16
+ 119              		.cfi_offset 3, -16
+ 120              		.cfi_offset 4, -12
+ 121              		.cfi_offset 5, -8
+ 122              		.cfi_offset 14, -4
+ 123              		.loc 1 126 8 view .LVU16
+ 124 0004 10D0     		beq	.L10
+ 127:user/src/emw3060_at.c ****         EMW3060_AT_POWER_PIN_HIGH();
+ 128:user/src/emw3060_at.c ****         g_powerOffCtr = _WIFI_OFF_TIME_;
+ 129:user/src/emw3060_at.c ****     } else {
+ 130:user/src/emw3060_at.c ****         EMW3060_AT_POWER_PIN_LOW();
+ 125              		.loc 1 130 9 is_stmt 1 view .LVU17
+ 126              		.loc 1 130 9 view .LVU18
+ 127 0006 0022     		movs	r2, #0
+ 128 0008 2021     		movs	r1, #32
+ 129 000a 0C48     		ldr	r0, .L11
+ 130              	.LVL8:
+ 131              		.loc 1 130 9 is_stmt 0 view .LVU19
+ 132 000c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 133              	.LVL9:
+ 134              		.loc 1 130 9 is_stmt 1 view .LVU20
+ 131:user/src/emw3060_at.c ****         g_connect = DISCONNECT;
+ 135              		.loc 1 131 9 view .LVU21
+ 136              		.loc 1 131 19 is_stmt 0 view .LVU22
+ 137 0010 0023     		movs	r3, #0
+ 132:user/src/emw3060_at.c ****         g_getTimeCtr = 0x00;
+ 138              		.loc 1 132 22 view .LVU23
+ 139 0012 0B48     		ldr	r0, .L11+4
+ 133:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+ 140              		.loc 1 133 23 view .LVU24
+ 141 0014 0B49     		ldr	r1, .L11+8
+ 134:user/src/emw3060_at.c ****         g_renewInitCtr = 0x00;
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 6
+
+
+ 142              		.loc 1 134 24 view .LVU25
+ 143 0016 0C4A     		ldr	r2, .L11+12
+ 131:user/src/emw3060_at.c ****         g_getTimeCtr = 0x00;
+ 144              		.loc 1 131 19 view .LVU26
+ 145 0018 0C4C     		ldr	r4, .L11+16
+ 135:user/src/emw3060_at.c ****         g_renewInitCtr_1 = 0x00;
+ 146              		.loc 1 135 26 view .LVU27
+ 147 001a 0D4D     		ldr	r5, .L11+20
+ 132:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+ 148              		.loc 1 132 22 view .LVU28
+ 149 001c 0370     		strb	r3, [r0]
+ 133:user/src/emw3060_at.c ****         g_renewInitCtr = 0x00;
+ 150              		.loc 1 133 23 view .LVU29
+ 151 001e 0B70     		strb	r3, [r1]
+ 134:user/src/emw3060_at.c ****         g_renewInitCtr_1 = 0x00;
+ 152              		.loc 1 134 24 view .LVU30
+ 153 0020 1370     		strb	r3, [r2]
+ 154              		.loc 1 135 26 view .LVU31
+ 155 0022 2B70     		strb	r3, [r5]
+ 131:user/src/emw3060_at.c ****         g_getTimeCtr = 0x00;
+ 156              		.loc 1 131 19 view .LVU32
+ 157 0024 2370     		strb	r3, [r4]
+ 132:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+ 158              		.loc 1 132 9 is_stmt 1 view .LVU33
+ 133:user/src/emw3060_at.c ****         g_renewInitCtr = 0x00;
+ 159              		.loc 1 133 9 view .LVU34
+ 134:user/src/emw3060_at.c ****         g_renewInitCtr_1 = 0x00;
+ 160              		.loc 1 134 9 view .LVU35
+ 161              		.loc 1 135 9 view .LVU36
+ 136:user/src/emw3060_at.c ****     }
+ 137:user/src/emw3060_at.c **** }
+ 162              		.loc 1 137 1 is_stmt 0 view .LVU37
+ 163 0026 38BD     		pop	{r3, r4, r5, pc}
+ 164              	.LVL10:
+ 165              	.L10:
+ 166              	.LBB68:
+ 167              	.LBI68:
+ 124:user/src/emw3060_at.c **** {
+ 168              		.loc 1 124 6 is_stmt 1 view .LVU38
+ 169              	.LBB69:
+ 127:user/src/emw3060_at.c ****         g_powerOffCtr = _WIFI_OFF_TIME_;
+ 170              		.loc 1 127 9 view .LVU39
+ 127:user/src/emw3060_at.c ****         g_powerOffCtr = _WIFI_OFF_TIME_;
+ 171              		.loc 1 127 9 view .LVU40
+ 172 0028 0246     		mov	r2, r0
+ 173 002a 2021     		movs	r1, #32
+ 174 002c 0348     		ldr	r0, .L11
+ 175              	.LVL11:
+ 127:user/src/emw3060_at.c ****         g_powerOffCtr = _WIFI_OFF_TIME_;
+ 176              		.loc 1 127 9 is_stmt 0 view .LVU41
+ 177 002e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 178              	.LVL12:
+ 127:user/src/emw3060_at.c ****         g_powerOffCtr = _WIFI_OFF_TIME_;
+ 179              		.loc 1 127 9 is_stmt 1 view .LVU42
+ 128:user/src/emw3060_at.c ****     } else {
+ 180              		.loc 1 128 9 view .LVU43
+ 128:user/src/emw3060_at.c ****     } else {
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 7
+
+
+ 181              		.loc 1 128 23 is_stmt 0 view .LVU44
+ 182 0032 7822     		movs	r2, #120
+ 183 0034 034B     		ldr	r3, .L11+8
+ 184 0036 1A70     		strb	r2, [r3]
+ 185              	.LBE69:
+ 186              	.LBE68:
+ 187              		.loc 1 137 1 view .LVU45
+ 188 0038 38BD     		pop	{r3, r4, r5, pc}
+ 189              	.L12:
+ 190 003a 00BF     		.align	2
+ 191              	.L11:
+ 192 003c 000C0140 		.word	1073810432
+ 193 0040 00000000 		.word	.LANCHOR2
+ 194 0044 00000000 		.word	.LANCHOR0
+ 195 0048 00000000 		.word	.LANCHOR3
+ 196 004c 00000000 		.word	.LANCHOR1
+ 197 0050 00000000 		.word	.LANCHOR4
+ 198              		.cfi_endproc
+ 199              	.LFE73:
+ 201              		.section	.rodata.WIFI_CtrDec.str1.4,"aMS",%progbits,1
+ 202              		.align	2
+ 203              	.LC4:
+ 204 0000 41542B53 		.ascii	"AT+SNTPCFG=+8,cn.ntp.org.cn,pool.ntp.org\015\000"
+ 204      4E545043 
+ 204      46473D2B 
+ 204      382C636E 
+ 204      2E6E7470 
+ 205 002a 0000     		.align	2
+ 206              	.LC5:
+ 207 002c 41542B53 		.ascii	"AT+SNTPTIME\015\000"
+ 207      4E545054 
+ 207      494D450D 
+ 207      00
+ 208              		.section	.text.WIFI_CtrDec,"ax",%progbits
+ 209              		.align	1
+ 210              		.p2align 2,,3
+ 211              		.global	WIFI_CtrDec
+ 212              		.syntax unified
+ 213              		.thumb
+ 214              		.thumb_func
+ 216              	WIFI_CtrDec:
+ 217              	.LFB74:
+ 138:user/src/emw3060_at.c **** 
+ 139:user/src/emw3060_at.c **** void WIFI_CtrDec(void)
+ 140:user/src/emw3060_at.c **** {
+ 218              		.loc 1 140 1 is_stmt 1 view -0
+ 219              		.cfi_startproc
+ 220              		@ args = 0, pretend = 0, frame = 0
+ 221              		@ frame_needed = 0, uses_anonymous_args = 0
+ 141:user/src/emw3060_at.c ****     if (g_powerOffCtr) {
+ 222              		.loc 1 141 5 view .LVU47
+ 140:user/src/emw3060_at.c ****     if (g_powerOffCtr) {
+ 223              		.loc 1 140 1 is_stmt 0 view .LVU48
+ 224 0000 38B5     		push	{r3, r4, r5, lr}
+ 225              	.LCFI3:
+ 226              		.cfi_def_cfa_offset 16
+ 227              		.cfi_offset 3, -16
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 8
+
+
+ 228              		.cfi_offset 4, -12
+ 229              		.cfi_offset 5, -8
+ 230              		.cfi_offset 14, -4
+ 231              		.loc 1 141 9 view .LVU49
+ 232 0002 304D     		ldr	r5, .L36
+ 233 0004 2A78     		ldrb	r2, [r5]	@ zero_extendqisi2
+ 234              		.loc 1 141 8 view .LVU50
+ 235 0006 1AB1     		cbz	r2, .L14
+ 142:user/src/emw3060_at.c ****         g_powerOffCtr--;
+ 236              		.loc 1 142 9 is_stmt 1 view .LVU51
+ 237              		.loc 1 142 22 is_stmt 0 view .LVU52
+ 238 0008 013A     		subs	r2, r2, #1
+ 239 000a D4B2     		uxtb	r4, r2
+ 240 000c 2C70     		strb	r4, [r5]
+ 143:user/src/emw3060_at.c ****         if (g_powerOffCtr == 0x00) {
+ 241              		.loc 1 143 9 is_stmt 1 view .LVU53
+ 242              		.loc 1 143 12 is_stmt 0 view .LVU54
+ 243 000e D4B1     		cbz	r4, .L33
+ 244              	.L14:
+ 144:user/src/emw3060_at.c ****             WIFI_PowerOnOff(POWER_OFF);
+ 145:user/src/emw3060_at.c ****         }
+ 146:user/src/emw3060_at.c ****     }
+ 147:user/src/emw3060_at.c **** 
+ 148:user/src/emw3060_at.c ****     if (g_getTimeCtr) {
+ 245              		.loc 1 148 5 is_stmt 1 view .LVU55
+ 246              		.loc 1 148 9 is_stmt 0 view .LVU56
+ 247 0010 2D49     		ldr	r1, .L36+4
+ 248 0012 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 249              		.loc 1 148 8 view .LVU57
+ 250 0014 43B1     		cbz	r3, .L31
+ 149:user/src/emw3060_at.c ****         g_getTimeCtr--;
+ 251              		.loc 1 149 9 is_stmt 1 view .LVU58
+ 252              		.loc 1 149 21 is_stmt 0 view .LVU59
+ 253 0016 5A1E     		subs	r2, r3, #1
+ 254 0018 D2B2     		uxtb	r2, r2
+ 150:user/src/emw3060_at.c ****         if (g_getTimeCtr == GET_TIME_14S) {
+ 255              		.loc 1 150 12 view .LVU60
+ 256 001a 0E2A     		cmp	r2, #14
+ 149:user/src/emw3060_at.c ****         g_getTimeCtr--;
+ 257              		.loc 1 149 21 view .LVU61
+ 258 001c 0A70     		strb	r2, [r1]
+ 259              		.loc 1 150 9 is_stmt 1 view .LVU62
+ 260              		.loc 1 150 12 is_stmt 0 view .LVU63
+ 261 001e 4AD0     		beq	.L34
+ 151:user/src/emw3060_at.c ****             EMW3060_AT_SNTP_CFG();
+ 152:user/src/emw3060_at.c ****         }
+ 153:user/src/emw3060_at.c ****         else if (g_getTimeCtr == GET_TIME_8S) {
+ 262              		.loc 1 153 14 is_stmt 1 view .LVU64
+ 154:user/src/emw3060_at.c ****             EMW3060_AT_GetTime();
+ 155:user/src/emw3060_at.c ****         } else if (g_getTimeCtr == 0x00) {
+ 263              		.loc 1 155 16 view .LVU65
+ 264              		.loc 1 155 19 is_stmt 0 view .LVU66
+ 265 0020 03F0F703 		and	r3, r3, #247
+ 266 0024 012B     		cmp	r3, #1
+ 267 0026 40D0     		beq	.L19
+ 268              	.L31:
+ 156:user/src/emw3060_at.c ****             EMW3060_AT_GetTime();
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 9
+
+
+ 157:user/src/emw3060_at.c ****         }
+ 158:user/src/emw3060_at.c ****     }
+ 159:user/src/emw3060_at.c **** 
+ 160:user/src/emw3060_at.c ****     if (g_renewInitCtr) {
+ 269              		.loc 1 160 9 view .LVU67
+ 270 0028 284A     		ldr	r2, .L36+8
+ 271 002a 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 272              	.L17:
+ 273              		.loc 1 160 5 is_stmt 1 view .LVU68
+ 274              		.loc 1 160 8 is_stmt 0 view .LVU69
+ 275 002c 1BB1     		cbz	r3, .L32
+ 161:user/src/emw3060_at.c ****         g_renewInitCtr--;
+ 276              		.loc 1 161 9 is_stmt 1 view .LVU70
+ 277              		.loc 1 161 23 is_stmt 0 view .LVU71
+ 278 002e 013B     		subs	r3, r3, #1
+ 279 0030 DBB2     		uxtb	r3, r3
+ 280 0032 1370     		strb	r3, [r2]
+ 162:user/src/emw3060_at.c ****         if (g_renewInitCtr == 0x00) {
+ 281              		.loc 1 162 9 is_stmt 1 view .LVU72
+ 282              		.loc 1 162 12 is_stmt 0 view .LVU73
+ 283 0034 B3B1     		cbz	r3, .L29
+ 284              	.L32:
+ 285 0036 264C     		ldr	r4, .L36+12
+ 286              	.L21:
+ 163:user/src/emw3060_at.c ****             g_renewInitCtr_1 = 2;
+ 164:user/src/emw3060_at.c ****             WIFI_PowerOnOff(POWER_ON);
+ 165:user/src/emw3060_at.c ****         }
+ 166:user/src/emw3060_at.c ****     }
+ 167:user/src/emw3060_at.c **** 
+ 168:user/src/emw3060_at.c ****     if (g_renewInitCtr_1) {
+ 287              		.loc 1 168 5 is_stmt 1 view .LVU74
+ 288              		.loc 1 168 9 is_stmt 0 view .LVU75
+ 289 0038 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 290              		.loc 1 168 8 view .LVU76
+ 291 003a 1BB1     		cbz	r3, .L13
+ 169:user/src/emw3060_at.c ****         g_renewInitCtr_1--;
+ 292              		.loc 1 169 9 is_stmt 1 view .LVU77
+ 293              		.loc 1 169 25 is_stmt 0 view .LVU78
+ 294 003c 013B     		subs	r3, r3, #1
+ 295 003e DBB2     		uxtb	r3, r3
+ 296 0040 2370     		strb	r3, [r4]
+ 170:user/src/emw3060_at.c ****         if (g_renewInitCtr_1 == 0x00) {
+ 297              		.loc 1 170 9 is_stmt 1 view .LVU79
+ 298              		.loc 1 170 12 is_stmt 0 view .LVU80
+ 299 0042 D3B1     		cbz	r3, .L35
+ 300              	.L13:
+ 171:user/src/emw3060_at.c ****             WIFI_Init();
+ 172:user/src/emw3060_at.c ****         }
+ 173:user/src/emw3060_at.c ****     }
+ 174:user/src/emw3060_at.c **** }
+ 301              		.loc 1 174 1 view .LVU81
+ 302 0044 38BD     		pop	{r3, r4, r5, pc}
+ 303              	.L33:
+ 144:user/src/emw3060_at.c ****         }
+ 304              		.loc 1 144 13 is_stmt 1 view .LVU82
+ 305              	.LVL13:
+ 306              	.LBB86:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 10
+
+
+ 307              	.LBI86:
+ 124:user/src/emw3060_at.c **** {
+ 308              		.loc 1 124 6 view .LVU83
+ 309              	.LBB87:
+ 126:user/src/emw3060_at.c ****         EMW3060_AT_POWER_PIN_HIGH();
+ 310              		.loc 1 126 5 view .LVU84
+ 130:user/src/emw3060_at.c ****         g_connect = DISCONNECT;
+ 311              		.loc 1 130 9 view .LVU85
+ 130:user/src/emw3060_at.c ****         g_connect = DISCONNECT;
+ 312              		.loc 1 130 9 view .LVU86
+ 313 0046 2246     		mov	r2, r4
+ 314 0048 2021     		movs	r1, #32
+ 315 004a 2248     		ldr	r0, .L36+16
+ 316 004c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 317              	.LVL14:
+ 130:user/src/emw3060_at.c ****         g_connect = DISCONNECT;
+ 318              		.loc 1 130 9 view .LVU87
+ 131:user/src/emw3060_at.c ****         g_getTimeCtr = 0x00;
+ 319              		.loc 1 131 9 view .LVU88
+ 132:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+ 320              		.loc 1 132 22 is_stmt 0 view .LVU89
+ 321 0050 1D4B     		ldr	r3, .L36+4
+ 131:user/src/emw3060_at.c ****         g_getTimeCtr = 0x00;
+ 322              		.loc 1 131 19 view .LVU90
+ 323 0052 2149     		ldr	r1, .L36+20
+ 132:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+ 324              		.loc 1 132 22 view .LVU91
+ 325 0054 1C70     		strb	r4, [r3]
+ 134:user/src/emw3060_at.c ****         g_renewInitCtr_1 = 0x00;
+ 326              		.loc 1 134 24 view .LVU92
+ 327 0056 1D4A     		ldr	r2, .L36+8
+ 135:user/src/emw3060_at.c ****     }
+ 328              		.loc 1 135 26 view .LVU93
+ 329 0058 1D4B     		ldr	r3, .L36+12
+ 131:user/src/emw3060_at.c ****         g_getTimeCtr = 0x00;
+ 330              		.loc 1 131 19 view .LVU94
+ 331 005a 0C70     		strb	r4, [r1]
+ 132:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+ 332              		.loc 1 132 9 is_stmt 1 view .LVU95
+ 133:user/src/emw3060_at.c ****         g_renewInitCtr = 0x00;
+ 333              		.loc 1 133 9 view .LVU96
+ 134:user/src/emw3060_at.c ****         g_renewInitCtr_1 = 0x00;
+ 334              		.loc 1 134 24 is_stmt 0 view .LVU97
+ 335 005c 1470     		strb	r4, [r2]
+ 135:user/src/emw3060_at.c ****     }
+ 336              		.loc 1 135 26 view .LVU98
+ 337 005e 1C70     		strb	r4, [r3]
+ 133:user/src/emw3060_at.c ****         g_renewInitCtr = 0x00;
+ 338              		.loc 1 133 23 view .LVU99
+ 339 0060 2C70     		strb	r4, [r5]
+ 134:user/src/emw3060_at.c ****         g_renewInitCtr_1 = 0x00;
+ 340              		.loc 1 134 9 is_stmt 1 view .LVU100
+ 135:user/src/emw3060_at.c ****     }
+ 341              		.loc 1 135 9 view .LVU101
+ 342              	.LVL15:
+ 135:user/src/emw3060_at.c ****     }
+ 343              		.loc 1 135 9 is_stmt 0 view .LVU102
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 11
+
+
+ 344              	.LBE87:
+ 345              	.LBE86:
+ 148:user/src/emw3060_at.c ****         g_getTimeCtr--;
+ 346              		.loc 1 148 5 is_stmt 1 view .LVU103
+ 160:user/src/emw3060_at.c ****         g_renewInitCtr--;
+ 347              		.loc 1 160 5 view .LVU104
+ 168:user/src/emw3060_at.c ****         g_renewInitCtr_1--;
+ 348              		.loc 1 168 5 view .LVU105
+ 349              		.loc 1 174 1 is_stmt 0 view .LVU106
+ 350 0062 38BD     		pop	{r3, r4, r5, pc}
+ 351              	.L29:
+ 163:user/src/emw3060_at.c ****             WIFI_PowerOnOff(POWER_ON);
+ 352              		.loc 1 163 13 is_stmt 1 view .LVU107
+ 163:user/src/emw3060_at.c ****             WIFI_PowerOnOff(POWER_ON);
+ 353              		.loc 1 163 30 is_stmt 0 view .LVU108
+ 354 0064 0223     		movs	r3, #2
+ 355 0066 1A4C     		ldr	r4, .L36+12
+ 356              	.LBB88:
+ 357              	.LBB89:
+ 358              	.LBB90:
+ 127:user/src/emw3060_at.c ****         g_powerOffCtr = _WIFI_OFF_TIME_;
+ 359              		.loc 1 127 9 view .LVU109
+ 360 0068 0122     		movs	r2, #1
+ 361 006a 2021     		movs	r1, #32
+ 362 006c 1948     		ldr	r0, .L36+16
+ 363              	.LBE90:
+ 364              	.LBE89:
+ 365              	.LBE88:
+ 163:user/src/emw3060_at.c ****             WIFI_PowerOnOff(POWER_ON);
+ 366              		.loc 1 163 30 view .LVU110
+ 367 006e 2370     		strb	r3, [r4]
+ 164:user/src/emw3060_at.c ****         }
+ 368              		.loc 1 164 13 is_stmt 1 view .LVU111
+ 369              	.LVL16:
+ 370              	.LBB93:
+ 371              	.LBI88:
+ 124:user/src/emw3060_at.c **** {
+ 372              		.loc 1 124 6 view .LVU112
+ 373              	.LBE93:
+ 126:user/src/emw3060_at.c ****         EMW3060_AT_POWER_PIN_HIGH();
+ 374              		.loc 1 126 5 view .LVU113
+ 375              	.LBB94:
+ 376              	.LBB92:
+ 377              	.LBI89:
+ 124:user/src/emw3060_at.c **** {
+ 378              		.loc 1 124 6 view .LVU114
+ 379              	.LBB91:
+ 127:user/src/emw3060_at.c ****         g_powerOffCtr = _WIFI_OFF_TIME_;
+ 380              		.loc 1 127 9 view .LVU115
+ 127:user/src/emw3060_at.c ****         g_powerOffCtr = _WIFI_OFF_TIME_;
+ 381              		.loc 1 127 9 view .LVU116
+ 382 0070 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 383              	.LVL17:
+ 127:user/src/emw3060_at.c ****         g_powerOffCtr = _WIFI_OFF_TIME_;
+ 384              		.loc 1 127 9 view .LVU117
+ 128:user/src/emw3060_at.c ****     } else {
+ 385              		.loc 1 128 9 view .LVU118
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 12
+
+
+ 128:user/src/emw3060_at.c ****     } else {
+ 386              		.loc 1 128 23 is_stmt 0 view .LVU119
+ 387 0074 7823     		movs	r3, #120
+ 388 0076 2B70     		strb	r3, [r5]
+ 389 0078 DEE7     		b	.L21
+ 390              	.LVL18:
+ 391              	.L35:
+ 128:user/src/emw3060_at.c ****     } else {
+ 392              		.loc 1 128 23 view .LVU120
+ 393              	.LBE91:
+ 394              	.LBE92:
+ 395              	.LBE94:
+ 171:user/src/emw3060_at.c ****         }
+ 396              		.loc 1 171 13 is_stmt 1 view .LVU121
+ 397              	.LBB95:
+ 398              	.LBI95:
+ 110:user/src/emw3060_at.c **** {
+ 399              		.loc 1 110 6 view .LVU122
+ 400              	.LBB96:
+ 112:user/src/emw3060_at.c ****     HAL_Delay(1000);
+ 401              		.loc 1 112 5 view .LVU123
+ 402 007a 1848     		ldr	r0, .L36+24
+ 403 007c FFF7FEFF 		bl	puts
+ 404              	.LVL19:
+ 113:user/src/emw3060_at.c **** 
+ 405              		.loc 1 113 5 view .LVU124
+ 406 0080 4FF47A70 		mov	r0, #1000
+ 407 0084 FFF7FEFF 		bl	HAL_Delay
+ 408              	.LVL20:
+ 115:user/src/emw3060_at.c ****     HAL_Delay(100);
+ 409              		.loc 1 115 5 view .LVU125
+ 410 0088 1548     		ldr	r0, .L36+28
+ 411 008a FFF7FEFF 		bl	puts
+ 412              	.LVL21:
+ 116:user/src/emw3060_at.c **** 
+ 413              		.loc 1 116 5 view .LVU126
+ 414 008e 6420     		movs	r0, #100
+ 415 0090 FFF7FEFF 		bl	HAL_Delay
+ 416              	.LVL22:
+ 118:user/src/emw3060_at.c ****     HAL_Delay(100);
+ 417              		.loc 1 118 5 view .LVU127
+ 418 0094 1348     		ldr	r0, .L36+32
+ 419 0096 FFF7FEFF 		bl	puts
+ 420              	.LVL23:
+ 119:user/src/emw3060_at.c **** 
+ 421              		.loc 1 119 5 view .LVU128
+ 422 009a 6420     		movs	r0, #100
+ 423 009c FFF7FEFF 		bl	HAL_Delay
+ 424              	.LVL24:
+ 121:user/src/emw3060_at.c **** }
+ 425              		.loc 1 121 5 view .LVU129
+ 426              	.LBE96:
+ 427              	.LBE95:
+ 428              		.loc 1 174 1 is_stmt 0 view .LVU130
+ 429 00a0 BDE83840 		pop	{r3, r4, r5, lr}
+ 430              	.LCFI4:
+ 431              		.cfi_remember_state
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 13
+
+
+ 432              		.cfi_restore 14
+ 433              		.cfi_restore 5
+ 434              		.cfi_restore 4
+ 435              		.cfi_restore 3
+ 436              		.cfi_def_cfa_offset 0
+ 437              	.LBB98:
+ 438              	.LBB97:
+ 121:user/src/emw3060_at.c **** }
+ 439              		.loc 1 121 5 view .LVU131
+ 440 00a4 1048     		ldr	r0, .L36+36
+ 441 00a6 FFF7FEBF 		b	puts
+ 442              	.LVL25:
+ 443              	.L19:
+ 444              	.LCFI5:
+ 445              		.cfi_restore_state
+ 446              	.LBE97:
+ 447              	.LBE98:
+ 154:user/src/emw3060_at.c ****         } else if (g_getTimeCtr == 0x00) {
+ 448              		.loc 1 154 13 is_stmt 1 view .LVU132
+ 449              	.LBB99:
+ 450              	.LBI99:
+ 100:user/src/emw3060_at.c **** {
+ 451              		.loc 1 100 13 view .LVU133
+ 452              	.LBB100:
+ 102:user/src/emw3060_at.c **** }
+ 453              		.loc 1 102 5 view .LVU134
+ 454 00aa 1048     		ldr	r0, .L36+40
+ 455 00ac FFF7FEFF 		bl	puts
+ 456              	.LVL26:
+ 457              	.LBE100:
+ 458              	.LBE99:
+ 160:user/src/emw3060_at.c ****         g_renewInitCtr--;
+ 459              		.loc 1 160 9 is_stmt 0 view .LVU135
+ 460 00b0 064A     		ldr	r2, .L36+8
+ 461 00b2 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 462              	.LBB102:
+ 463              	.LBB101:
+ 103:user/src/emw3060_at.c **** 
+ 464              		.loc 1 103 1 view .LVU136
+ 465 00b4 BAE7     		b	.L17
+ 466              	.L34:
+ 467              	.LBE101:
+ 468              	.LBE102:
+ 151:user/src/emw3060_at.c ****         }
+ 469              		.loc 1 151 13 is_stmt 1 view .LVU137
+ 470              	.LBB103:
+ 471              	.LBI103:
+ 105:user/src/emw3060_at.c **** {
+ 472              		.loc 1 105 13 view .LVU138
+ 473              	.LBB104:
+ 107:user/src/emw3060_at.c **** }
+ 474              		.loc 1 107 5 view .LVU139
+ 475 00b6 0E48     		ldr	r0, .L36+44
+ 476 00b8 FFF7FEFF 		bl	puts
+ 477              	.LVL27:
+ 478              	.LBE104:
+ 479              	.LBE103:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 14
+
+
+ 160:user/src/emw3060_at.c ****         g_renewInitCtr--;
+ 480              		.loc 1 160 9 is_stmt 0 view .LVU140
+ 481 00bc 034A     		ldr	r2, .L36+8
+ 482 00be 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 483              	.LBB106:
+ 484              	.LBB105:
+ 108:user/src/emw3060_at.c **** 
+ 485              		.loc 1 108 1 view .LVU141
+ 486 00c0 B4E7     		b	.L17
+ 487              	.L37:
+ 488 00c2 00BF     		.align	2
+ 489              	.L36:
+ 490 00c4 00000000 		.word	.LANCHOR0
+ 491 00c8 00000000 		.word	.LANCHOR2
+ 492 00cc 00000000 		.word	.LANCHOR3
+ 493 00d0 00000000 		.word	.LANCHOR4
+ 494 00d4 000C0140 		.word	1073810432
+ 495 00d8 00000000 		.word	.LANCHOR1
+ 496 00dc 00000000 		.word	.LC0
+ 497 00e0 0C000000 		.word	.LC1
+ 498 00e4 18000000 		.word	.LC2
+ 499 00e8 24000000 		.word	.LC3
+ 500 00ec 2C000000 		.word	.LC5
+ 501 00f0 00000000 		.word	.LC4
+ 502              	.LBE105:
+ 503              	.LBE106:
+ 504              		.cfi_endproc
+ 505              	.LFE74:
+ 507              		.section	.rodata.WIFI_ReceiveProcess.str1.4,"aMS",%progbits,1
+ 508              		.align	2
+ 509              	.LC6:
+ 510 0000 2B574556 		.ascii	"+WEVENT:STATION_UP\000"
+ 510      454E543A 
+ 510      53544154 
+ 510      494F4E5F 
+ 510      555000
+ 511 0013 00       		.align	2
+ 512              	.LC7:
+ 513 0014 2B574556 		.ascii	"+WEVENT:STATION_DOWN\000"
+ 513      454E543A 
+ 513      53544154 
+ 513      494F4E5F 
+ 513      444F574E 
+ 514 0029 000000   		.align	2
+ 515              	.LC8:
+ 516 002c 2B534E54 		.ascii	"+SNTPTIME:20\000"
+ 516      5054494D 
+ 516      453A3230 
+ 516      00
+ 517              		.section	.text.WIFI_ReceiveProcess,"ax",%progbits
+ 518              		.align	1
+ 519              		.p2align 2,,3
+ 520              		.global	WIFI_ReceiveProcess
+ 521              		.syntax unified
+ 522              		.thumb
+ 523              		.thumb_func
+ 525              	WIFI_ReceiveProcess:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 15
+
+
+ 526              	.LVL28:
+ 527              	.LFB75:
+ 175:user/src/emw3060_at.c **** 
+ 176:user/src/emw3060_at.c **** void WIFI_ReceiveProcess(u8 *buf)
+ 177:user/src/emw3060_at.c **** {
+ 528              		.loc 1 177 1 is_stmt 1 view -0
+ 529              		.cfi_startproc
+ 530              		@ args = 0, pretend = 0, frame = 8
+ 531              		@ frame_needed = 0, uses_anonymous_args = 0
+ 178:user/src/emw3060_at.c ****     char *str;
+ 532              		.loc 1 178 5 view .LVU143
+ 179:user/src/emw3060_at.c ****     char *strPosition;
+ 533              		.loc 1 179 5 view .LVU144
+ 180:user/src/emw3060_at.c **** 
+ 181:user/src/emw3060_at.c ****     str = "+WEVENT:STATION_UP"; /* WIFI CONNECTED */
+ 534              		.loc 1 181 5 view .LVU145
+ 182:user/src/emw3060_at.c ****     if (strstr((char *)buf, str) != NULL) {
+ 535              		.loc 1 182 5 view .LVU146
+ 177:user/src/emw3060_at.c ****     char *str;
+ 536              		.loc 1 177 1 is_stmt 0 view .LVU147
+ 537 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 538              	.LCFI6:
+ 539              		.cfi_def_cfa_offset 28
+ 540              		.cfi_offset 4, -28
+ 541              		.cfi_offset 5, -24
+ 542              		.cfi_offset 6, -20
+ 543              		.cfi_offset 7, -16
+ 544              		.cfi_offset 8, -12
+ 545              		.cfi_offset 9, -8
+ 546              		.cfi_offset 14, -4
+ 547              		.loc 1 182 9 view .LVU148
+ 548 0004 B849     		ldr	r1, .L116
+ 177:user/src/emw3060_at.c ****     char *str;
+ 549              		.loc 1 177 1 view .LVU149
+ 550 0006 83B0     		sub	sp, sp, #12
+ 551              	.LCFI7:
+ 552              		.cfi_def_cfa_offset 40
+ 177:user/src/emw3060_at.c ****     char *str;
+ 553              		.loc 1 177 1 view .LVU150
+ 554 0008 0446     		mov	r4, r0
+ 555              		.loc 1 182 9 view .LVU151
+ 556 000a FFF7FEFF 		bl	strstr
+ 557              	.LVL29:
+ 558              		.loc 1 182 8 view .LVU152
+ 559 000e E0B1     		cbz	r0, .L39
+ 183:user/src/emw3060_at.c ****         g_connect = CONNECT;
+ 560              		.loc 1 183 9 is_stmt 1 view .LVU153
+ 561              		.loc 1 183 19 is_stmt 0 view .LVU154
+ 562 0010 0122     		movs	r2, #1
+ 184:user/src/emw3060_at.c ****         g_getTimeCtr = GET_TIME_16S;
+ 563              		.loc 1 184 22 view .LVU155
+ 564 0012 1023     		movs	r3, #16
+ 183:user/src/emw3060_at.c ****         g_connect = CONNECT;
+ 565              		.loc 1 183 19 view .LVU156
+ 566 0014 B54E     		ldr	r6, .L116+4
+ 567              		.loc 1 184 22 view .LVU157
+ 568 0016 B64D     		ldr	r5, .L116+8
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 16
+
+
+ 185:user/src/emw3060_at.c ****     }
+ 186:user/src/emw3060_at.c ****     str = "+WEVENT:STATION_DOWN"; /* WIFI DISCONNECT */
+ 187:user/src/emw3060_at.c ****     if (strstr((char *)buf, str) != NULL) {
+ 569              		.loc 1 187 9 view .LVU158
+ 570 0018 2046     		mov	r0, r4
+ 571 001a B649     		ldr	r1, .L116+12
+ 183:user/src/emw3060_at.c ****         g_getTimeCtr = GET_TIME_16S;
+ 572              		.loc 1 183 19 view .LVU159
+ 573 001c 3270     		strb	r2, [r6]
+ 184:user/src/emw3060_at.c ****         g_getTimeCtr = GET_TIME_16S;
+ 574              		.loc 1 184 9 is_stmt 1 view .LVU160
+ 184:user/src/emw3060_at.c ****         g_getTimeCtr = GET_TIME_16S;
+ 575              		.loc 1 184 22 is_stmt 0 view .LVU161
+ 576 001e 2B70     		strb	r3, [r5]
+ 186:user/src/emw3060_at.c ****     if (strstr((char *)buf, str) != NULL) {
+ 577              		.loc 1 186 5 is_stmt 1 view .LVU162
+ 578              	.LVL30:
+ 579              		.loc 1 187 5 view .LVU163
+ 580              		.loc 1 187 9 is_stmt 0 view .LVU164
+ 581 0020 FFF7FEFF 		bl	strstr
+ 582              	.LVL31:
+ 583              		.loc 1 187 8 view .LVU165
+ 584 0024 D0B1     		cbz	r0, .L44
+ 585              	.L40:
+ 188:user/src/emw3060_at.c ****         WIFI_PowerOnOff(POWER_OFF);
+ 586              		.loc 1 188 9 is_stmt 1 view .LVU166
+ 587              	.LVL32:
+ 588              	.LBB169:
+ 589              	.LBI169:
+ 124:user/src/emw3060_at.c **** {
+ 590              		.loc 1 124 6 view .LVU167
+ 591              	.LBB170:
+ 126:user/src/emw3060_at.c ****         EMW3060_AT_POWER_PIN_HIGH();
+ 592              		.loc 1 126 5 view .LVU168
+ 130:user/src/emw3060_at.c ****         g_connect = DISCONNECT;
+ 593              		.loc 1 130 9 view .LVU169
+ 130:user/src/emw3060_at.c ****         g_connect = DISCONNECT;
+ 594              		.loc 1 130 9 view .LVU170
+ 595 0026 0022     		movs	r2, #0
+ 596 0028 2021     		movs	r1, #32
+ 597 002a B348     		ldr	r0, .L116+16
+ 598 002c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 599              	.LVL33:
+ 130:user/src/emw3060_at.c ****         g_connect = DISCONNECT;
+ 600              		.loc 1 130 9 view .LVU171
+ 131:user/src/emw3060_at.c ****         g_getTimeCtr = 0x00;
+ 601              		.loc 1 131 9 view .LVU172
+ 131:user/src/emw3060_at.c ****         g_getTimeCtr = 0x00;
+ 602              		.loc 1 131 19 is_stmt 0 view .LVU173
+ 603 0030 0023     		movs	r3, #0
+ 604              	.LBE170:
+ 605              	.LBE169:
+ 189:user/src/emw3060_at.c ****         g_renewInitCtr = 2;
+ 606              		.loc 1 189 24 view .LVU174
+ 607 0032 0221     		movs	r1, #2
+ 608              	.LBB173:
+ 609              	.LBB171:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 17
+
+
+ 135:user/src/emw3060_at.c ****     }
+ 610              		.loc 1 135 26 view .LVU175
+ 611 0034 B14A     		ldr	r2, .L116+20
+ 133:user/src/emw3060_at.c ****         g_renewInitCtr = 0x00;
+ 612              		.loc 1 133 23 view .LVU176
+ 613 0036 B248     		ldr	r0, .L116+24
+ 135:user/src/emw3060_at.c ****     }
+ 614              		.loc 1 135 26 view .LVU177
+ 615 0038 1370     		strb	r3, [r2]
+ 616              	.LBE171:
+ 617              	.LBE173:
+ 618              		.loc 1 189 24 view .LVU178
+ 619 003a B24A     		ldr	r2, .L116+28
+ 620              	.LBB174:
+ 621              	.LBB172:
+ 131:user/src/emw3060_at.c ****         g_getTimeCtr = 0x00;
+ 622              		.loc 1 131 19 view .LVU179
+ 623 003c 3370     		strb	r3, [r6]
+ 132:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+ 624              		.loc 1 132 9 is_stmt 1 view .LVU180
+ 132:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+ 625              		.loc 1 132 22 is_stmt 0 view .LVU181
+ 626 003e 2B70     		strb	r3, [r5]
+ 133:user/src/emw3060_at.c ****         g_renewInitCtr = 0x00;
+ 627              		.loc 1 133 9 is_stmt 1 view .LVU182
+ 133:user/src/emw3060_at.c ****         g_renewInitCtr = 0x00;
+ 628              		.loc 1 133 23 is_stmt 0 view .LVU183
+ 629 0040 0370     		strb	r3, [r0]
+ 134:user/src/emw3060_at.c ****         g_renewInitCtr_1 = 0x00;
+ 630              		.loc 1 134 9 is_stmt 1 view .LVU184
+ 135:user/src/emw3060_at.c ****     }
+ 631              		.loc 1 135 9 view .LVU185
+ 632              	.LVL34:
+ 135:user/src/emw3060_at.c ****     }
+ 633              		.loc 1 135 9 is_stmt 0 view .LVU186
+ 634              	.LBE172:
+ 635              	.LBE174:
+ 636              		.loc 1 189 9 is_stmt 1 view .LVU187
+ 637              		.loc 1 189 24 is_stmt 0 view .LVU188
+ 638 0042 1170     		strb	r1, [r2]
+ 190:user/src/emw3060_at.c ****     }
+ 191:user/src/emw3060_at.c ****     // str = "+CWJAP:2";//"WIFI CONNECT FAIL";
+ 192:user/src/emw3060_at.c ****     // if (strstr(buf, str) != NULL) {
+ 193:user/src/emw3060_at.c ****     //   WIFI_PowerOnOff(_POWER_OFF_);
+ 194:user/src/emw3060_at.c ****     //   EMW3060_AT_RenewInitCtr = 2;
+ 195:user/src/emw3060_at.c ****     // }
+ 196:user/src/emw3060_at.c ****     if (g_connect == CONNECT) {
+ 639              		.loc 1 196 5 is_stmt 1 view .LVU189
+ 640              	.LVL35:
+ 641              	.L38:
+ 197:user/src/emw3060_at.c ****         str = "+SNTPTIME:20";
+ 198:user/src/emw3060_at.c ****         strPosition = strstr((char *)buf, str);
+ 199:user/src/emw3060_at.c ****         if (strPosition != NULL) {
+ 200:user/src/emw3060_at.c ****             ProcessClock(strPosition);
+ 201:user/src/emw3060_at.c ****         }
+ 202:user/src/emw3060_at.c ****     }
+ 203:user/src/emw3060_at.c **** }
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 18
+
+
+ 642              		.loc 1 203 1 is_stmt 0 view .LVU190
+ 643 0044 03B0     		add	sp, sp, #12
+ 644              	.LCFI8:
+ 645              		.cfi_remember_state
+ 646              		.cfi_def_cfa_offset 28
+ 647              		@ sp needed
+ 648 0046 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 649              	.LVL36:
+ 650              	.L39:
+ 651              	.LCFI9:
+ 652              		.cfi_restore_state
+ 186:user/src/emw3060_at.c ****     if (strstr((char *)buf, str) != NULL) {
+ 653              		.loc 1 186 5 is_stmt 1 view .LVU191
+ 187:user/src/emw3060_at.c ****         WIFI_PowerOnOff(POWER_OFF);
+ 654              		.loc 1 187 5 view .LVU192
+ 187:user/src/emw3060_at.c ****         WIFI_PowerOnOff(POWER_OFF);
+ 655              		.loc 1 187 9 is_stmt 0 view .LVU193
+ 656 004a 2046     		mov	r0, r4
+ 657 004c A949     		ldr	r1, .L116+12
+ 658 004e FFF7FEFF 		bl	strstr
+ 659              	.LVL37:
+ 187:user/src/emw3060_at.c ****         WIFI_PowerOnOff(POWER_OFF);
+ 660              		.loc 1 187 8 view .LVU194
+ 661 0052 70BB     		cbnz	r0, .L107
+ 196:user/src/emw3060_at.c ****         str = "+SNTPTIME:20";
+ 662              		.loc 1 196 5 is_stmt 1 view .LVU195
+ 196:user/src/emw3060_at.c ****         str = "+SNTPTIME:20";
+ 663              		.loc 1 196 19 is_stmt 0 view .LVU196
+ 664 0054 A54B     		ldr	r3, .L116+4
+ 196:user/src/emw3060_at.c ****         str = "+SNTPTIME:20";
+ 665              		.loc 1 196 8 view .LVU197
+ 666 0056 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 667 0058 012B     		cmp	r3, #1
+ 668 005a F3D1     		bne	.L38
+ 669              	.L44:
+ 197:user/src/emw3060_at.c ****         strPosition = strstr((char *)buf, str);
+ 670              		.loc 1 197 9 is_stmt 1 view .LVU198
+ 671              	.LVL38:
+ 198:user/src/emw3060_at.c ****         if (strPosition != NULL) {
+ 672              		.loc 1 198 9 view .LVU199
+ 198:user/src/emw3060_at.c ****         if (strPosition != NULL) {
+ 673              		.loc 1 198 23 is_stmt 0 view .LVU200
+ 674 005c 2046     		mov	r0, r4
+ 675 005e AA49     		ldr	r1, .L116+32
+ 676 0060 FFF7FEFF 		bl	strstr
+ 677              	.LVL39:
+ 199:user/src/emw3060_at.c ****             ProcessClock(strPosition);
+ 678              		.loc 1 199 9 is_stmt 1 view .LVU201
+ 199:user/src/emw3060_at.c ****             ProcessClock(strPosition);
+ 679              		.loc 1 199 12 is_stmt 0 view .LVU202
+ 680 0064 0028     		cmp	r0, #0
+ 681 0066 EDD0     		beq	.L38
+ 200:user/src/emw3060_at.c ****         }
+ 682              		.loc 1 200 13 is_stmt 1 view .LVU203
+ 683              	.LVL40:
+ 684              	.LBB175:
+ 685              	.LBI175:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 19
+
+
+  56:user/src/emw3060_at.c **** {
+ 686              		.loc 1 56 13 view .LVU204
+ 687              	.LBB176:
+  58:user/src/emw3060_at.c ****     u8 month, day, hour, minute, second;
+ 688              		.loc 1 58 5 view .LVU205
+  59:user/src/emw3060_at.c ****     struct TimeType time;
+ 689              		.loc 1 59 5 view .LVU206
+  60:user/src/emw3060_at.c ****     bool status = true;
+ 690              		.loc 1 60 5 view .LVU207
+  61:user/src/emw3060_at.c **** 
+ 691              		.loc 1 61 5 view .LVU208
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 692              		.loc 1 63 5 view .LVU209
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 693              		.loc 1 63 12 is_stmt 0 view .LVU210
+ 694 0068 827A     		ldrb	r2, [r0, #10]	@ zero_extendqisi2
+ 695              	.LVL41:
+ 696              	.LBB177:
+ 697              	.LBI177:
+  39:user/src/emw3060_at.c **** {
+ 698              		.loc 1 39 11 is_stmt 1 view .LVU211
+ 699              	.LBB178:
+  41:user/src/emw3060_at.c **** 
+ 700              		.loc 1 41 5 view .LVU212
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 701              		.loc 1 43 5 view .LVU213
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 702              		.loc 1 43 23 is_stmt 0 view .LVU214
+ 703 006a A2F13003 		sub	r3, r2, #48
+ 704 006e DBB2     		uxtb	r3, r3
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 705              		.loc 1 43 8 view .LVU215
+ 706 0070 092B     		cmp	r3, #9
+ 707 0072 00F29381 		bhi	.L45
+ 708              	.LBE178:
+ 709              	.LBE177:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 710              		.loc 1 63 40 view .LVU216
+ 711 0076 C3EB4312 		rsb	r2, r3, r3, lsl #5
+ 712              	.LVL42:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 713              		.loc 1 63 40 view .LVU217
+ 714 007a 03EB8203 		add	r3, r3, r2, lsl #2
+ 715 007e DB00     		lsls	r3, r3, #3
+ 716 0080 9AB2     		uxth	r2, r3
+ 717              	.LVL43:
+ 718              	.L46:
+ 719              	.LBB189:
+ 720              	.LBB185:
+  53:user/src/emw3060_at.c **** }
+ 721              		.loc 1 53 5 is_stmt 1 view .LVU218
+  53:user/src/emw3060_at.c **** }
+ 722              		.loc 1 53 5 is_stmt 0 view .LVU219
+ 723              	.LBE185:
+ 724              	.LBE189:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 725              		.loc 1 63 42 view .LVU220
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 20
+
+
+ 726 0082 C17A     		ldrb	r1, [r0, #11]	@ zero_extendqisi2
+ 727              	.LVL44:
+ 728              	.LBB190:
+ 729              	.LBI190:
+  39:user/src/emw3060_at.c **** {
+ 730              		.loc 1 39 11 is_stmt 1 view .LVU221
+ 731              	.LBB191:
+  41:user/src/emw3060_at.c **** 
+ 732              		.loc 1 41 5 view .LVU222
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 733              		.loc 1 43 5 view .LVU223
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 734              		.loc 1 43 23 is_stmt 0 view .LVU224
+ 735 0084 A1F13003 		sub	r3, r1, #48
+ 736 0088 DBB2     		uxtb	r3, r3
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 737              		.loc 1 43 8 view .LVU225
+ 738 008a 092B     		cmp	r3, #9
+ 739 008c 17D9     		bls	.L105
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 740              		.loc 1 45 12 is_stmt 1 view .LVU226
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 741              		.loc 1 45 15 is_stmt 0 view .LVU227
+ 742 008e A1F14103 		sub	r3, r1, #65
+ 743 0092 052B     		cmp	r3, #5
+ 744 0094 10D9     		bls	.L108
+ 745              	.LVL45:
+ 746              	.LBB192:
+ 747              	.LBI192:
+  39:user/src/emw3060_at.c **** {
+ 748              		.loc 1 39 11 is_stmt 1 view .LVU228
+ 749              	.LBB193:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 750              		.loc 1 47 12 view .LVU229
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 751              		.loc 1 47 15 is_stmt 0 view .LVU230
+ 752 0096 A1F16103 		sub	r3, r1, #97
+ 753 009a 052B     		cmp	r3, #5
+ 754 009c 00F2EB81 		bhi	.L85
+  48:user/src/emw3060_at.c ****     } else {
+ 755              		.loc 1 48 9 is_stmt 1 view .LVU231
+ 756              	.LVL46:
+  48:user/src/emw3060_at.c ****     } else {
+ 757              		.loc 1 48 13 is_stmt 0 view .LVU232
+ 758 00a0 A1F15703 		sub	r3, r1, #87
+ 759              	.LBE193:
+ 760              	.LBE192:
+ 761              	.LBE191:
+ 762              	.LBE190:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 763              		.loc 1 63 40 view .LVU233
+ 764 00a4 DBB2     		uxtb	r3, r3
+ 765 00a6 03EB8303 		add	r3, r3, r3, lsl #2
+ 766 00aa 03EB8303 		add	r3, r3, r3, lsl #2
+ 767 00ae 9B00     		lsls	r3, r3, #2
+ 768              	.LBB201:
+ 769              	.LBB198:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 21
+
+
+ 770              	.LBB196:
+ 771              	.LBB194:
+ 772 00b0 0AE0     		b	.L49
+ 773              	.LVL47:
+ 774              	.L107:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 775              		.loc 1 63 40 view .LVU234
+ 776 00b2 8E4E     		ldr	r6, .L116+4
+ 777 00b4 8E4D     		ldr	r5, .L116+8
+ 778 00b6 B6E7     		b	.L40
+ 779              	.LVL48:
+ 780              	.L108:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 781              		.loc 1 63 40 view .LVU235
+ 782              	.LBE194:
+ 783              	.LBE196:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 784              		.loc 1 46 9 is_stmt 1 view .LVU236
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 785              		.loc 1 46 13 is_stmt 0 view .LVU237
+ 786 00b8 A1F13703 		sub	r3, r1, #55
+ 787              	.LBE198:
+ 788              	.LBE201:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 789              		.loc 1 63 40 view .LVU238
+ 790 00bc DBB2     		uxtb	r3, r3
+ 791              	.LVL49:
+ 792              	.L105:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 793              		.loc 1 63 40 view .LVU239
+ 794 00be 03EB8303 		add	r3, r3, r3, lsl #2
+ 795 00c2 03EB8303 		add	r3, r3, r3, lsl #2
+ 796 00c6 9B00     		lsls	r3, r3, #2
+ 797              	.L49:
+ 798              	.LBB202:
+ 799              	.LBB199:
+  53:user/src/emw3060_at.c **** }
+ 800              		.loc 1 53 5 is_stmt 1 view .LVU240
+ 801              	.LVL50:
+  53:user/src/emw3060_at.c **** }
+ 802              		.loc 1 53 5 is_stmt 0 view .LVU241
+ 803              	.LBE199:
+ 804              	.LBE202:
+  64:user/src/emw3060_at.c ****     month = AscToHex(cRxBuf[15]) * 10 + AscToHex(cRxBuf[16]);
+ 805              		.loc 1 64 12 view .LVU242
+ 806 00c8 017B     		ldrb	r1, [r0, #12]	@ zero_extendqisi2
+ 807              	.LVL51:
+ 808              	.LBB203:
+ 809              	.LBI203:
+  39:user/src/emw3060_at.c **** {
+ 810              		.loc 1 39 11 is_stmt 1 view .LVU243
+ 811              	.LBB204:
+  41:user/src/emw3060_at.c **** 
+ 812              		.loc 1 41 5 view .LVU244
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 813              		.loc 1 43 5 view .LVU245
+ 814              	.LBE204:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 22
+
+
+ 815              	.LBE203:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 816              		.loc 1 63 40 is_stmt 0 view .LVU246
+ 817 00ca 1344     		add	r3, r3, r2
+ 818              	.LBB216:
+ 819              	.LBB211:
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 820              		.loc 1 43 23 view .LVU247
+ 821 00cc A1F13002 		sub	r2, r1, #48
+ 822 00d0 D2B2     		uxtb	r2, r2
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 823              		.loc 1 43 8 view .LVU248
+ 824 00d2 092A     		cmp	r2, #9
+ 825              	.LBE211:
+ 826              	.LBE216:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 827              		.loc 1 63 40 view .LVU249
+ 828 00d4 9BB2     		uxth	r3, r3
+ 829              	.LBB217:
+ 830              	.LBB212:
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 831              		.loc 1 43 8 view .LVU250
+ 832 00d6 12D9     		bls	.L106
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 833              		.loc 1 45 12 is_stmt 1 view .LVU251
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 834              		.loc 1 45 15 is_stmt 0 view .LVU252
+ 835 00d8 A1F14102 		sub	r2, r1, #65
+ 836 00dc 052A     		cmp	r2, #5
+ 837 00de 0BD9     		bls	.L109
+ 838              	.LVL52:
+ 839              	.LBB205:
+ 840              	.LBI205:
+  39:user/src/emw3060_at.c **** {
+ 841              		.loc 1 39 11 is_stmt 1 view .LVU253
+ 842              	.LBB206:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 843              		.loc 1 47 12 view .LVU254
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 844              		.loc 1 47 15 is_stmt 0 view .LVU255
+ 845 00e0 A1F16102 		sub	r2, r1, #97
+ 846 00e4 052A     		cmp	r2, #5
+ 847 00e6 00F2CD81 		bhi	.L86
+  48:user/src/emw3060_at.c ****     } else {
+ 848              		.loc 1 48 9 is_stmt 1 view .LVU256
+ 849              	.LVL53:
+  48:user/src/emw3060_at.c ****     } else {
+ 850              		.loc 1 48 13 is_stmt 0 view .LVU257
+ 851 00ea A1F15702 		sub	r2, r1, #87
+ 852              	.LBE206:
+ 853              	.LBE205:
+ 854              	.LBE212:
+ 855              	.LBE217:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 856              		.loc 1 63 69 view .LVU258
+ 857 00ee D2B2     		uxtb	r2, r2
+ 858 00f0 02EB8202 		add	r2, r2, r2, lsl #2
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 23
+
+
+ 859 00f4 5200     		lsls	r2, r2, #1
+ 860              	.LBB218:
+ 861              	.LBB213:
+ 862              	.LBB209:
+ 863              	.LBB207:
+ 864 00f6 05E0     		b	.L52
+ 865              	.LVL54:
+ 866              	.L109:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 867              		.loc 1 63 69 view .LVU259
+ 868              	.LBE207:
+ 869              	.LBE209:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 870              		.loc 1 46 9 is_stmt 1 view .LVU260
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 871              		.loc 1 46 13 is_stmt 0 view .LVU261
+ 872 00f8 A1F13702 		sub	r2, r1, #55
+ 873              	.LBE213:
+ 874              	.LBE218:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 875              		.loc 1 63 69 view .LVU262
+ 876 00fc D2B2     		uxtb	r2, r2
+ 877              	.LVL55:
+ 878              	.L106:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 879              		.loc 1 63 69 view .LVU263
+ 880 00fe 02EB8202 		add	r2, r2, r2, lsl #2
+ 881 0102 5200     		lsls	r2, r2, #1
+ 882              	.L52:
+ 883              	.LBB219:
+ 884              	.LBB214:
+  53:user/src/emw3060_at.c **** }
+ 885              		.loc 1 53 5 is_stmt 1 view .LVU264
+ 886              	.LVL56:
+  53:user/src/emw3060_at.c **** }
+ 887              		.loc 1 53 5 is_stmt 0 view .LVU265
+ 888              	.LBE214:
+ 889              	.LBE219:
+  64:user/src/emw3060_at.c ****     month = AscToHex(cRxBuf[15]) * 10 + AscToHex(cRxBuf[16]);
+ 890              		.loc 1 64 40 view .LVU266
+ 891 0104 447B     		ldrb	r4, [r0, #13]	@ zero_extendqisi2
+ 892              	.LVL57:
+ 893              	.LBB220:
+ 894              	.LBI220:
+  39:user/src/emw3060_at.c **** {
+ 895              		.loc 1 39 11 is_stmt 1 view .LVU267
+ 896              	.LBB221:
+  41:user/src/emw3060_at.c **** 
+ 897              		.loc 1 41 5 view .LVU268
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 898              		.loc 1 43 5 view .LVU269
+ 899              	.LBE221:
+ 900              	.LBE220:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 901              		.loc 1 63 69 is_stmt 0 view .LVU270
+ 902 0106 1344     		add	r3, r3, r2
+ 903              	.LBB230:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 24
+
+
+ 904              	.LBB224:
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 905              		.loc 1 43 23 view .LVU271
+ 906 0108 A4F13002 		sub	r2, r4, #48
+ 907 010c D2B2     		uxtb	r2, r2
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 908              		.loc 1 43 8 view .LVU272
+ 909 010e 092A     		cmp	r2, #9
+ 910              	.LBE224:
+ 911              	.LBE230:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 912              		.loc 1 63 69 view .LVU273
+ 913 0110 99B2     		uxth	r1, r3
+ 914              	.LBB231:
+ 915              	.LBB225:
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 916              		.loc 1 43 8 view .LVU274
+ 917 0112 00F23B81 		bhi	.L54
+ 918              	.LBE225:
+ 919              	.LBE231:
+  64:user/src/emw3060_at.c ****     month = AscToHex(cRxBuf[15]) * 10 + AscToHex(cRxBuf[16]);
+ 920              		.loc 1 64 40 view .LVU275
+ 921 0116 93B2     		uxth	r3, r2
+ 922              	.LVL58:
+ 923              	.L55:
+ 924              	.LBB232:
+ 925              	.LBB226:
+  53:user/src/emw3060_at.c **** }
+ 926              		.loc 1 53 5 is_stmt 1 view .LVU276
+  53:user/src/emw3060_at.c **** }
+ 927              		.loc 1 53 5 is_stmt 0 view .LVU277
+ 928              	.LBE226:
+ 929              	.LBE232:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 930              		.loc 1 65 13 view .LVU278
+ 931 0118 C47B     		ldrb	r4, [r0, #15]	@ zero_extendqisi2
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 932              		.loc 1 63 10 view .LVU279
+ 933 011a 0B44     		add	r3, r3, r1
+ 934              	.LBB233:
+ 935              	.LBB234:
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 936              		.loc 1 43 23 view .LVU280
+ 937 011c A4F13001 		sub	r1, r4, #48
+ 938 0120 C9B2     		uxtb	r1, r1
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 939              		.loc 1 43 8 view .LVU281
+ 940 0122 0929     		cmp	r1, #9
+ 941              	.LBE234:
+ 942              	.LBE233:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 943              		.loc 1 63 10 view .LVU282
+ 944 0124 9BB2     		uxth	r3, r3
+ 945              	.LVL59:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 946              		.loc 1 65 5 is_stmt 1 view .LVU283
+ 947              	.LBB248:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 25
+
+
+ 948              	.LBI233:
+  39:user/src/emw3060_at.c **** {
+ 949              		.loc 1 39 11 view .LVU284
+ 950              	.LBB241:
+  41:user/src/emw3060_at.c **** 
+ 951              		.loc 1 41 5 view .LVU285
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 952              		.loc 1 43 5 view .LVU286
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 953              		.loc 1 43 8 is_stmt 0 view .LVU287
+ 954 0126 00F22281 		bhi	.L57
+ 955              	.LBE241:
+ 956              	.LBE248:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 957              		.loc 1 65 39 view .LVU288
+ 958 012a 01EB8101 		add	r1, r1, r1, lsl #2
+ 959 012e 4900     		lsls	r1, r1, #1
+ 960 0130 C9B2     		uxtb	r1, r1
+ 961              	.LVL60:
+ 962              	.L58:
+ 963              	.LBB249:
+ 964              	.LBB242:
+  53:user/src/emw3060_at.c **** }
+ 965              		.loc 1 53 5 is_stmt 1 view .LVU289
+  53:user/src/emw3060_at.c **** }
+ 966              		.loc 1 53 5 is_stmt 0 view .LVU290
+ 967              	.LBE242:
+ 968              	.LBE249:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 969              		.loc 1 65 41 view .LVU291
+ 970 0132 027C     		ldrb	r2, [r0, #16]	@ zero_extendqisi2
+ 971              	.LVL61:
+ 972              	.LBB250:
+ 973              	.LBI250:
+  39:user/src/emw3060_at.c **** {
+ 974              		.loc 1 39 11 is_stmt 1 view .LVU292
+ 975              	.LBB251:
+  41:user/src/emw3060_at.c **** 
+ 976              		.loc 1 41 5 view .LVU293
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 977              		.loc 1 43 5 view .LVU294
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 978              		.loc 1 43 23 is_stmt 0 view .LVU295
+ 979 0134 A2F1300E 		sub	lr, r2, #48
+ 980 0138 5FFA8EFE 		uxtb	lr, lr
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 981              		.loc 1 43 8 view .LVU296
+ 982 013c BEF1090F 		cmp	lr, #9
+ 983 0140 07D9     		bls	.L60
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 984              		.loc 1 45 12 is_stmt 1 view .LVU297
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 985              		.loc 1 45 15 is_stmt 0 view .LVU298
+ 986 0142 A2F14104 		sub	r4, r2, #65
+ 987 0146 052C     		cmp	r4, #5
+ 988 0148 00F26D81 		bhi	.L61
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 26
+
+
+ 989              		.loc 1 46 9 is_stmt 1 view .LVU299
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 990              		.loc 1 46 13 is_stmt 0 view .LVU300
+ 991 014c 373A     		subs	r2, r2, #55
+ 992              	.LVL62:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 993              		.loc 1 46 13 view .LVU301
+ 994 014e 5FFA82FE 		uxtb	lr, r2
+ 995              	.LVL63:
+ 996              	.L60:
+  53:user/src/emw3060_at.c **** }
+ 997              		.loc 1 53 5 is_stmt 1 view .LVU302
+  53:user/src/emw3060_at.c **** }
+ 998              		.loc 1 53 5 is_stmt 0 view .LVU303
+ 999              	.LBE251:
+ 1000              	.LBE250:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1001              		.loc 1 66 5 is_stmt 1 view .LVU304
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1002              		.loc 1 66 11 is_stmt 0 view .LVU305
+ 1003 0152 847C     		ldrb	r4, [r0, #18]	@ zero_extendqisi2
+ 1004              	.LVL64:
+ 1005              	.LBB255:
+ 1006              	.LBI255:
+  39:user/src/emw3060_at.c **** {
+ 1007              		.loc 1 39 11 is_stmt 1 view .LVU306
+ 1008              	.LBB256:
+  41:user/src/emw3060_at.c **** 
+ 1009              		.loc 1 41 5 view .LVU307
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1010              		.loc 1 43 5 view .LVU308
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1011              		.loc 1 43 23 is_stmt 0 view .LVU309
+ 1012 0154 A4F13002 		sub	r2, r4, #48
+ 1013 0158 D2B2     		uxtb	r2, r2
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1014              		.loc 1 43 8 view .LVU310
+ 1015 015a 092A     		cmp	r2, #9
+ 1016 015c 00F2F880 		bhi	.L62
+ 1017              	.LBE256:
+ 1018              	.LBE255:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1019              		.loc 1 66 37 view .LVU311
+ 1020 0160 02EB8202 		add	r2, r2, r2, lsl #2
+ 1021 0164 5200     		lsls	r2, r2, #1
+ 1022 0166 D2B2     		uxtb	r2, r2
+ 1023              	.LVL65:
+ 1024              	.L63:
+ 1025              	.LBB269:
+ 1026              	.LBB263:
+  53:user/src/emw3060_at.c **** }
+ 1027              		.loc 1 53 5 is_stmt 1 view .LVU312
+  53:user/src/emw3060_at.c **** }
+ 1028              		.loc 1 53 5 is_stmt 0 view .LVU313
+ 1029              	.LBE263:
+ 1030              	.LBE269:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 27
+
+
+ 1031              		.loc 1 66 39 view .LVU314
+ 1032 0168 C47C     		ldrb	r4, [r0, #19]	@ zero_extendqisi2
+ 1033              	.LVL66:
+ 1034              	.LBB270:
+ 1035              	.LBI270:
+  39:user/src/emw3060_at.c **** {
+ 1036              		.loc 1 39 11 is_stmt 1 view .LVU315
+ 1037              	.LBB271:
+  41:user/src/emw3060_at.c **** 
+ 1038              		.loc 1 41 5 view .LVU316
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1039              		.loc 1 43 5 view .LVU317
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1040              		.loc 1 43 23 is_stmt 0 view .LVU318
+ 1041 016a A4F13005 		sub	r5, r4, #48
+ 1042 016e EDB2     		uxtb	r5, r5
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1043              		.loc 1 43 8 view .LVU319
+ 1044 0170 092D     		cmp	r5, #9
+ 1045 0172 06D9     		bls	.L65
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1046              		.loc 1 45 12 is_stmt 1 view .LVU320
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1047              		.loc 1 45 15 is_stmt 0 view .LVU321
+ 1048 0174 A4F14105 		sub	r5, r4, #65
+ 1049 0178 052D     		cmp	r5, #5
+ 1050 017a 00F24C81 		bhi	.L66
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1051              		.loc 1 46 9 is_stmt 1 view .LVU322
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1052              		.loc 1 46 13 is_stmt 0 view .LVU323
+ 1053 017e 373C     		subs	r4, r4, #55
+ 1054              	.LVL67:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1055              		.loc 1 46 13 view .LVU324
+ 1056 0180 E5B2     		uxtb	r5, r4
+ 1057              	.LVL68:
+ 1058              	.L65:
+  53:user/src/emw3060_at.c **** }
+ 1059              		.loc 1 53 5 is_stmt 1 view .LVU325
+  53:user/src/emw3060_at.c **** }
+ 1060              		.loc 1 53 5 is_stmt 0 view .LVU326
+ 1061              	.LBE271:
+ 1062              	.LBE270:
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1063              		.loc 1 67 5 is_stmt 1 view .LVU327
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1064              		.loc 1 67 12 is_stmt 0 view .LVU328
+ 1065 0182 467D     		ldrb	r6, [r0, #21]	@ zero_extendqisi2
+ 1066              	.LVL69:
+ 1067              	.LBB275:
+ 1068              	.LBI275:
+  39:user/src/emw3060_at.c **** {
+ 1069              		.loc 1 39 11 is_stmt 1 view .LVU329
+ 1070              	.LBB276:
+  41:user/src/emw3060_at.c **** 
+ 1071              		.loc 1 41 5 view .LVU330
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 28
+
+
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1072              		.loc 1 43 5 view .LVU331
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1073              		.loc 1 43 23 is_stmt 0 view .LVU332
+ 1074 0184 A6F13004 		sub	r4, r6, #48
+ 1075 0188 E4B2     		uxtb	r4, r4
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1076              		.loc 1 43 8 view .LVU333
+ 1077 018a 092C     		cmp	r4, #9
+ 1078 018c 00F2D180 		bhi	.L67
+ 1079              	.LBE276:
+ 1080              	.LBE275:
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1081              		.loc 1 67 38 view .LVU334
+ 1082 0190 04EB8404 		add	r4, r4, r4, lsl #2
+ 1083 0194 6400     		lsls	r4, r4, #1
+ 1084 0196 E4B2     		uxtb	r4, r4
+ 1085              	.LVL70:
+ 1086              	.L68:
+ 1087              	.LBB289:
+ 1088              	.LBB283:
+  53:user/src/emw3060_at.c **** }
+ 1089              		.loc 1 53 5 is_stmt 1 view .LVU335
+  53:user/src/emw3060_at.c **** }
+ 1090              		.loc 1 53 5 is_stmt 0 view .LVU336
+ 1091              	.LBE283:
+ 1092              	.LBE289:
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1093              		.loc 1 67 40 view .LVU337
+ 1094 0198 877D     		ldrb	r7, [r0, #22]	@ zero_extendqisi2
+ 1095              	.LVL71:
+ 1096              	.LBB290:
+ 1097              	.LBI290:
+  39:user/src/emw3060_at.c **** {
+ 1098              		.loc 1 39 11 is_stmt 1 view .LVU338
+ 1099              	.LBB291:
+  41:user/src/emw3060_at.c **** 
+ 1100              		.loc 1 41 5 view .LVU339
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1101              		.loc 1 43 5 view .LVU340
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1102              		.loc 1 43 23 is_stmt 0 view .LVU341
+ 1103 019a A7F13006 		sub	r6, r7, #48
+ 1104 019e F6B2     		uxtb	r6, r6
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1105              		.loc 1 43 8 view .LVU342
+ 1106 01a0 092E     		cmp	r6, #9
+ 1107 01a2 07D9     		bls	.L70
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1108              		.loc 1 45 12 is_stmt 1 view .LVU343
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1109              		.loc 1 45 15 is_stmt 0 view .LVU344
+ 1110 01a4 A7F14106 		sub	r6, r7, #65
+ 1111 01a8 052E     		cmp	r6, #5
+ 1112 01aa 00F25281 		bhi	.L71
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1113              		.loc 1 46 9 is_stmt 1 view .LVU345
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 29
+
+
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1114              		.loc 1 46 13 is_stmt 0 view .LVU346
+ 1115 01ae A7F13706 		sub	r6, r7, #55
+ 1116 01b2 F6B2     		uxtb	r6, r6
+ 1117              	.LVL72:
+ 1118              	.L70:
+  53:user/src/emw3060_at.c **** }
+ 1119              		.loc 1 53 5 is_stmt 1 view .LVU347
+  53:user/src/emw3060_at.c **** }
+ 1120              		.loc 1 53 5 is_stmt 0 view .LVU348
+ 1121              	.LBE291:
+ 1122              	.LBE290:
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1123              		.loc 1 68 5 is_stmt 1 view .LVU349
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1124              		.loc 1 68 14 is_stmt 0 view .LVU350
+ 1125 01b4 077E     		ldrb	r7, [r0, #24]	@ zero_extendqisi2
+ 1126              	.LVL73:
+ 1127              	.LBB295:
+ 1128              	.LBI295:
+  39:user/src/emw3060_at.c **** {
+ 1129              		.loc 1 39 11 is_stmt 1 view .LVU351
+ 1130              	.LBB296:
+  41:user/src/emw3060_at.c **** 
+ 1131              		.loc 1 41 5 view .LVU352
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1132              		.loc 1 43 5 view .LVU353
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1133              		.loc 1 43 23 is_stmt 0 view .LVU354
+ 1134 01b6 A7F1300C 		sub	ip, r7, #48
+ 1135 01ba 5FFA8CFC 		uxtb	ip, ip
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1136              		.loc 1 43 8 view .LVU355
+ 1137 01be BCF1090F 		cmp	ip, #9
+ 1138 01c2 00F2A580 		bhi	.L72
+ 1139              	.LBE296:
+ 1140              	.LBE295:
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1141              		.loc 1 68 40 view .LVU356
+ 1142 01c6 0CEB8C0C 		add	ip, ip, ip, lsl #2
+ 1143 01ca 4FEA4C0C 		lsl	ip, ip, #1
+ 1144 01ce 5FFA8CF7 		uxtb	r7, ip
+ 1145              	.LVL74:
+ 1146              	.L73:
+ 1147              	.LBB309:
+ 1148              	.LBB303:
+  53:user/src/emw3060_at.c **** }
+ 1149              		.loc 1 53 5 is_stmt 1 view .LVU357
+  53:user/src/emw3060_at.c **** }
+ 1150              		.loc 1 53 5 is_stmt 0 view .LVU358
+ 1151              	.LBE303:
+ 1152              	.LBE309:
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1153              		.loc 1 68 42 view .LVU359
+ 1154 01d2 90F819C0 		ldrb	ip, [r0, #25]	@ zero_extendqisi2
+ 1155              	.LVL75:
+ 1156              	.LBB310:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 30
+
+
+ 1157              	.LBI310:
+  39:user/src/emw3060_at.c **** {
+ 1158              		.loc 1 39 11 is_stmt 1 view .LVU360
+ 1159              	.LBB311:
+  41:user/src/emw3060_at.c **** 
+ 1160              		.loc 1 41 5 view .LVU361
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1161              		.loc 1 43 5 view .LVU362
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1162              		.loc 1 43 23 is_stmt 0 view .LVU363
+ 1163 01d6 ACF13008 		sub	r8, ip, #48
+ 1164 01da 5FFA88F8 		uxtb	r8, r8
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1165              		.loc 1 43 8 view .LVU364
+ 1166 01de B8F1090F 		cmp	r8, #9
+ 1167 01e2 09D9     		bls	.L75
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1168              		.loc 1 45 12 is_stmt 1 view .LVU365
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1169              		.loc 1 45 15 is_stmt 0 view .LVU366
+ 1170 01e4 ACF14108 		sub	r8, ip, #65
+ 1171 01e8 B8F1050F 		cmp	r8, #5
+ 1172 01ec 00F22581 		bhi	.L76
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1173              		.loc 1 46 9 is_stmt 1 view .LVU367
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1174              		.loc 1 46 13 is_stmt 0 view .LVU368
+ 1175 01f0 ACF1370C 		sub	ip, ip, #55
+ 1176              	.LVL76:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1177              		.loc 1 46 13 view .LVU369
+ 1178 01f4 5FFA8CF8 		uxtb	r8, ip
+ 1179              	.LVL77:
+ 1180              	.L75:
+  53:user/src/emw3060_at.c **** }
+ 1181              		.loc 1 53 5 is_stmt 1 view .LVU370
+  53:user/src/emw3060_at.c **** }
+ 1182              		.loc 1 53 5 is_stmt 0 view .LVU371
+ 1183              	.LBE311:
+ 1184              	.LBE310:
+  69:user/src/emw3060_at.c **** 
+ 1185              		.loc 1 69 5 is_stmt 1 view .LVU372
+  69:user/src/emw3060_at.c **** 
+ 1186              		.loc 1 69 14 is_stmt 0 view .LVU373
+ 1187 01f8 90F81B90 		ldrb	r9, [r0, #27]	@ zero_extendqisi2
+ 1188              	.LVL78:
+ 1189              	.LBB315:
+ 1190              	.LBI315:
+  39:user/src/emw3060_at.c **** {
+ 1191              		.loc 1 39 11 is_stmt 1 view .LVU374
+ 1192              	.LBB316:
+  41:user/src/emw3060_at.c **** 
+ 1193              		.loc 1 41 5 view .LVU375
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1194              		.loc 1 43 5 view .LVU376
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1195              		.loc 1 43 23 is_stmt 0 view .LVU377
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 31
+
+
+ 1196 01fc A9F1300C 		sub	ip, r9, #48
+ 1197 0200 5FFA8CFC 		uxtb	ip, ip
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1198              		.loc 1 43 8 view .LVU378
+ 1199 0204 BCF1090F 		cmp	ip, #9
+ 1200 0208 58D8     		bhi	.L77
+ 1201              	.LBE316:
+ 1202              	.LBE315:
+  69:user/src/emw3060_at.c **** 
+ 1203              		.loc 1 69 40 view .LVU379
+ 1204 020a 0CEB8C0C 		add	ip, ip, ip, lsl #2
+ 1205 020e 4FEA4C0C 		lsl	ip, ip, #1
+ 1206 0212 5FFA8CFC 		uxtb	ip, ip
+ 1207              	.LVL79:
+ 1208              	.L78:
+ 1209              	.LBB329:
+ 1210              	.LBB323:
+  53:user/src/emw3060_at.c **** }
+ 1211              		.loc 1 53 5 is_stmt 1 view .LVU380
+  53:user/src/emw3060_at.c **** }
+ 1212              		.loc 1 53 5 is_stmt 0 view .LVU381
+ 1213              	.LBE323:
+ 1214              	.LBE329:
+  69:user/src/emw3060_at.c **** 
+ 1215              		.loc 1 69 42 view .LVU382
+ 1216 0216 90F81C90 		ldrb	r9, [r0, #28]	@ zero_extendqisi2
+ 1217              	.LVL80:
+ 1218              	.LBB330:
+ 1219              	.LBI330:
+  39:user/src/emw3060_at.c **** {
+ 1220              		.loc 1 39 11 is_stmt 1 view .LVU383
+ 1221              	.LBB331:
+  41:user/src/emw3060_at.c **** 
+ 1222              		.loc 1 41 5 view .LVU384
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1223              		.loc 1 43 5 view .LVU385
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1224              		.loc 1 43 23 is_stmt 0 view .LVU386
+ 1225 021a A9F13000 		sub	r0, r9, #48
+ 1226              	.LVL81:
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1227              		.loc 1 43 23 view .LVU387
+ 1228 021e C0B2     		uxtb	r0, r0
+  43:user/src/emw3060_at.c ****         hex -= 0x30;
+ 1229              		.loc 1 43 8 view .LVU388
+ 1230 0220 0928     		cmp	r0, #9
+ 1231 0222 07D9     		bls	.L80
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1232              		.loc 1 45 12 is_stmt 1 view .LVU389
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1233              		.loc 1 45 15 is_stmt 0 view .LVU390
+ 1234 0224 A9F14100 		sub	r0, r9, #65
+ 1235 0228 0528     		cmp	r0, #5
+ 1236 022a 00F21B81 		bhi	.L81
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1237              		.loc 1 46 9 is_stmt 1 view .LVU391
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 32
+
+
+ 1238              		.loc 1 46 13 is_stmt 0 view .LVU392
+ 1239 022e A9F13700 		sub	r0, r9, #55
+ 1240 0232 C0B2     		uxtb	r0, r0
+ 1241              	.LVL82:
+ 1242              	.L80:
+  53:user/src/emw3060_at.c **** }
+ 1243              		.loc 1 53 5 is_stmt 1 view .LVU393
+  53:user/src/emw3060_at.c **** }
+ 1244              		.loc 1 53 5 is_stmt 0 view .LVU394
+ 1245              	.LBE331:
+ 1246              	.LBE330:
+  71:user/src/emw3060_at.c ****         status = false;
+ 1247              		.loc 1 71 5 is_stmt 1 view .LVU395
+  71:user/src/emw3060_at.c ****         status = false;
+ 1248              		.loc 1 71 8 is_stmt 0 view .LVU396
+ 1249 0234 A3F5FA69 		sub	r9, r3, #2000
+ 1250 0238 B9F1630F 		cmp	r9, #99
+ 1251 023c 38D8     		bhi	.L82
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 1252              		.loc 1 65 11 view .LVU397
+ 1253 023e 7144     		add	r1, r1, lr
+ 1254              	.LVL83:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 1255              		.loc 1 65 11 view .LVU398
+ 1256 0240 C9B2     		uxtb	r1, r1
+  74:user/src/emw3060_at.c ****             (day == 0) || (day > 31) || (hour > 23) || (minute > 59) || (second > 59)) {
+ 1257              		.loc 1 74 9 is_stmt 1 view .LVU399
+  74:user/src/emw3060_at.c ****             (day == 0) || (day > 31) || (hour > 23) || (minute > 59) || (second > 59)) {
+ 1258              		.loc 1 74 44 is_stmt 0 view .LVU400
+ 1259 0242 01F1FF3E 		add	lr, r1, #-1
+  74:user/src/emw3060_at.c ****             (day == 0) || (day > 31) || (hour > 23) || (minute > 59) || (second > 59)) {
+ 1260              		.loc 1 74 44 view .LVU401
+ 1261 0246 BEF10B0F 		cmp	lr, #11
+ 1262 024a 31D8     		bhi	.L82
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1263              		.loc 1 66 9 view .LVU402
+ 1264 024c 2A44     		add	r2, r2, r5
+ 1265              	.LVL84:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1266              		.loc 1 66 9 view .LVU403
+ 1267 024e D2B2     		uxtb	r2, r2
+  74:user/src/emw3060_at.c ****             (day == 0) || (day > 31) || (hour > 23) || (minute > 59) || (second > 59)) {
+ 1268              		.loc 1 74 76 view .LVU404
+ 1269 0250 551E     		subs	r5, r2, #1
+  74:user/src/emw3060_at.c ****             (day == 0) || (day > 31) || (hour > 23) || (minute > 59) || (second > 59)) {
+ 1270              		.loc 1 74 76 view .LVU405
+ 1271 0252 1E2D     		cmp	r5, #30
+ 1272 0254 2CD8     		bhi	.L82
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1273              		.loc 1 67 10 view .LVU406
+ 1274 0256 3444     		add	r4, r4, r6
+ 1275              	.LVL85:
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1276              		.loc 1 67 10 view .LVU407
+ 1277 0258 E4B2     		uxtb	r4, r4
+  75:user/src/emw3060_at.c ****             status = false;
+ 1278              		.loc 1 75 38 view .LVU408
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 33
+
+
+ 1279 025a 172C     		cmp	r4, #23
+ 1280 025c 28D8     		bhi	.L82
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1281              		.loc 1 68 12 view .LVU409
+ 1282 025e 4744     		add	r7, r7, r8
+ 1283              	.LVL86:
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1284              		.loc 1 68 12 view .LVU410
+ 1285 0260 FDB2     		uxtb	r5, r7
+  75:user/src/emw3060_at.c ****             status = false;
+ 1286              		.loc 1 75 53 view .LVU411
+ 1287 0262 3B2D     		cmp	r5, #59
+ 1288 0264 24D8     		bhi	.L82
+  69:user/src/emw3060_at.c **** 
+ 1289              		.loc 1 69 12 view .LVU412
+ 1290 0266 8444     		add	ip, ip, r0
+ 1291              	.LVL87:
+  69:user/src/emw3060_at.c **** 
+ 1292              		.loc 1 69 12 view .LVU413
+ 1293 0268 5FFA8CF6 		uxtb	r6, ip
+  75:user/src/emw3060_at.c ****             status = false;
+ 1294              		.loc 1 75 70 view .LVU414
+ 1295 026c 3B2E     		cmp	r6, #59
+ 1296 026e 1FD8     		bhi	.L82
+  80:user/src/emw3060_at.c ****         time.year = year;
+ 1297              		.loc 1 80 5 is_stmt 1 view .LVU415
+  81:user/src/emw3060_at.c ****         time.month = month;
+ 1298              		.loc 1 81 9 view .LVU416
+  86:user/src/emw3060_at.c ****         CalculateWeek(time.year, time.month, time.day, &time.week);
+ 1299              		.loc 1 86 18 is_stmt 0 view .LVU417
+ 1300 0270 0027     		movs	r7, #0
+ 1301 0272 66F30707 		bfi	r7, r6, #0, #8
+  86:user/src/emw3060_at.c ****         CalculateWeek(time.year, time.month, time.day, &time.week);
+ 1302              		.loc 1 86 18 view .LVU418
+ 1303 0276 65F30F27 		bfi	r7, r5, #8, #8
+ 1304 027a 64F31747 		bfi	r7, r4, #16, #8
+ 1305 027e 62F31F67 		bfi	r7, r2, #24, #8
+  87:user/src/emw3060_at.c **** 
+ 1306              		.loc 1 87 9 view .LVU419
+ 1307 0282 1846     		mov	r0, r3
+  81:user/src/emw3060_at.c ****         time.month = month;
+ 1308              		.loc 1 81 19 view .LVU420
+ 1309 0284 ADF80630 		strh	r3, [sp, #6]	@ movhi
+  82:user/src/emw3060_at.c ****         time.day = day;
+ 1310              		.loc 1 82 9 is_stmt 1 view .LVU421
+  87:user/src/emw3060_at.c **** 
+ 1311              		.loc 1 87 9 is_stmt 0 view .LVU422
+ 1312 0288 01AB     		add	r3, sp, #4
+ 1313              	.LVL88:
+  82:user/src/emw3060_at.c ****         time.day = day;
+ 1314              		.loc 1 82 20 view .LVU423
+ 1315 028a 8DF80510 		strb	r1, [sp, #5]
+  83:user/src/emw3060_at.c ****         time.hour = hour;
+ 1316              		.loc 1 83 9 is_stmt 1 view .LVU424
+  84:user/src/emw3060_at.c ****         time.min = minute;
+ 1317              		.loc 1 84 9 view .LVU425
+  85:user/src/emw3060_at.c ****         time.sec = second;
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 34
+
+
+ 1318              		.loc 1 85 9 view .LVU426
+  86:user/src/emw3060_at.c ****         CalculateWeek(time.year, time.month, time.day, &time.week);
+ 1319              		.loc 1 86 9 view .LVU427
+  86:user/src/emw3060_at.c ****         CalculateWeek(time.year, time.month, time.day, &time.week);
+ 1320              		.loc 1 86 18 is_stmt 0 view .LVU428
+ 1321 028e 0097     		str	r7, [sp]
+  87:user/src/emw3060_at.c **** 
+ 1322              		.loc 1 87 9 is_stmt 1 view .LVU429
+ 1323 0290 FFF7FEFF 		bl	CalculateWeek
+ 1324              	.LVL89:
+  89:user/src/emw3060_at.c ****         g_powerOffCtr = 0x00;
+ 1325              		.loc 1 89 9 view .LVU430
+ 1326 0294 1D48     		ldr	r0, .L116+36
+ 1327 0296 FFF7FEFF 		bl	HAL_UART_DeInit
+ 1328              	.LVL90:
+  90:user/src/emw3060_at.c ****         EMW3060_AT_POWER_PIN_LOW();
+ 1329              		.loc 1 90 9 view .LVU431
+  90:user/src/emw3060_at.c ****         EMW3060_AT_POWER_PIN_LOW();
+ 1330              		.loc 1 90 23 is_stmt 0 view .LVU432
+ 1331 029a 0022     		movs	r2, #0
+ 1332 029c 184B     		ldr	r3, .L116+24
+  91:user/src/emw3060_at.c ****         SetClock(&time);
+ 1333              		.loc 1 91 9 view .LVU433
+ 1334 029e 2021     		movs	r1, #32
+ 1335 02a0 1548     		ldr	r0, .L116+16
+  90:user/src/emw3060_at.c ****         EMW3060_AT_POWER_PIN_LOW();
+ 1336              		.loc 1 90 23 view .LVU434
+ 1337 02a2 1A70     		strb	r2, [r3]
+  91:user/src/emw3060_at.c ****         SetClock(&time);
+ 1338              		.loc 1 91 9 is_stmt 1 view .LVU435
+  91:user/src/emw3060_at.c ****         SetClock(&time);
+ 1339              		.loc 1 91 9 view .LVU436
+ 1340 02a4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1341              	.LVL91:
+  91:user/src/emw3060_at.c ****         SetClock(&time);
+ 1342              		.loc 1 91 9 view .LVU437
+  92:user/src/emw3060_at.c ****     } else {
+ 1343              		.loc 1 92 9 view .LVU438
+ 1344 02a8 6846     		mov	r0, sp
+ 1345 02aa FFF7FEFF 		bl	SetClock
+ 1346              	.LVL92:
+ 1347 02ae C9E6     		b	.L38
+ 1348              	.LVL93:
+ 1349              	.L82:
+  94:user/src/emw3060_at.c ****     }
+ 1350              		.loc 1 94 9 view .LVU439
+  94:user/src/emw3060_at.c ****     }
+ 1351              		.loc 1 94 22 is_stmt 0 view .LVU440
+ 1352 02b0 0A22     		movs	r2, #10
+ 1353 02b2 0F4B     		ldr	r3, .L116+8
+ 1354              	.LVL94:
+  94:user/src/emw3060_at.c ****     }
+ 1355              		.loc 1 94 22 view .LVU441
+ 1356 02b4 1A70     		strb	r2, [r3]
+  97:user/src/emw3060_at.c **** }
+ 1357              		.loc 1 97 5 is_stmt 1 view .LVU442
+ 1358              	.LVL95:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 35
+
+
+  97:user/src/emw3060_at.c **** }
+ 1359              		.loc 1 97 5 is_stmt 0 view .LVU443
+ 1360              	.LBE176:
+ 1361              	.LBE175:
+ 1362              		.loc 1 203 1 view .LVU444
+ 1363 02b6 03B0     		add	sp, sp, #12
+ 1364              	.LCFI10:
+ 1365              		.cfi_remember_state
+ 1366              		.cfi_def_cfa_offset 28
+ 1367              		@ sp needed
+ 1368 02b8 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 1369              	.LVL96:
+ 1370              	.L77:
+ 1371              	.LCFI11:
+ 1372              		.cfi_restore_state
+ 1373              	.LBB374:
+ 1374              	.LBB373:
+ 1375              	.LBB335:
+ 1376              	.LBB324:
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1377              		.loc 1 45 12 is_stmt 1 view .LVU445
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1378              		.loc 1 45 15 is_stmt 0 view .LVU446
+ 1379 02bc A9F1410C 		sub	ip, r9, #65
+ 1380 02c0 BCF1050F 		cmp	ip, #5
+ 1381 02c4 40F29E80 		bls	.L110
+ 1382              	.LVL97:
+ 1383              	.LBB317:
+ 1384              	.LBI317:
+  39:user/src/emw3060_at.c **** {
+ 1385              		.loc 1 39 11 is_stmt 1 view .LVU447
+ 1386              	.LBB318:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1387              		.loc 1 47 12 view .LVU448
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1388              		.loc 1 47 15 is_stmt 0 view .LVU449
+ 1389 02c8 A9F1610C 		sub	ip, r9, #97
+ 1390 02cc BCF1050F 		cmp	ip, #5
+ 1391 02d0 00F2E280 		bhi	.L96
+  48:user/src/emw3060_at.c ****     } else {
+ 1392              		.loc 1 48 9 is_stmt 1 view .LVU450
+ 1393              	.LVL98:
+  48:user/src/emw3060_at.c ****     } else {
+ 1394              		.loc 1 48 13 is_stmt 0 view .LVU451
+ 1395 02d4 A9F15709 		sub	r9, r9, #87
+ 1396              	.LVL99:
+  48:user/src/emw3060_at.c ****     } else {
+ 1397              		.loc 1 48 13 view .LVU452
+ 1398              	.LBE318:
+ 1399              	.LBE317:
+ 1400              	.LBE324:
+ 1401              	.LBE335:
+  69:user/src/emw3060_at.c **** 
+ 1402              		.loc 1 69 40 view .LVU453
+ 1403 02d8 09EB8909 		add	r9, r9, r9, lsl #2
+ 1404              	.LVL100:
+  69:user/src/emw3060_at.c **** 
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 36
+
+
+ 1405              		.loc 1 69 40 view .LVU454
+ 1406 02dc 4FEA490C 		lsl	ip, r9, #1
+ 1407              	.LVL101:
+  69:user/src/emw3060_at.c **** 
+ 1408              		.loc 1 69 40 view .LVU455
+ 1409 02e0 5FFA8CFC 		uxtb	ip, ip
+ 1410              	.LBB336:
+ 1411              	.LBB325:
+ 1412              	.LBB321:
+ 1413              	.LBB319:
+ 1414 02e4 97E7     		b	.L78
+ 1415              	.L117:
+ 1416 02e6 00BF     		.align	2
+ 1417              	.L116:
+ 1418 02e8 00000000 		.word	.LC6
+ 1419 02ec 00000000 		.word	.LANCHOR1
+ 1420 02f0 00000000 		.word	.LANCHOR2
+ 1421 02f4 14000000 		.word	.LC7
+ 1422 02f8 000C0140 		.word	1073810432
+ 1423 02fc 00000000 		.word	.LANCHOR4
+ 1424 0300 00000000 		.word	.LANCHOR0
+ 1425 0304 00000000 		.word	.LANCHOR3
+ 1426 0308 2C000000 		.word	.LC8
+ 1427 030c 00000000 		.word	huart1
+ 1428              	.LVL102:
+ 1429              	.L72:
+  69:user/src/emw3060_at.c **** 
+ 1430              		.loc 1 69 40 view .LVU456
+ 1431              	.LBE319:
+ 1432              	.LBE321:
+ 1433              	.LBE325:
+ 1434              	.LBE336:
+ 1435              	.LBB337:
+ 1436              	.LBB304:
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1437              		.loc 1 45 12 is_stmt 1 view .LVU457
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1438              		.loc 1 45 15 is_stmt 0 view .LVU458
+ 1439 0310 A7F1410C 		sub	ip, r7, #65
+ 1440 0314 BCF1050F 		cmp	ip, #5
+ 1441 0318 6ED9     		bls	.L111
+ 1442              	.LVL103:
+ 1443              	.LBB297:
+ 1444              	.LBI297:
+  39:user/src/emw3060_at.c **** {
+ 1445              		.loc 1 39 11 is_stmt 1 view .LVU459
+ 1446              	.LBB298:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1447              		.loc 1 47 12 view .LVU460
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1448              		.loc 1 47 15 is_stmt 0 view .LVU461
+ 1449 031a A7F1610C 		sub	ip, r7, #97
+ 1450 031e BCF1050F 		cmp	ip, #5
+ 1451 0322 00F2AD80 		bhi	.L94
+  48:user/src/emw3060_at.c ****     } else {
+ 1452              		.loc 1 48 9 is_stmt 1 view .LVU462
+ 1453              	.LVL104:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 37
+
+
+  48:user/src/emw3060_at.c ****     } else {
+ 1454              		.loc 1 48 13 is_stmt 0 view .LVU463
+ 1455 0326 573F     		subs	r7, r7, #87
+ 1456              	.LVL105:
+  48:user/src/emw3060_at.c ****     } else {
+ 1457              		.loc 1 48 13 view .LVU464
+ 1458              	.LBE298:
+ 1459              	.LBE297:
+ 1460              	.LBE304:
+ 1461              	.LBE337:
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1462              		.loc 1 68 40 view .LVU465
+ 1463 0328 07EB8707 		add	r7, r7, r7, lsl #2
+ 1464              	.LVL106:
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1465              		.loc 1 68 40 view .LVU466
+ 1466 032c 7F00     		lsls	r7, r7, #1
+ 1467 032e FFB2     		uxtb	r7, r7
+ 1468              	.LBB338:
+ 1469              	.LBB305:
+ 1470              	.LBB301:
+ 1471              	.LBB299:
+ 1472 0330 4FE7     		b	.L73
+ 1473              	.LVL107:
+ 1474              	.L67:
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1475              		.loc 1 68 40 view .LVU467
+ 1476              	.LBE299:
+ 1477              	.LBE301:
+ 1478              	.LBE305:
+ 1479              	.LBE338:
+ 1480              	.LBB339:
+ 1481              	.LBB284:
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1482              		.loc 1 45 12 is_stmt 1 view .LVU468
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1483              		.loc 1 45 15 is_stmt 0 view .LVU469
+ 1484 0332 A6F14104 		sub	r4, r6, #65
+ 1485 0336 052C     		cmp	r4, #5
+ 1486 0338 58D9     		bls	.L112
+ 1487              	.LVL108:
+ 1488              	.LBB277:
+ 1489              	.LBI277:
+  39:user/src/emw3060_at.c **** {
+ 1490              		.loc 1 39 11 is_stmt 1 view .LVU470
+ 1491              	.LBB278:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1492              		.loc 1 47 12 view .LVU471
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1493              		.loc 1 47 15 is_stmt 0 view .LVU472
+ 1494 033a A6F16104 		sub	r4, r6, #97
+ 1495 033e 052C     		cmp	r4, #5
+ 1496 0340 00F29C80 		bhi	.L92
+  48:user/src/emw3060_at.c ****     } else {
+ 1497              		.loc 1 48 9 is_stmt 1 view .LVU473
+ 1498              	.LVL109:
+  48:user/src/emw3060_at.c ****     } else {
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 38
+
+
+ 1499              		.loc 1 48 13 is_stmt 0 view .LVU474
+ 1500 0344 573E     		subs	r6, r6, #87
+ 1501              	.LVL110:
+  48:user/src/emw3060_at.c ****     } else {
+ 1502              		.loc 1 48 13 view .LVU475
+ 1503              	.LBE278:
+ 1504              	.LBE277:
+ 1505              	.LBE284:
+ 1506              	.LBE339:
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1507              		.loc 1 67 38 view .LVU476
+ 1508 0346 06EB8606 		add	r6, r6, r6, lsl #2
+ 1509 034a 7400     		lsls	r4, r6, #1
+ 1510 034c E4B2     		uxtb	r4, r4
+ 1511              	.LBB340:
+ 1512              	.LBB285:
+ 1513              	.LBB281:
+ 1514              	.LBB279:
+ 1515 034e 23E7     		b	.L68
+ 1516              	.LVL111:
+ 1517              	.L62:
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1518              		.loc 1 67 38 view .LVU477
+ 1519              	.LBE279:
+ 1520              	.LBE281:
+ 1521              	.LBE285:
+ 1522              	.LBE340:
+ 1523              	.LBB341:
+ 1524              	.LBB264:
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1525              		.loc 1 45 12 is_stmt 1 view .LVU478
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1526              		.loc 1 45 15 is_stmt 0 view .LVU479
+ 1527 0350 A4F14102 		sub	r2, r4, #65
+ 1528 0354 052A     		cmp	r2, #5
+ 1529 0356 43D9     		bls	.L113
+ 1530              	.LVL112:
+ 1531              	.LBB257:
+ 1532              	.LBI257:
+  39:user/src/emw3060_at.c **** {
+ 1533              		.loc 1 39 11 is_stmt 1 view .LVU480
+ 1534              	.LBB258:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1535              		.loc 1 47 12 view .LVU481
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1536              		.loc 1 47 15 is_stmt 0 view .LVU482
+ 1537 0358 A4F16102 		sub	r2, r4, #97
+ 1538 035c 052A     		cmp	r2, #5
+ 1539 035e 00F29980 		bhi	.L90
+  48:user/src/emw3060_at.c ****     } else {
+ 1540              		.loc 1 48 9 is_stmt 1 view .LVU483
+ 1541              	.LVL113:
+  48:user/src/emw3060_at.c ****     } else {
+ 1542              		.loc 1 48 13 is_stmt 0 view .LVU484
+ 1543 0362 573C     		subs	r4, r4, #87
+ 1544              	.LVL114:
+  48:user/src/emw3060_at.c ****     } else {
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 39
+
+
+ 1545              		.loc 1 48 13 view .LVU485
+ 1546              	.LBE258:
+ 1547              	.LBE257:
+ 1548              	.LBE264:
+ 1549              	.LBE341:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1550              		.loc 1 66 37 view .LVU486
+ 1551 0364 04EB8404 		add	r4, r4, r4, lsl #2
+ 1552              	.LVL115:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1553              		.loc 1 66 37 view .LVU487
+ 1554 0368 6200     		lsls	r2, r4, #1
+ 1555 036a D2B2     		uxtb	r2, r2
+ 1556              	.LBB342:
+ 1557              	.LBB265:
+ 1558              	.LBB261:
+ 1559              	.LBB259:
+ 1560 036c FCE6     		b	.L63
+ 1561              	.LVL116:
+ 1562              	.L57:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1563              		.loc 1 66 37 view .LVU488
+ 1564              	.LBE259:
+ 1565              	.LBE261:
+ 1566              	.LBE265:
+ 1567              	.LBE342:
+ 1568              	.LBB343:
+ 1569              	.LBB243:
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1570              		.loc 1 45 12 is_stmt 1 view .LVU489
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1571              		.loc 1 45 15 is_stmt 0 view .LVU490
+ 1572 036e A4F14102 		sub	r2, r4, #65
+ 1573 0372 052A     		cmp	r2, #5
+ 1574 0374 2ED9     		bls	.L114
+ 1575              	.LVL117:
+ 1576              	.LBB235:
+ 1577              	.LBI235:
+  39:user/src/emw3060_at.c **** {
+ 1578              		.loc 1 39 11 is_stmt 1 view .LVU491
+ 1579              	.LBB236:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1580              		.loc 1 47 12 view .LVU492
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1581              		.loc 1 47 15 is_stmt 0 view .LVU493
+ 1582 0376 A4F16102 		sub	r2, r4, #97
+ 1583 037a 052A     		cmp	r2, #5
+ 1584 037c 00F28880 		bhi	.L88
+  48:user/src/emw3060_at.c ****     } else {
+ 1585              		.loc 1 48 9 is_stmt 1 view .LVU494
+ 1586              	.LVL118:
+  48:user/src/emw3060_at.c ****     } else {
+ 1587              		.loc 1 48 13 is_stmt 0 view .LVU495
+ 1588 0380 573C     		subs	r4, r4, #87
+ 1589              	.LVL119:
+  48:user/src/emw3060_at.c ****     } else {
+ 1590              		.loc 1 48 13 view .LVU496
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 40
+
+
+ 1591              	.LBE236:
+ 1592              	.LBE235:
+ 1593              	.LBE243:
+ 1594              	.LBE343:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 1595              		.loc 1 65 39 view .LVU497
+ 1596 0382 04EB8404 		add	r4, r4, r4, lsl #2
+ 1597              	.LVL120:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 1598              		.loc 1 65 39 view .LVU498
+ 1599 0386 6100     		lsls	r1, r4, #1
+ 1600 0388 C9B2     		uxtb	r1, r1
+ 1601              	.LBB344:
+ 1602              	.LBB244:
+ 1603              	.LBB239:
+ 1604              	.LBB237:
+ 1605 038a D2E6     		b	.L58
+ 1606              	.LVL121:
+ 1607              	.L54:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 1608              		.loc 1 65 39 view .LVU499
+ 1609              	.LBE237:
+ 1610              	.LBE239:
+ 1611              	.LBE244:
+ 1612              	.LBE344:
+ 1613              	.LBB345:
+ 1614              	.LBB227:
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1615              		.loc 1 45 12 is_stmt 1 view .LVU500
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1616              		.loc 1 45 15 is_stmt 0 view .LVU501
+ 1617 038c A4F14103 		sub	r3, r4, #65
+ 1618 0390 052B     		cmp	r3, #5
+ 1619 0392 16D8     		bhi	.L56
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1620              		.loc 1 46 9 is_stmt 1 view .LVU502
+ 1621              	.LVL122:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1622              		.loc 1 46 13 is_stmt 0 view .LVU503
+ 1623 0394 A4F13703 		sub	r3, r4, #55
+ 1624              	.LBE227:
+ 1625              	.LBE345:
+  64:user/src/emw3060_at.c ****     month = AscToHex(cRxBuf[15]) * 10 + AscToHex(cRxBuf[16]);
+ 1626              		.loc 1 64 40 view .LVU504
+ 1627 0398 DBB2     		uxtb	r3, r3
+ 1628              	.LBB346:
+ 1629              	.LBB228:
+ 1630 039a BDE6     		b	.L55
+ 1631              	.LVL123:
+ 1632              	.L45:
+  64:user/src/emw3060_at.c ****     month = AscToHex(cRxBuf[15]) * 10 + AscToHex(cRxBuf[16]);
+ 1633              		.loc 1 64 40 view .LVU505
+ 1634              	.LBE228:
+ 1635              	.LBE346:
+ 1636              	.LBB347:
+ 1637              	.LBB186:
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 41
+
+
+ 1638              		.loc 1 45 12 is_stmt 1 view .LVU506
+  45:user/src/emw3060_at.c ****         hex -= 0x37;
+ 1639              		.loc 1 45 15 is_stmt 0 view .LVU507
+ 1640 039c A2F14103 		sub	r3, r2, #65
+ 1641 03a0 052B     		cmp	r3, #5
+ 1642 03a2 0CD9     		bls	.L115
+ 1643              	.LVL124:
+ 1644              	.LBB179:
+ 1645              	.LBI179:
+  39:user/src/emw3060_at.c **** {
+ 1646              		.loc 1 39 11 is_stmt 1 view .LVU508
+ 1647              	.LBB180:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1648              		.loc 1 47 12 view .LVU509
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1649              		.loc 1 47 15 is_stmt 0 view .LVU510
+ 1650 03a4 A2F16103 		sub	r3, r2, #97
+ 1651 03a8 052B     		cmp	r3, #5
+ 1652 03aa 6ED8     		bhi	.L84
+  48:user/src/emw3060_at.c ****     } else {
+ 1653              		.loc 1 48 9 is_stmt 1 view .LVU511
+ 1654              	.LVL125:
+  48:user/src/emw3060_at.c ****     } else {
+ 1655              		.loc 1 48 13 is_stmt 0 view .LVU512
+ 1656 03ac 573A     		subs	r2, r2, #87
+ 1657              	.LVL126:
+ 1658              	.L104:
+  48:user/src/emw3060_at.c ****     } else {
+ 1659              		.loc 1 48 13 view .LVU513
+ 1660              	.LBE180:
+ 1661              	.LBE179:
+ 1662              	.LBE186:
+ 1663              	.LBE347:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 1664              		.loc 1 63 40 view .LVU514
+ 1665 03ae D2B2     		uxtb	r2, r2
+ 1666 03b0 C2EB4213 		rsb	r3, r2, r2, lsl #5
+ 1667 03b4 02EB8302 		add	r2, r2, r3, lsl #2
+ 1668 03b8 D300     		lsls	r3, r2, #3
+ 1669 03ba 9AB2     		uxth	r2, r3
+ 1670              	.LBB348:
+ 1671              	.LBB187:
+ 1672              	.LBB183:
+ 1673              	.LBB181:
+ 1674 03bc 61E6     		b	.L46
+ 1675              	.LVL127:
+ 1676              	.L115:
+  63:user/src/emw3060_at.c ****            AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+ 1677              		.loc 1 63 40 view .LVU515
+ 1678              	.LBE181:
+ 1679              	.LBE183:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1680              		.loc 1 46 9 is_stmt 1 view .LVU516
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1681              		.loc 1 46 13 is_stmt 0 view .LVU517
+ 1682 03be 373A     		subs	r2, r2, #55
+ 1683              	.LVL128:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 42
+
+
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1684              		.loc 1 46 13 view .LVU518
+ 1685 03c0 F5E7     		b	.L104
+ 1686              	.LVL129:
+ 1687              	.L56:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1688              		.loc 1 46 13 view .LVU519
+ 1689              	.LBE187:
+ 1690              	.LBE348:
+ 1691              	.LBB349:
+ 1692              	.LBB229:
+ 1693              	.LBB222:
+ 1694              	.LBI222:
+  39:user/src/emw3060_at.c **** {
+ 1695              		.loc 1 39 11 is_stmt 1 view .LVU520
+ 1696              	.LBB223:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1697              		.loc 1 47 12 view .LVU521
+  48:user/src/emw3060_at.c ****     } else {
+ 1698              		.loc 1 48 9 view .LVU522
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1699              		.loc 1 47 15 is_stmt 0 view .LVU523
+ 1700 03c2 A4F16103 		sub	r3, r4, #97
+ 1701 03c6 052B     		cmp	r3, #5
+  48:user/src/emw3060_at.c ****     } else {
+ 1702              		.loc 1 48 13 view .LVU524
+ 1703 03c8 96BF     		itet	ls
+ 1704 03ca A4F15703 		subls	r3, r4, #87
+ 1705 03ce FF23     		movhi	r3, #255
+ 1706              	.LBE223:
+ 1707              	.LBE222:
+ 1708              	.LBE229:
+ 1709              	.LBE349:
+  64:user/src/emw3060_at.c ****     month = AscToHex(cRxBuf[15]) * 10 + AscToHex(cRxBuf[16]);
+ 1710              		.loc 1 64 40 view .LVU525
+ 1711 03d0 DBB2     		uxtbls	r3, r3
+ 1712 03d2 A1E6     		b	.L55
+ 1713              	.LVL130:
+ 1714              	.L114:
+ 1715              	.LBB350:
+ 1716              	.LBB245:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1717              		.loc 1 46 9 is_stmt 1 view .LVU526
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1718              		.loc 1 46 13 is_stmt 0 view .LVU527
+ 1719 03d4 373C     		subs	r4, r4, #55
+ 1720              	.LVL131:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1721              		.loc 1 46 13 view .LVU528
+ 1722              	.LBE245:
+ 1723              	.LBE350:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 1724              		.loc 1 65 39 view .LVU529
+ 1725 03d6 04EB8404 		add	r4, r4, r4, lsl #2
+ 1726 03da 6100     		lsls	r1, r4, #1
+ 1727 03dc C9B2     		uxtb	r1, r1
+ 1728              	.LBB351:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 43
+
+
+ 1729              	.LBB246:
+ 1730 03de A8E6     		b	.L58
+ 1731              	.LVL132:
+ 1732              	.L113:
+  65:user/src/emw3060_at.c ****     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
+ 1733              		.loc 1 65 39 view .LVU530
+ 1734              	.LBE246:
+ 1735              	.LBE351:
+ 1736              	.LBB352:
+ 1737              	.LBB266:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1738              		.loc 1 46 9 is_stmt 1 view .LVU531
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1739              		.loc 1 46 13 is_stmt 0 view .LVU532
+ 1740 03e0 373C     		subs	r4, r4, #55
+ 1741              	.LVL133:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1742              		.loc 1 46 13 view .LVU533
+ 1743              	.LBE266:
+ 1744              	.LBE352:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1745              		.loc 1 66 37 view .LVU534
+ 1746 03e2 04EB8404 		add	r4, r4, r4, lsl #2
+ 1747 03e6 6200     		lsls	r2, r4, #1
+ 1748              	.LVL134:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1749              		.loc 1 66 37 view .LVU535
+ 1750 03e8 D2B2     		uxtb	r2, r2
+ 1751              	.LBB353:
+ 1752              	.LBB267:
+ 1753 03ea BDE6     		b	.L63
+ 1754              	.LVL135:
+ 1755              	.L112:
+  66:user/src/emw3060_at.c ****     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+ 1756              		.loc 1 66 37 view .LVU536
+ 1757              	.LBE267:
+ 1758              	.LBE353:
+ 1759              	.LBB354:
+ 1760              	.LBB286:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1761              		.loc 1 46 9 is_stmt 1 view .LVU537
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1762              		.loc 1 46 13 is_stmt 0 view .LVU538
+ 1763 03ec 373E     		subs	r6, r6, #55
+ 1764              	.LVL136:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1765              		.loc 1 46 13 view .LVU539
+ 1766              	.LBE286:
+ 1767              	.LBE354:
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1768              		.loc 1 67 38 view .LVU540
+ 1769 03ee 06EB8606 		add	r6, r6, r6, lsl #2
+ 1770 03f2 7400     		lsls	r4, r6, #1
+ 1771              	.LVL137:
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1772              		.loc 1 67 38 view .LVU541
+ 1773 03f4 E4B2     		uxtb	r4, r4
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 44
+
+
+ 1774              	.LBB355:
+ 1775              	.LBB287:
+ 1776 03f6 CFE6     		b	.L68
+ 1777              	.LVL138:
+ 1778              	.L111:
+  67:user/src/emw3060_at.c ****     minute = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+ 1779              		.loc 1 67 38 view .LVU542
+ 1780              	.LBE287:
+ 1781              	.LBE355:
+ 1782              	.LBB356:
+ 1783              	.LBB306:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1784              		.loc 1 46 9 is_stmt 1 view .LVU543
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1785              		.loc 1 46 13 is_stmt 0 view .LVU544
+ 1786 03f8 373F     		subs	r7, r7, #55
+ 1787              	.LVL139:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1788              		.loc 1 46 13 view .LVU545
+ 1789              	.LBE306:
+ 1790              	.LBE356:
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1791              		.loc 1 68 40 view .LVU546
+ 1792 03fa 07EB8707 		add	r7, r7, r7, lsl #2
+ 1793 03fe 7F00     		lsls	r7, r7, #1
+ 1794 0400 FFB2     		uxtb	r7, r7
+ 1795              	.LBB357:
+ 1796              	.LBB307:
+ 1797 0402 E6E6     		b	.L73
+ 1798              	.LVL140:
+ 1799              	.L110:
+  68:user/src/emw3060_at.c ****     second = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
+ 1800              		.loc 1 68 40 view .LVU547
+ 1801              	.LBE307:
+ 1802              	.LBE357:
+ 1803              	.LBB358:
+ 1804              	.LBB326:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1805              		.loc 1 46 9 is_stmt 1 view .LVU548
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1806              		.loc 1 46 13 is_stmt 0 view .LVU549
+ 1807 0404 A9F13709 		sub	r9, r9, #55
+ 1808              	.LVL141:
+  46:user/src/emw3060_at.c ****     } else if ((asc >= 0x61) && (asc <= 0x66)) {
+ 1809              		.loc 1 46 13 view .LVU550
+ 1810              	.LBE326:
+ 1811              	.LBE358:
+  69:user/src/emw3060_at.c **** 
+ 1812              		.loc 1 69 40 view .LVU551
+ 1813 0408 09EB8909 		add	r9, r9, r9, lsl #2
+ 1814 040c 4FEA490C 		lsl	ip, r9, #1
+ 1815              	.LVL142:
+  69:user/src/emw3060_at.c **** 
+ 1816              		.loc 1 69 40 view .LVU552
+ 1817 0410 5FFA8CFC 		uxtb	ip, ip
+ 1818              	.LBB359:
+ 1819              	.LBB327:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 45
+
+
+ 1820 0414 FFE6     		b	.L78
+ 1821              	.LVL143:
+ 1822              	.L66:
+  69:user/src/emw3060_at.c **** 
+ 1823              		.loc 1 69 40 view .LVU553
+ 1824              	.LBE327:
+ 1825              	.LBE359:
+ 1826              	.LBB360:
+ 1827              	.LBB274:
+ 1828              	.LBB272:
+ 1829              	.LBI272:
+  39:user/src/emw3060_at.c **** {
+ 1830              		.loc 1 39 11 is_stmt 1 view .LVU554
+ 1831              	.LBB273:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1832              		.loc 1 47 12 view .LVU555
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1833              		.loc 1 47 15 is_stmt 0 view .LVU556
+ 1834 0416 A4F16105 		sub	r5, r4, #97
+ 1835 041a 052D     		cmp	r5, #5
+  48:user/src/emw3060_at.c ****     } else {
+ 1836              		.loc 1 48 9 is_stmt 1 view .LVU557
+  48:user/src/emw3060_at.c ****     } else {
+ 1837              		.loc 1 48 13 is_stmt 0 view .LVU558
+ 1838 041c 96BF     		itet	ls
+ 1839 041e 573C     		subls	r4, r4, #87
+ 1840              	.LVL144:
+  50:user/src/emw3060_at.c ****     }
+ 1841              		.loc 1 50 13 view .LVU559
+ 1842 0420 FF25     		movhi	r5, #255
+ 1843              	.LVL145:
+  48:user/src/emw3060_at.c ****     } else {
+ 1844              		.loc 1 48 13 view .LVU560
+ 1845 0422 E5B2     		uxtbls	r5, r4
+ 1846 0424 ADE6     		b	.L65
+ 1847              	.LVL146:
+ 1848              	.L61:
+  48:user/src/emw3060_at.c ****     } else {
+ 1849              		.loc 1 48 13 view .LVU561
+ 1850              	.LBE273:
+ 1851              	.LBE272:
+ 1852              	.LBE274:
+ 1853              	.LBE360:
+ 1854              	.LBB361:
+ 1855              	.LBB254:
+ 1856              	.LBB252:
+ 1857              	.LBI252:
+  39:user/src/emw3060_at.c **** {
+ 1858              		.loc 1 39 11 is_stmt 1 view .LVU562
+ 1859              	.LBB253:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1860              		.loc 1 47 12 view .LVU563
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1861              		.loc 1 47 15 is_stmt 0 view .LVU564
+ 1862 0426 A2F16104 		sub	r4, r2, #97
+ 1863 042a 052C     		cmp	r4, #5
+  48:user/src/emw3060_at.c ****     } else {
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 46
+
+
+ 1864              		.loc 1 48 9 is_stmt 1 view .LVU565
+  48:user/src/emw3060_at.c ****     } else {
+ 1865              		.loc 1 48 13 is_stmt 0 view .LVU566
+ 1866 042c 96BF     		itet	ls
+ 1867 042e 573A     		subls	r2, r2, #87
+ 1868              	.LVL147:
+  50:user/src/emw3060_at.c ****     }
+ 1869              		.loc 1 50 13 view .LVU567
+ 1870 0430 4FF0FF0E 		movhi	lr, #255
+  48:user/src/emw3060_at.c ****     } else {
+ 1871              		.loc 1 48 13 view .LVU568
+ 1872 0434 5FFA82FE 		uxtbls	lr, r2
+ 1873 0438 8BE6     		b	.L60
+ 1874              	.LVL148:
+ 1875              	.L76:
+  48:user/src/emw3060_at.c ****     } else {
+ 1876              		.loc 1 48 13 view .LVU569
+ 1877              	.LBE253:
+ 1878              	.LBE252:
+ 1879              	.LBE254:
+ 1880              	.LBE361:
+ 1881              	.LBB362:
+ 1882              	.LBB314:
+ 1883              	.LBB312:
+ 1884              	.LBI312:
+  39:user/src/emw3060_at.c **** {
+ 1885              		.loc 1 39 11 is_stmt 1 view .LVU570
+ 1886              	.LBB313:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1887              		.loc 1 47 12 view .LVU571
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1888              		.loc 1 47 15 is_stmt 0 view .LVU572
+ 1889 043a ACF16108 		sub	r8, ip, #97
+ 1890 043e B8F1050F 		cmp	r8, #5
+  48:user/src/emw3060_at.c ****     } else {
+ 1891              		.loc 1 48 9 is_stmt 1 view .LVU573
+  48:user/src/emw3060_at.c ****     } else {
+ 1892              		.loc 1 48 13 is_stmt 0 view .LVU574
+ 1893 0442 96BF     		itet	ls
+ 1894 0444 ACF1570C 		subls	ip, ip, #87
+ 1895              	.LVL149:
+  50:user/src/emw3060_at.c ****     }
+ 1896              		.loc 1 50 13 view .LVU575
+ 1897 0448 4FF0FF08 		movhi	r8, #255
+ 1898              	.LVL150:
+  48:user/src/emw3060_at.c ****     } else {
+ 1899              		.loc 1 48 13 view .LVU576
+ 1900 044c 5FFA8CF8 		uxtbls	r8, ip
+ 1901 0450 D2E6     		b	.L75
+ 1902              	.LVL151:
+ 1903              	.L71:
+  48:user/src/emw3060_at.c ****     } else {
+ 1904              		.loc 1 48 13 view .LVU577
+ 1905              	.LBE313:
+ 1906              	.LBE312:
+ 1907              	.LBE314:
+ 1908              	.LBE362:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 47
+
+
+ 1909              	.LBB363:
+ 1910              	.LBB294:
+ 1911              	.LBB292:
+ 1912              	.LBI292:
+  39:user/src/emw3060_at.c **** {
+ 1913              		.loc 1 39 11 is_stmt 1 view .LVU578
+ 1914              	.LBB293:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1915              		.loc 1 47 12 view .LVU579
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1916              		.loc 1 47 15 is_stmt 0 view .LVU580
+ 1917 0452 A7F16106 		sub	r6, r7, #97
+ 1918 0456 052E     		cmp	r6, #5
+  48:user/src/emw3060_at.c ****     } else {
+ 1919              		.loc 1 48 9 is_stmt 1 view .LVU581
+  48:user/src/emw3060_at.c ****     } else {
+ 1920              		.loc 1 48 13 is_stmt 0 view .LVU582
+ 1921 0458 96BF     		itet	ls
+ 1922 045a A7F15706 		subls	r6, r7, #87
+  50:user/src/emw3060_at.c ****     }
+ 1923              		.loc 1 50 13 view .LVU583
+ 1924 045e FF26     		movhi	r6, #255
+  48:user/src/emw3060_at.c ****     } else {
+ 1925              		.loc 1 48 13 view .LVU584
+ 1926 0460 F6B2     		uxtbls	r6, r6
+ 1927 0462 A7E6     		b	.L70
+ 1928              	.LVL152:
+ 1929              	.L81:
+  48:user/src/emw3060_at.c ****     } else {
+ 1930              		.loc 1 48 13 view .LVU585
+ 1931              	.LBE293:
+ 1932              	.LBE292:
+ 1933              	.LBE294:
+ 1934              	.LBE363:
+ 1935              	.LBB364:
+ 1936              	.LBB334:
+ 1937              	.LBB332:
+ 1938              	.LBI332:
+  39:user/src/emw3060_at.c **** {
+ 1939              		.loc 1 39 11 is_stmt 1 view .LVU586
+ 1940              	.LBB333:
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1941              		.loc 1 47 12 view .LVU587
+  47:user/src/emw3060_at.c ****         hex -= 0x57;
+ 1942              		.loc 1 47 15 is_stmt 0 view .LVU588
+ 1943 0464 A9F16100 		sub	r0, r9, #97
+ 1944 0468 0528     		cmp	r0, #5
+  48:user/src/emw3060_at.c ****     } else {
+ 1945              		.loc 1 48 9 is_stmt 1 view .LVU589
+  48:user/src/emw3060_at.c ****     } else {
+ 1946              		.loc 1 48 13 is_stmt 0 view .LVU590
+ 1947 046a 96BF     		itet	ls
+ 1948 046c A9F15700 		subls	r0, r9, #87
+  50:user/src/emw3060_at.c ****     }
+ 1949              		.loc 1 50 13 view .LVU591
+ 1950 0470 FF20     		movhi	r0, #255
+  48:user/src/emw3060_at.c ****     } else {
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 48
+
+
+ 1951              		.loc 1 48 13 view .LVU592
+ 1952 0472 C0B2     		uxtbls	r0, r0
+ 1953 0474 DEE6     		b	.L80
+ 1954              	.LVL153:
+ 1955              	.L85:
+  48:user/src/emw3060_at.c ****     } else {
+ 1956              		.loc 1 48 13 view .LVU593
+ 1957              	.LBE333:
+ 1958              	.LBE332:
+ 1959              	.LBE334:
+ 1960              	.LBE364:
+ 1961              	.LBB365:
+ 1962              	.LBB200:
+ 1963              	.LBB197:
+ 1964              	.LBB195:
+ 1965 0476 46F29C33 		movw	r3, #25500
+ 1966 047a 25E6     		b	.L49
+ 1967              	.LVL154:
+ 1968              	.L92:
+  48:user/src/emw3060_at.c ****     } else {
+ 1969              		.loc 1 48 13 view .LVU594
+ 1970              	.LBE195:
+ 1971              	.LBE197:
+ 1972              	.LBE200:
+ 1973              	.LBE365:
+ 1974              	.LBB366:
+ 1975              	.LBB288:
+ 1976              	.LBB282:
+ 1977              	.LBB280:
+ 1978 047c F624     		movs	r4, #246
+ 1979 047e 8BE6     		b	.L68
+ 1980              	.LVL155:
+ 1981              	.L94:
+  48:user/src/emw3060_at.c ****     } else {
+ 1982              		.loc 1 48 13 view .LVU595
+ 1983              	.LBE280:
+ 1984              	.LBE282:
+ 1985              	.LBE288:
+ 1986              	.LBE366:
+ 1987              	.LBB367:
+ 1988              	.LBB308:
+ 1989              	.LBB302:
+ 1990              	.LBB300:
+ 1991 0480 F627     		movs	r7, #246
+ 1992              	.LVL156:
+  48:user/src/emw3060_at.c ****     } else {
+ 1993              		.loc 1 48 13 view .LVU596
+ 1994 0482 A6E6     		b	.L73
+ 1995              	.LVL157:
+ 1996              	.L86:
+  48:user/src/emw3060_at.c ****     } else {
+ 1997              		.loc 1 48 13 view .LVU597
+ 1998              	.LBE300:
+ 1999              	.LBE302:
+ 2000              	.LBE308:
+ 2001              	.LBE367:
+ 2002              	.LBB368:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 49
+
+
+ 2003              	.LBB215:
+ 2004              	.LBB210:
+ 2005              	.LBB208:
+ 2006 0484 40F6F612 		movw	r2, #2550
+ 2007 0488 3CE6     		b	.L52
+ 2008              	.LVL158:
+ 2009              	.L84:
+  48:user/src/emw3060_at.c ****     } else {
+ 2010              		.loc 1 48 13 view .LVU598
+ 2011              	.LBE208:
+ 2012              	.LBE210:
+ 2013              	.LBE215:
+ 2014              	.LBE368:
+ 2015              	.LBB369:
+ 2016              	.LBB188:
+ 2017              	.LBB184:
+ 2018              	.LBB182:
+ 2019 048a 4EF21842 		movw	r2, #58392
+ 2020              	.LVL159:
+  48:user/src/emw3060_at.c ****     } else {
+ 2021              		.loc 1 48 13 view .LVU599
+ 2022 048e F8E5     		b	.L46
+ 2023              	.LVL160:
+ 2024              	.L88:
+  48:user/src/emw3060_at.c ****     } else {
+ 2025              		.loc 1 48 13 view .LVU600
+ 2026              	.LBE182:
+ 2027              	.LBE184:
+ 2028              	.LBE188:
+ 2029              	.LBE369:
+ 2030              	.LBB370:
+ 2031              	.LBB247:
+ 2032              	.LBB240:
+ 2033              	.LBB238:
+ 2034 0490 F621     		movs	r1, #246
+ 2035 0492 4EE6     		b	.L58
+ 2036              	.LVL161:
+ 2037              	.L90:
+  48:user/src/emw3060_at.c ****     } else {
+ 2038              		.loc 1 48 13 view .LVU601
+ 2039              	.LBE238:
+ 2040              	.LBE240:
+ 2041              	.LBE247:
+ 2042              	.LBE370:
+ 2043              	.LBB371:
+ 2044              	.LBB268:
+ 2045              	.LBB262:
+ 2046              	.LBB260:
+ 2047 0494 F622     		movs	r2, #246
+ 2048 0496 67E6     		b	.L63
+ 2049              	.LVL162:
+ 2050              	.L96:
+  48:user/src/emw3060_at.c ****     } else {
+ 2051              		.loc 1 48 13 view .LVU602
+ 2052              	.LBE260:
+ 2053              	.LBE262:
+ 2054              	.LBE268:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 50
+
+
+ 2055              	.LBE371:
+ 2056              	.LBB372:
+ 2057              	.LBB328:
+ 2058              	.LBB322:
+ 2059              	.LBB320:
+ 2060 0498 4FF0F60C 		mov	ip, #246
+ 2061 049c BBE6     		b	.L78
+ 2062              	.LBE320:
+ 2063              	.LBE322:
+ 2064              	.LBE328:
+ 2065              	.LBE372:
+ 2066              	.LBE373:
+ 2067              	.LBE374:
+ 2068              		.cfi_endproc
+ 2069              	.LFE75:
+ 2071 049e 00BF     		.section	.bss.g_connect,"aw",%nobits
+ 2072              		.set	.LANCHOR1,. + 0
+ 2075              	g_connect:
+ 2076 0000 00       		.space	1
+ 2077              		.section	.bss.g_getTimeCtr,"aw",%nobits
+ 2078              		.set	.LANCHOR2,. + 0
+ 2081              	g_getTimeCtr:
+ 2082 0000 00       		.space	1
+ 2083              		.section	.bss.g_powerOffCtr,"aw",%nobits
+ 2084              		.set	.LANCHOR0,. + 0
+ 2087              	g_powerOffCtr:
+ 2088 0000 00       		.space	1
+ 2089              		.section	.bss.g_renewInitCtr,"aw",%nobits
+ 2090              		.set	.LANCHOR3,. + 0
+ 2093              	g_renewInitCtr:
+ 2094 0000 00       		.space	1
+ 2095              		.section	.bss.g_renewInitCtr_1,"aw",%nobits
+ 2096              		.set	.LANCHOR4,. + 0
+ 2099              	g_renewInitCtr_1:
+ 2100 0000 00       		.space	1
+ 2101              		.text
+ 2102              	.Letext0:
+ 2103              		.file 2 "user/inc/type_define.h"
+ 2104              		.file 3 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 2105              		.file 4 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 2106              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 2107              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 2108              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 2109              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 2110              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 2111              		.file 10 "user/inc/time.h"
+ 2112              		.file 11 "user/inc/emw3060_at.h"
+ 2113              		.file 12 "Core/Inc/usart.h"
+ 2114              		.file 13 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\
+ 2115              		.file 14 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 2116              		.file 15 "<built-in>"
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s 			page 51
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 emw3060_at.c
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:18     .rodata.WIFI_Init.str1.4:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:31     .text.WIFI_Init:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:38     .text.WIFI_Init:00000000 WIFI_Init
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:90     .text.WIFI_Init:00000034 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:98     .text.WIFI_PowerOnOff:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:105    .text.WIFI_PowerOnOff:00000000 WIFI_PowerOnOff
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:192    .text.WIFI_PowerOnOff:0000003c $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:202    .rodata.WIFI_CtrDec.str1.4:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:209    .text.WIFI_CtrDec:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:216    .text.WIFI_CtrDec:00000000 WIFI_CtrDec
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:490    .text.WIFI_CtrDec:000000c4 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:508    .rodata.WIFI_ReceiveProcess.str1.4:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:518    .text.WIFI_ReceiveProcess:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:525    .text.WIFI_ReceiveProcess:00000000 WIFI_ReceiveProcess
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:1418   .text.WIFI_ReceiveProcess:000002e8 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:1439   .text.WIFI_ReceiveProcess:00000310 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2075   .bss.g_connect:00000000 g_connect
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2076   .bss.g_connect:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2081   .bss.g_getTimeCtr:00000000 g_getTimeCtr
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2082   .bss.g_getTimeCtr:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2087   .bss.g_powerOffCtr:00000000 g_powerOffCtr
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2088   .bss.g_powerOffCtr:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2093   .bss.g_renewInitCtr:00000000 g_renewInitCtr
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2094   .bss.g_renewInitCtr:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2099   .bss.g_renewInitCtr_1:00000000 g_renewInitCtr_1
+C:\Users\WENHUA~1\AppData\Local\Temp\ccGF4JIf.s:2100   .bss.g_renewInitCtr_1:00000000 $d
+
+UNDEFINED SYMBOLS
+puts
+HAL_Delay
+HAL_GPIO_WritePin
+strstr
+CalculateWeek
+HAL_UART_DeInit
+SetClock
+huart1

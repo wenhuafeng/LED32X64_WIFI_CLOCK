@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Inc</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../user/inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -533,37 +533,37 @@
             <File>
               <FileName>delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\delay.c</FilePath>
+              <FilePath>..\user\src\delay.c</FilePath>
             </File>
             <File>
               <FileName>emw3060_at.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\emw3060_at.c</FilePath>
+              <FilePath>..\user\src\emw3060_at.c</FilePath>
             </File>
             <File>
               <FileName>esp8266_at.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\esp8266_at.c</FilePath>
+              <FilePath>..\user\src\esp8266_at.c</FilePath>
             </File>
             <File>
               <FileName>htu21d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\htu21d.c</FilePath>
+              <FilePath>..\user\src\htu21d.c</FilePath>
             </File>
             <File>
               <FileName>hub75d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\hub75d.c</FilePath>
+              <FilePath>..\user\src\hub75d.c</FilePath>
             </File>
             <File>
               <FileName>lunar_calendar.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\lunar_calendar.c</FilePath>
+              <FilePath>..\user\src\lunar_calendar.c</FilePath>
             </File>
             <File>
               <FileName>time.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Src\time.c</FilePath>
+              <FilePath>..\user\src\time.c</FilePath>
             </File>
           </Files>
         </Group>

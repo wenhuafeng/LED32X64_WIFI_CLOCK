@@ -27,7 +27,7 @@ static const u32 g_lunarCalendarTable[YEAR_TABLE_NUM] = {
 };
 static const u16 g_monthAdd[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
-struct LunarCalendarType lunarCalendarData;
+struct LunarCalendarType g_lunarCalendarData;
 
 static bool LunarCalendar(struct TimeType *time, struct LunarCalendarType *lcData)
 {
@@ -119,10 +119,10 @@ static bool LunarCalendar(struct TimeType *time, struct LunarCalendarType *lcDat
 
 void CalculationLunarCalendar(struct TimeType *time)
 {
-    (void)LunarCalendar(time, &lunarCalendarData);
+    (void)LunarCalendar(time, &g_lunarCalendarData);
 }
 
 struct LunarCalendarType GetLunarCalendar(void)
 {
-    return lunarCalendarData;
+    return g_lunarCalendarData;
 }

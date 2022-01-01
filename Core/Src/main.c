@@ -71,8 +71,8 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 //##############################################################################
-#warning message "Software_Version: <V208>"
-#warning message "Software_Date:    2021/08/21"
+#warning message "Software_Version: <V209>"
+#warning message "Software_Date:    2022/01/01"
 #warning message "Software_Project: CLOCK_WIFI"
 #warning message "Software_MCU:     STM32F103C8T6"
 #warning message "Main_OSC:         EXT_8M=IXT_72MHz"

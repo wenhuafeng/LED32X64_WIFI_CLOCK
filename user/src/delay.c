@@ -1,4 +1,4 @@
-#include "stm32f10x.h"
+#include "stm32f1xx.h"
 #include "delay.h"
 
 static u8  fac_us = 0;//us��ʱ������
