@@ -33,7 +33,7 @@ bool Get1sFlag(void)
 
 void Set1sFlag(bool flag)
 {
-    g_1sFlag = true;
+    g_1sFlag = flag;
 }
 
 struct TimeType *GetTimeData(void)
@@ -65,6 +65,17 @@ void CalculateWeek(u16 year, u8 month, u8 day, u8 *week)
     wk = (wk + 140) % 7;
 
     *week = wk;
+}
+
+void SetTimeData(struct TimeType *time)
+{
+    g_time.sec = time->sec;
+    g_time.min = time->min;
+    g_time.hour = time->hour;
+    g_time.week = time->week;
+    g_time.day = time->day;
+    g_time.month = time->month;
+    g_time.year = time->year;
 }
 
 bool ClockRun(void)
@@ -126,9 +137,8 @@ void GetClock(void)
     HUB75D_CalculateCalendar(&g_time);
     CalculationLunarCalendar(&g_time);
 
-    printf("\r\nTime: %d-%d-%d %02d:%02d:%02d \r\n",
-           g_time.year, g_time.month, g_time.day,
-           g_time.hour, g_time.min, g_time.sec);
+    printf("\r\nTime: %d-%d-%d %02d:%02d:%02d \r\n", g_time.year, g_time.month, g_time.day, g_time.hour, g_time.min,
+           g_time.sec);
 }
 
 void SetClock(struct TimeType *time)
@@ -148,7 +158,6 @@ void SetClock(struct TimeType *time)
     HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-    printf("\r\nTime: %d-%d-%d   %02d:%02d:%02d \r\n",
-           time->year, time->month, time->day,
-           time->hour, time->min, time->sec);
+    printf("\r\nTime: %d-%d-%d   %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
+           time->sec);
 }

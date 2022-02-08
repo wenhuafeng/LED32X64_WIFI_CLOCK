@@ -21,8 +21,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-#include <stdio.h>
-USART_RECEIVETYPE UsartType1;
+
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -83,7 +82,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 
     GPIO_InitStruct.Pin = GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /* USART1 DMA Init */
@@ -119,6 +118,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 
     __HAL_LINKDMA(uartHandle,hdmatx,hdma_usart1_tx);
 
+    /* USART1 interrupt Init */
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
   /* USER CODE BEGIN USART1_MspInit 1 */
 
   /* USER CODE END USART1_MspInit 1 */
@@ -155,48 +157,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 }
 
 /* USER CODE BEGIN 1 */
-#ifdef __GNUC__  
-/* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf set to 'Yes') calls __io_putchar() */  
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif /* __GNUC__ */
 
-PUTCHAR_PROTOTYPE
-{
-  HAL_UART_Transmit(&huart1 , (uint8_t *)&ch, 1, 0xFFFF);
-  return ch;
-}
-
-void Usart1SendData_DMA(uint8_t *pdata, uint16_t Length)
-{
-  while(UsartType1.dmaSend_flag == USART_DMA_SENDING);
-  UsartType1.dmaSend_flag = USART_DMA_SENDING;
-  HAL_UART_Transmit_DMA(&huart1, pdata, Length);
-}
-
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
-  __HAL_DMA_DISABLE(huart->hdmatx);
-  if(huart->Instance == huart1.Instance)
-    UsartType1.dmaSend_flag = USART_DMA_SENDOVER;
-}
-
-void UsartReceive_IDLE(UART_HandleTypeDef *huart)
-{
-  uint32_t temp;
-  
-  if ((__HAL_UART_GET_FLAG(huart,UART_FLAG_IDLE) != RESET)) {
-    __HAL_UART_CLEAR_IDLEFLAG(huart);
-    HAL_UART_DMAStop(huart);
-    if (huart->Instance == huart1.Instance) {
-      temp = huart1.hdmarx->Instance->CNDTR;
-      UsartType1.rx_len =  RECEIVELEN - temp;
-      UsartType1.receive_flag=1;
-      HAL_UART_Receive_DMA(&huart1,UsartType1.usartDMA_rxBuf,RECEIVELEN);
-    }
-  }
-}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,0 +1,5 @@
+{
+    "files.associations": {
+        "wifi_uart_if.h": "c"
+    }
+}

@@ -4,29 +4,29 @@
 #include "htu21d.h"
 #include "main.h"
 
-#define Write   0
-#define Read    1
+#define Write 0
+#define Read 1
 
-#define HIGH    1
-#define LOW     0
+#define HIGH 1
+#define LOW 0
 
-#define TRUE    1
-#define FALSE   0
+#define TRUE 1
+#define FALSE 0
 
-#define _HTU21D_I2C_DELAY_ 2
+#define HTU21D_I2C_DELAY 2
 
-#define SlaveAddr   0x80
-#define resolution  0
+#define SlaveAddr 0x80
+#define resolution 0
 
-#define TEM_HOLD    0xe3
-#define TEM_NO      0xf3
+#define TEM_HOLD 0xe3
+#define TEM_NO 0xf3
 
-#define HUM_HOLD    0xe5
-#define HUM_NO      0xf5
+#define HUM_HOLD 0xe5
+#define HUM_NO 0xf5
 
-#define WRSR    0xe6
-#define RDSR    0xe7
-#define HT_RST  0xfe
+#define WRSR 0xe6
+#define RDSR 0xe7
+#define HT_RST 0xfe
 
 typedef enum {
     _HTU21D_SDA_OUTPUT_,
@@ -45,19 +45,17 @@ typedef enum {
     do {                                                                       \
         HAL_GPIO_WritePin(HTU21D_SCL_GPIO_Port, HTU21D_SCL_Pin, GPIO_PIN_SET); \
     } while (0)
-#define HTU21D_SCL_LOW()                                        \
-    do {                                                        \
-        HAL_GPIO_WritePin(HTU21D_SCL_GPIO_Port, HTU21D_SCL_Pin, \
-                          GPIO_PIN_RESET);                      \
+#define HTU21D_SCL_LOW()                                                         \
+    do {                                                                         \
+        HAL_GPIO_WritePin(HTU21D_SCL_GPIO_Port, HTU21D_SCL_Pin, GPIO_PIN_RESET); \
     } while (0)
 #define HTU21D_SDA_HIGH()                                                      \
     do {                                                                       \
         HAL_GPIO_WritePin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin, GPIO_PIN_SET); \
     } while (0)
-#define HTU21D_SDA_LOW()                                        \
-    do {                                                        \
-        HAL_GPIO_WritePin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin, \
-                          GPIO_PIN_RESET);                      \
+#define HTU21D_SDA_LOW()                                                         \
+    do {                                                                         \
+        HAL_GPIO_WritePin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin, GPIO_PIN_RESET); \
     } while (0)
 
 s16 g_temperature;
@@ -78,7 +76,8 @@ static void DelayUs(u8 j)
 {
     u16 i = j;
 
-    while (i--);
+    while (i--)
+        ;
 }
 
 static void HTU21D_SDA_SET(SDA_IO_Type ioset)
@@ -101,45 +100,45 @@ static void HTU21D_SDA_SET(SDA_IO_Type ioset)
 static void StartBus(void)
 {
     HTU21D_SDA_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SCL_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SDA_LOW();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SCL_LOW();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
 }
 
 static void StopBus(void)
 {
     HTU21D_SDA_LOW();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SCL_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SDA_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
 }
 
 static void AckBus(void)
 {
     HTU21D_SDA_LOW();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SCL_LOW();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SCL_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SCL_LOW();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SDA_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
 }
 
 static void NoAckBus(void)
 {
     HTU21D_SDA_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SCL_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SCL_LOW();
 }
 
@@ -174,26 +173,25 @@ static u8 WriteByte(u8 send_data)
         } else {
             HTU21D_SDA_LOW();
         }
-        DelayUs(_HTU21D_I2C_DELAY_);
+        DelayUs(HTU21D_I2C_DELAY);
         HTU21D_SCL_HIGH();
-        DelayUs(_HTU21D_I2C_DELAY_);
+        DelayUs(HTU21D_I2C_DELAY);
     }
 
     HTU21D_SCL_LOW();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SDA_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
 
-    //DelayUs(_HTU21D_I2C_DELAY_);
+    //DelayUs(HTU21D_I2C_DELAY);
     HTU21D_SCL_HIGH();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
 
     HTU21D_SDAIN();
     temp = 200;
     while (--temp) {
-        DelayUs(_HTU21D_I2C_DELAY_);
-        if (HAL_GPIO_ReadPin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin) ==
-            GPIO_PIN_RESET) {
+        DelayUs(HTU21D_I2C_DELAY);
+        if (HAL_GPIO_ReadPin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin) == GPIO_PIN_RESET) {
             ack = 1;
             break;
         }
@@ -205,7 +203,7 @@ static u8 WriteByte(u8 send_data)
     }
 
     HTU21D_SCL_LOW();
-    DelayUs(_HTU21D_I2C_DELAY_);
+    DelayUs(HTU21D_I2C_DELAY);
 
     return ack;
 }
@@ -218,10 +216,9 @@ static u8 ReadByte(void)
     HTU21D_SDAIN();
     for (i = 0; i < 8; i++) {
         HTU21D_SCL_HIGH();
-        DelayUs(_HTU21D_I2C_DELAY_);
+        DelayUs(HTU21D_I2C_DELAY);
         value <<= 1;
-        if (HAL_GPIO_ReadPin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin) ==
-            GPIO_PIN_SET) {
+        if (HAL_GPIO_ReadPin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin) == GPIO_PIN_SET) {
             value += 1;
         }
         HTU21D_SCL_LOW();

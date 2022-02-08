@@ -8,26 +8,27 @@
 
 #if (WIFI_MODULE == WIFI_EMW3060)
 
-#define GET_TIME_8S     (8)
-#define GET_TIME_10S    (10)
-#define GET_TIME_14S    (14)
-#define GET_TIME_16S    (16)
+#define GET_TIME_8S (8)
+#define GET_TIME_10S (10)
+#define GET_TIME_14S (14)
+#define GET_TIME_16S (16)
 
 enum ConnectFlag {
     DISCONNECT,
-    CONNECT
+    CONNECT,
 };
 
-#define _WIFI_OFF_TIME_ (2 * 60) /* 2min */
+#define WIFI_OFF_TIME (2 * 60) /* 2min */
 #define EMW3060_AT_POWER_PIN_HIGH()                                            \
     do {                                                                       \
         HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, GPIO_PIN_SET); \
     } while (0)
-#define EMW3060_AT_POWER_PIN_LOW()                              \
-    do {                                                        \
-        HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, \
-                          GPIO_PIN_RESET);                      \
+#define EMW3060_AT_POWER_PIN_LOW()                                               \
+    do {                                                                         \
+        HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, GPIO_PIN_RESET); \
     } while (0)
+
+#define WIFI_NAME_PASSWD "AT+WJAP=HSG2,13537011631\r\n"
 
 static u8 g_powerOffCtr;
 static u8 g_getTimeCtr;
@@ -60,8 +61,7 @@ static bool ProcessClock(char *cRxBuf)
     struct TimeType time;
     bool status = true;
 
-    year = AscToHex(cRxBuf[10]) * 1000 + AscToHex(cRxBuf[11]) * 100 +
-           AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
+    year = AscToHex(cRxBuf[10]) * 1000 + AscToHex(cRxBuf[11]) * 100 + AscToHex(cRxBuf[12]) * 10 + AscToHex(cRxBuf[13]);
     month = AscToHex(cRxBuf[15]) * 10 + AscToHex(cRxBuf[16]);
     day = AscToHex(cRxBuf[18]) * 10 + AscToHex(cRxBuf[19]);
     hour = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
@@ -71,8 +71,8 @@ static bool ProcessClock(char *cRxBuf)
     if (year == 1970) {
         status = false;
     } else {
-        if ((year < 2000) || (year > 2099) || (month == 0) || (month > 12) ||
-            (day == 0) || (day > 31) || (hour > 23) || (minute > 59) || (second > 59)) {
+        if ((year < 2000) || (year > 2099) || (month == 0) || (month > 12) || (day == 0) || (day > 31) || (hour > 23) ||
+            (minute > 59) || (second > 59)) {
             status = false;
         }
     }
@@ -118,14 +118,14 @@ void WIFI_Init(void)
     printf("AT+WMAC?\r\n");
     HAL_Delay(100);
 
-    printf("AT+WJAP=ABC,WenHuaFeng547566993\r\n");
+    printf(WIFI_NAME_PASSWD);
 }
 
 void WIFI_PowerOnOff(enum PowerFlag flag)
 {
     if (flag == POWER_ON) {
         EMW3060_AT_POWER_PIN_HIGH();
-        g_powerOffCtr = _WIFI_OFF_TIME_;
+        g_powerOffCtr = WIFI_OFF_TIME;
     } else {
         EMW3060_AT_POWER_PIN_LOW();
         g_connect = DISCONNECT;
@@ -149,8 +149,7 @@ void WIFI_CtrDec(void)
         g_getTimeCtr--;
         if (g_getTimeCtr == GET_TIME_14S) {
             EMW3060_AT_SNTP_CFG();
-        }
-        else if (g_getTimeCtr == GET_TIME_8S) {
+        } else if (g_getTimeCtr == GET_TIME_8S) {
             EMW3060_AT_GetTime();
         } else if (g_getTimeCtr == 0x00) {
             EMW3060_AT_GetTime();

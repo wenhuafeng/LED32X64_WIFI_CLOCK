@@ -6,6 +6,7 @@
 #include "main.h"
 #include "usart.h"
 #include "time.h"
+#include "lunar_calendar.h"
 
 #if (WIFI_MODULE == WIFI_ESP8266)
 
@@ -30,26 +31,27 @@
 #define NOV 0x004e6f76
 #define DEC 0x00446563
 
-#define GET_TIME_6S     (6)
-#define GET_TIME_8S     (8)
-#define GET_TIME_10S    (10)
-#define GET_TIME_14S    (14)
+#define GET_TIME_6S (6)
+#define GET_TIME_8S (8)
+#define GET_TIME_10S (10)
+#define GET_TIME_14S (14)
 
 enum ConnectFlag {
     DISCONNECT,
-    CONNECT
+    CONNECT,
 };
 
-#define _WIFI_OFF_TIME_ (2 * 60) /* 2min */
+#define WIFI_OFF_TIME (2 * 60) /* 2min */
 #define ESP8266_AT_POWER_PIN_HIGH()                                            \
     do {                                                                       \
         HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, GPIO_PIN_SET); \
     } while (0)
-#define ESP8266_AT_POWER_PIN_LOW()                              \
-    do {                                                        \
-        HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, \
-                          GPIO_PIN_RESET);                      \
+#define ESP8266_AT_POWER_PIN_LOW()                                               \
+    do {                                                                         \
+        HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, GPIO_PIN_RESET); \
     } while (0)
+
+#define WIFI_NAME_PASSWD "AT+CWJAP_DEF=\"HSG2\",\"13537011631\"\r\n"
 
 static u8 g_powerOffCtr;
 static u8 g_getTimeCtr;
@@ -130,14 +132,13 @@ static u8 ProcessClock(char *cRxBuf)
     hour = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
     minute = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
     second = AscToHex(cRxBuf[30]) * 10 + AscToHex(cRxBuf[31]);
-    year = AscToHex(cRxBuf[33]) * 1000 + AscToHex(cRxBuf[34]) * 100 +
-           AscToHex(cRxBuf[35]) * 10 + AscToHex(cRxBuf[36]);
+    year = AscToHex(cRxBuf[33]) * 1000 + AscToHex(cRxBuf[34]) * 100 + AscToHex(cRxBuf[35]) * 10 + AscToHex(cRxBuf[36]);
 
     if (year == 1970) {
         status = false;
     } else {
-        if ((year < 2000) || (year > 2099) || (month == 0) || (month > 12) ||
-            (day == 0) || (day > 31) || (hour > 23) || (minute > 59) || (second > 59)) {
+        if ((year < 2000) || (year > 2099) || (month == 0) || (month > 12) || (day == 0) || (day > 31) || (hour > 23) ||
+            (minute > 59) || (second > 59)) {
             status = false;
         }
     }
@@ -154,7 +155,9 @@ static u8 ProcessClock(char *cRxBuf)
         HAL_UART_DeInit(&huart1);
         g_powerOffCtr = 0x00;
         ESP8266_AT_POWER_PIN_LOW();
+        SetTimeData(&time);
         SetClock(&time);
+        CalculationLunarCalendar(&time);
     } else {
         g_getTimeCtr = GET_TIME_10S;
     }
@@ -174,23 +177,32 @@ static void ESP8266_AT_SNTP_CFG(void)
 
 void WIFI_Init(void)
 {
+    //printf("AT+RESTORE\r\n");
+    //HAL_Delay(1000);
+
     printf("AT+RST\r\n");
     HAL_Delay(1000);
 
-    printf("AT+CWMODE_DEF=1\r\n");
-    HAL_Delay(100);
+    //printf("AT+GMR\r\n");
+    //HAL_Delay(100);
 
-    printf("AT+CWAUTOCONN=1\r\n");
-    HAL_Delay(100);
+    //printf("AT+CWQAP\r\n");
+    //HAL_Delay(100);
 
-    printf("AT+CWJAP_DEF=\"ABC\",\"WenHuaFeng547566993\"\r\n");
+    printf("AT+CWMODE=1\r\n");
+    HAL_Delay(1000);
+
+    //printf("AT+CWAUTOCONN=1\r\n");
+    //HAL_Delay(1000);
+
+    printf("AT+CWJAP=\"HSG2\",\"13537011631\"\r\n");
 }
 
 void WIFI_PowerOnOff(enum PowerFlag flag)
 {
     if (flag == POWER_ON) {
         ESP8266_AT_POWER_PIN_HIGH();
-        g_powerOffCtr = _WIFI_OFF_TIME_;
+        g_powerOffCtr = WIFI_OFF_TIME;
     } else {
         ESP8266_AT_POWER_PIN_LOW();
         g_connect = DISCONNECT;

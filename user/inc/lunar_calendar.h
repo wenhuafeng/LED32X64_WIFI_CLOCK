@@ -11,6 +11,6 @@ struct LunarCalendarType {
 };
 
 void CalculationLunarCalendar(struct TimeType *time);
-struct LunarCalendarType GetLunarCalendar(void);
+struct LunarCalendarType *GetLunarCalendar(void);
 
 #endif

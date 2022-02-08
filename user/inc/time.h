@@ -17,6 +17,7 @@ struct TimeType {
 bool Get1sFlag(void);
 void Set1sFlag(bool flag);
 struct TimeType *GetTimeData(void);
+void SetTimeData(struct TimeType *time);
 void CalculateWeek(u16 year, u8 month, u8 day, u8 *week);
 bool ClockRun(void);
 void GetClock(void);

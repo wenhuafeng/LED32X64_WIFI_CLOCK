@@ -56,6 +56,7 @@
 #elif (WIFI_MODULE==WIFI_EMW3060)
 #include "emw3060_at.h"
 #endif
+#include "wifi_uart_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,13 +72,13 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 //##############################################################################
-#warning message "Software_Version: <V209>"
-#warning message "Software_Date:    2022/01/01"
-#warning message "Software_Project: CLOCK_WIFI"
-#warning message "Software_MCU:     STM32F103C8T6"
-#warning message "Main_OSC:         EXT_8M=IXT_72MHz"
-#warning message "SUB_OSC:          EXT_32.768KHZ"
-#warning message "Author:           wenhuafeng"
+// #warning message "Software_Version: <V209>"
+// #warning message "Software_Date:    2022/01/01"
+// #warning message "Software_Project: CLOCK_WIFI"
+// #warning message "Software_MCU:     STM32F103C8T6"
+// #warning message "Main_OSC:         EXT_8M=IXT_72MHz"
+// #warning message "SUB_OSC:          EXT_32.768KHZ"
+// #warning message "Author:           wenhuafeng"
 //##############################################################################
 /* USER CODE END PM */
 
@@ -127,37 +128,35 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_RTC_Init();
   MX_TIM4_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
+  //HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVE_LENGTH);
+  //__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+  Usart1ReceiveDmaInit();
+  WIFI_PowerOnOff(POWER_ON);
   HTU21D_I2cInit();
   HAL_RTCEx_SetSecond_IT(&hrtc);
-  GetClock();
   HAL_Delay(200);
-  //TH init
+  // TH init
   HTU21D_Init();
   HAL_Delay(10);
   HTU21D_Reset();
   HAL_Delay(100);
   HTU21D_GetData();
-  //UART WIFI init
-  WIFI_PowerOnOff(POWER_ON);
+  // UART WIFI init
   HAL_Delay(100);
-  WIFI_Init();
-
-  HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVELEN);
-  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
-  //DISP power on
+  GetClock();
+  CalculationLunarCalendar(GetTimeData());
   HUB75D_DispOnOff(DISP_TIME_5MIN);
-  HAL_Delay(10);
-  MX_TIM4_Init();
-  HAL_TIM_Base_Start(&htim4);
   HAL_TIM_Base_Start_IT(&htim4);
+
+  WIFI_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -167,11 +166,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (UsartType1.receive_flag) {
-      UsartType1.receive_flag = 0;
-      WIFI_ReceiveProcess(UsartType1.usartDMA_rxBuf);
-      HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVELEN);
-    }
+    HandlerUartData();
 
     if (Get1sFlag() == true) {
       Set1sFlag(false);
@@ -244,15 +239,6 @@ static void MX_NVIC_Init(void)
   /* TIM4_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM4_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM4_IRQn);
-  /* USART1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
-  HAL_NVIC_EnableIRQ(USART1_IRQn);
-  /* DMA1_Channel4_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 1, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
-  /* DMA1_Channel5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 1, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
   /* RTC_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(RTC_IRQn, 1, 1);
   HAL_NVIC_EnableIRQ(RTC_IRQn);
@@ -298,13 +284,14 @@ void EnterStandbyMode(void)
   WIFI_PowerOnOff(POWER_ON);
   HAL_Delay(100);
   WIFI_Init();
-  HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVELEN);
-  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+  //HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVE_LENGTH);
+  //__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+  Usart1ReceiveDmaInit();
   //DISP power on
   HUB75D_DispOnOff(DISP_TIME_5MIN);
   HAL_Delay(100);
   MX_TIM4_Init();
-  HAL_TIM_Base_Start(&htim4);
+  //HAL_TIM_Base_Start(&htim4);
   HAL_TIM_Base_Start_IT(&htim4);
 
   printf("Exit_Stop_Mode\n\r");

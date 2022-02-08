@@ -59,7 +59,7 @@ extern "C" {
 /* USER CODE BEGIN ET */
 #define WIFI_ESP8266    1
 #define WIFI_EMW3060    2
-#define WIFI_MODULE     WIFI_EMW3060
+#define WIFI_MODULE     WIFI_ESP8266
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

@@ -34,23 +34,7 @@ extern "C" {
 extern UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN Private defines */
-#define RECEIVELEN 100
-#define USART_DMA_SENDING 1//?送未完成  
-#define USART_DMA_SENDOVER 0//?送完成  
 
-typedef struct
-{
-  uint8_t receive_flag:1;//空?接收??  
-  uint8_t dmaSend_flag:1;//?送完成??  
-  uint16_t rx_len;//接收?度  
-  uint8_t usartDMA_rxBuf[RECEIVELEN];//DMA接收?存  
-}USART_RECEIVETYPE;
-
-extern USART_RECEIVETYPE UsartType1;//,UsartType2;
-
-void UsartReceive_IDLE(UART_HandleTypeDef *huart);
-void Usart1SendData_DMA(uint8_t *pdata, uint16_t Length);
-//void Usart2SendData_DMA(uint8_t *pdata, uint16_t Length);
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);
