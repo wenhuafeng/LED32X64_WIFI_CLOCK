@@ -1,17 +1,17 @@
 #include "stm32f1xx.h"
 #include "delay.h"
 
-static u8 fac_us = 0;  //us��ʱ������
-static u16 fac_ms = 0; //ms��ʱ������
+static uint8_t fac_us = 0;  //us��ʱ������
+static uint16_t fac_ms = 0; //ms��ʱ������
 
 //��ʼ���ӳٺ���
 //SYSTICK��ʱ�ӹ̶�ΪHCLKʱ�ӵ�1/8
 //SYSCLK:ϵͳʱ��
-void delay_init(u8 SYSCLK)
+void delay_init(uint8_t SYSCLK)
 {
     SysTick->CTRL &= 0xfffffffb; //bit2���,ѡ���ⲿʱ��  HCLK/8
     fac_us = SYSCLK / 8;
-    fac_ms = (u16)fac_us * 1000;
+    fac_ms = (uint16_t)fac_us * 1000;
 }
 
 //��ʱnms
@@ -20,10 +20,10 @@ void delay_init(u8 SYSCLK)
 //nms<=0xffffff*8*1000/SYSCLK
 //SYSCLK��λΪHz,nms��λΪms
 //��72M������,nms<=1864
-void delay_ms(u16 nms)
+void delay_ms(uint16_t nms)
 {
-    u32 temp;
-    SysTick->LOAD = (u32)nms * fac_ms; //ʱ�����(SysTick->LOADΪ24bit)
+    uint32_t temp;
+    SysTick->LOAD = (uint32_t)nms * fac_ms; //ʱ�����(SysTick->LOADΪ24bit)
     SysTick->VAL = 0x00;               //��ռ�����
     SysTick->CTRL = 0x01;              //��ʼ����
     do {
@@ -35,9 +35,9 @@ void delay_ms(u16 nms)
 
 //��ʱnus
 //nusΪҪ��ʱ��us��.
-void delay_us(u32 nus)
+void delay_us(uint32_t nus)
 {
-    u32 temp;
+    uint32_t temp;
     SysTick->LOAD = nus * fac_us; //ʱ�����
     SysTick->VAL = 0x00;          //��ռ�����
     SysTick->CTRL = 0x01;         //��ʼ����

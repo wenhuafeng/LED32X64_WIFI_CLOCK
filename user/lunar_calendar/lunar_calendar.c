@@ -1,9 +1,9 @@
 #include "lunar_calendar.h"
-#include "type_define.h"
+#include <stdint.h>
 
 #define YEAR_TABLE_NUM 199
 
-static const u32 g_lunarCalendarTable[YEAR_TABLE_NUM] = {
+static const uint32_t g_lunarCalendarTable[YEAR_TABLE_NUM] = {
     0x04AE53, 0x0A5748, 0x5526BD, 0x0D2650, 0x0D9544, 0x46AAB9, 0x056A4D, 0x09AD42, 0x24AEB6, 0x04AE4A, /*1901-1910*/
     0x6A4DBE, 0x0A4D52, 0x0D2546, 0x5D52BA, 0x0B544E, 0x0D6A43, 0x296D37, 0x095B4B, 0x749BC1, 0x049754, /*1911-1920*/
     0x0A4B48, 0x5B25BC, 0x06A550, 0x06D445, 0x4ADAB8, 0x02B64D, 0x095742, 0x2497B7, 0x04974A, 0x664B3E, /*1921-1930*/
@@ -25,20 +25,20 @@ static const u32 g_lunarCalendarTable[YEAR_TABLE_NUM] = {
     0x069349, 0x7729BD, 0x06AA51, 0x0AD546, 0x54DABA, 0x04B64E, 0x0A5743, 0x452738, 0x0D264A, 0x8E933E, /*2081-2090*/
     0x0D5252, 0x0DAA47, 0x66B53B, 0x056D4F, 0x04AE45, 0x4A4EB9, 0x0A4D4C, 0x0D1541, 0x2D92B5            /*2091-2099*/
 };
-static const u16 g_monthAdd[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+static const uint16_t g_monthAdd[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
 struct LunarCalendarType g_lunarCalendarData;
 
 static bool LunarCalendar(struct TimeType *time, struct LunarCalendarType *lcData)
 {
-    u16 springToNY; /* 记录春节离当年元旦的天数 */
-    u16 sunToNY;    /* 记录阳历日离当年元旦的天数 */
-    u8 dayCount;    /* 记录大小月的天数29或30*/
-    u8 index;       /* 记录从哪个月开始来计算 */
-    u8 flag;        /* 用来对闰月的特殊处理 */
-    u16 year = time->year;
-    u8 month = time->month;
-    u8 day = time->day;
+    uint16_t springToNY; /* 记录春节离当年元旦的天数 */
+    uint16_t sunToNY;    /* 记录阳历日离当年元旦的天数 */
+    uint8_t dayCount;    /* 记录大小月的天数29或30*/
+    uint8_t index;       /* 记录从哪个月开始来计算 */
+    uint8_t flag;        /* 用来对闰月的特殊处理 */
+    uint16_t year = time->year;
+    uint8_t month = time->month;
+    uint8_t day = time->day;
 
     if (((g_lunarCalendarTable[year - 1901] & 0x0060) >> 5) == 1) {
         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1;

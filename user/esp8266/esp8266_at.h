@@ -1,19 +1,19 @@
 #ifndef ESP8266_AT_H
 #define ESP8266_AT_H
 
-#include "type_define.h"
-#include "gpio_bit_ctrl.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 enum PowerFlag {
     POWER_OFF,
     POWER_ON
 };
 
-void WIFI_ReceiveProcess(u8 *buf);
+void WIFI_ReceiveProcess(uint8_t *buf);
 void WIFI_Init(void);
 void WIFI_CtrDec(void);
 void WIFI_PowerOnOff(enum PowerFlag flag);
-BOOLEAN WIFI_GetTimeDataFlag(void);
-void WIFI_SetTimeDataFlag(BOOLEAN value);
+bool WIFI_GetTimeDataFlag(void);
+void WIFI_SetTimeDataFlag(bool value);
 
 #endif

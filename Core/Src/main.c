@@ -136,20 +136,11 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  //HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVE_LENGTH);
-  //__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
   Usart1ReceiveDmaInit();
   WIFI_PowerOnOff(POWER_ON);
-  HTU21D_I2cInit();
   HAL_RTCEx_SetSecond_IT(&hrtc);
   HAL_Delay(200);
-  // TH init
   HTU21D_Init();
-  HAL_Delay(10);
-  HTU21D_Reset();
-  HAL_Delay(100);
-  HTU21D_GetData();
-  // UART WIFI init
   HAL_Delay(100);
   GetClock();
   CalculationLunarCalendar(GetTimeData());
@@ -270,28 +261,19 @@ void EnterStandbyMode(void)
   MX_USART1_UART_Init();
   /* Initialize interrupts */
   MX_NVIC_Init();
-  HTU21D_I2cInit();
   HAL_RTCEx_SetSecond_IT(&hrtc);
   GetClock();
   HAL_Delay(200);
-  /* TH init */
   HTU21D_Init();
-  HAL_Delay(10);
-  HTU21D_Reset();
-  HAL_Delay(100);
-  HTU21D_GetData();
   /* wifi init */
   WIFI_PowerOnOff(POWER_ON);
   HAL_Delay(100);
   WIFI_Init();
-  //HAL_UART_Receive_DMA(&huart1, UsartType1.usartDMA_rxBuf, RECEIVE_LENGTH);
-  //__HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
   Usart1ReceiveDmaInit();
   //DISP power on
   HUB75D_DispOnOff(DISP_TIME_5MIN);
   HAL_Delay(100);
   MX_TIM4_Init();
-  //HAL_TIM_Base_Start(&htim4);
   HAL_TIM_Base_Start_IT(&htim4);
 
   printf("Exit_Stop_Mode\n\r");

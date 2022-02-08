@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include "type_define.h"
+#include <stdbool.h>
 #include "main.h"
 #include "usart.h"
 #include "time.h"
@@ -53,17 +53,17 @@ enum ConnectFlag {
 
 #define WIFI_NAME_PASSWD "AT+CWJAP_DEF=\"HSG2\",\"13537011631\"\r\n"
 
-static u8 g_powerOffCtr;
-static u8 g_getTimeCtr;
-static u8 g_renewInitCtr;
-static u8 g_renewInitCtr_1;
+static uint8_t g_powerOffCtr;
+static uint8_t g_getTimeCtr;
+static uint8_t g_renewInitCtr;
+static uint8_t g_renewInitCtr_1;
 
 static enum ConnectFlag g_connect;
-static BOOLEAN g_timeDataOkFlag;
+static bool g_timeDataOkFlag;
 
-static u8 AscToHex(u8 asc)
+static uint8_t AscToHex(uint8_t asc)
 {
-    u8 hex = asc;
+    uint8_t hex = asc;
 
     if ((asc >= 0x30) && (asc <= 0x39)) {
         hex -= 0x30;
@@ -110,11 +110,11 @@ uint8_t GetMonth(uint32_t monthString)
     return i;
 }
 
-static u8 ProcessClock(char *cRxBuf)
+static uint8_t ProcessClock(char *cRxBuf)
 {
-    u16 year;
-    u8 month, day, week, hour, minute, second;
-    u32 i;
+    uint16_t year;
+    uint8_t month, day, week, hour, minute, second;
+    uint32_t i;
     struct TimeType time;
     bool status = true;
 
@@ -181,7 +181,7 @@ void WIFI_Init(void)
     //HAL_Delay(1000);
 
     printf("AT+RST\r\n");
-    HAL_Delay(1000);
+    HAL_Delay(100);
 
     //printf("AT+GMR\r\n");
     //HAL_Delay(100);
@@ -190,7 +190,7 @@ void WIFI_Init(void)
     //HAL_Delay(100);
 
     printf("AT+CWMODE=1\r\n");
-    HAL_Delay(1000);
+    HAL_Delay(100);
 
     //printf("AT+CWAUTOCONN=1\r\n");
     //HAL_Delay(1000);
@@ -251,7 +251,7 @@ void WIFI_CtrDec(void)
     }
 }
 
-void WIFI_ReceiveProcess(u8 *buf)
+void WIFI_ReceiveProcess(uint8_t *buf)
 {
     char *str;
     char *strPosition;
@@ -281,12 +281,12 @@ void WIFI_ReceiveProcess(u8 *buf)
     }
 }
 
-BOOLEAN WIFI_GetTimeDataFlag(void)
+bool WIFI_GetTimeDataFlag(void)
 {
     return g_timeDataOkFlag;
 }
 
-void WIFI_SetTimeDataFlag(BOOLEAN value)
+void WIFI_SetTimeDataFlag(bool value)
 {
     g_timeDataOkFlag = value;
 }

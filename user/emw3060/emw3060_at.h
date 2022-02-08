@@ -1,7 +1,8 @@
 #ifndef _EMW3060_AT_H_
 #define _EMW3060_AT_H_
 
-#include "type_define.h"
+#include <stdint.h>
+#include <stdbool.h>
 #include "gpio_bit_ctrl.h"
 
 enum PowerFlag {
@@ -9,11 +10,11 @@ enum PowerFlag {
     POWER_ON
 };
 
-void WIFI_ReceiveProcess(u8 *buf);
+void WIFI_ReceiveProcess(uint8_t *buf);
 void WIFI_Init(void);
 void WIFI_CtrDec(void);
 void WIFI_PowerOnOff(enum PowerFlag flag);
-BOOLEAN WIFI_GetTimeDataFlag(void);
-void WIFI_SetTimeDataFlag(BOOLEAN value);
+bool WIFI_GetTimeDataFlag(void);
+void WIFI_SetTimeDataFlag(bool value);
 
 #endif

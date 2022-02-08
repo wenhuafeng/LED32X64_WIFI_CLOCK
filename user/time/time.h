@@ -1,24 +1,24 @@
 #ifndef TIME_H
 #define TIME_H
 
+#include <stdint.h>
 #include <stdbool.h>
-#include "type_define.h"
 
 struct TimeType {
-    u8 sec;
-    u8 min;
-    u8 hour;
-    u8 day;
-    u8 week;
-    u8 month;
-    u16 year;
+    uint8_t sec;
+    uint8_t min;
+    uint8_t hour;
+    uint8_t day;
+    uint8_t week;
+    uint8_t month;
+    uint16_t year;
 };
 
 bool Get1sFlag(void);
 void Set1sFlag(bool flag);
 struct TimeType *GetTimeData(void);
 void SetTimeData(struct TimeType *time);
-void CalculateWeek(u16 year, u8 month, u8 day, u8 *week);
+void CalculateWeek(uint16_t year, uint8_t month, uint8_t day, uint8_t *week);
 bool ClockRun(void);
 void GetClock(void);
 void SetClock(struct TimeType *time);

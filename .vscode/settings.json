@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "wifi_uart_if.h": "c"
+        "wifi_uart_if.h": "c",
+        "type_define.h": "c",
+        "main.h": "c",
+        "htu21d.h": "c",
+        "esp8266_at.h": "c",
+        "string.h": "c"
     }
 }

@@ -8,10 +8,10 @@
 struct TimeType g_time;
 bool g_1sFlag;
 
-static u8 GetMaxDay(u16 year, u8 month)
+static uint8_t GetMaxDay(uint16_t year, uint8_t month)
 {
-    u8 day;
-    const u8 constDays[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    uint8_t day;
+    uint8_t constDays[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
     if (month == 2) {
         if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
@@ -41,13 +41,13 @@ struct TimeType *GetTimeData(void)
     return &g_time;
 }
 
-void CalculateWeek(u16 year, u8 month, u8 day, u8 *week)
+void CalculateWeek(uint16_t year, uint8_t month, uint8_t day, uint8_t *week)
 {
-    s16 yearTemp = 0;
-    s16 yearHigh;
-    s16 yearLow;
-    s8 monthTemp = 0;
-    s8 wk;
+    int16_t yearTemp = 0;
+    int16_t yearHigh;
+    int16_t yearLow;
+    int8_t monthTemp = 0;
+    int8_t wk;
 
     if (month < 3) {
         monthTemp = month + 12;

@@ -1,13 +1,13 @@
 #ifndef LUNAR_CALENDAR_H
 #define LUNAR_CALENDAR_H
 
-#include "type_define.h"
+#include <stdint.h>
 #include "time.h"
 
 struct LunarCalendarType {
-    u8 year;
-    u8 month;
-    u8 day;
+    uint8_t year;
+    uint8_t month;
+    uint8_t day;
 };
 
 void CalculationLunarCalendar(struct TimeType *time);

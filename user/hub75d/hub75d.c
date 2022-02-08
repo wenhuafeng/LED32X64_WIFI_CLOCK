@@ -1,11 +1,10 @@
+#include "hub75d.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include "type_define.h"
-#include "hub75d.h"
+#include "gpio_bit_ctrl.h"
 #include "htu21d.h"
-#include "esp8266_at.h"
 #include "lunar_calendar.h"
 #include "main.h"
 #include "time.h"
@@ -28,50 +27,50 @@
 #define HUB75D_DISP_POWER_PIN PBout(11)
 
 struct CalendarDecimal {
-    u8 yearH;
-    u8 yearL;
-    u8 week;
-    u8 monthH;
-    u8 monthL;
-    u8 dayH;
-    u8 dayL;
-    u8 hourH;
-    u8 hourL;
-    u8 minH;
-    u8 minL;
-    u8 secH;
-    u8 secL;
-    u8 colon;
+    uint8_t yearH;
+    uint8_t yearL;
+    uint8_t week;
+    uint8_t monthH;
+    uint8_t monthL;
+    uint8_t dayH;
+    uint8_t dayL;
+    uint8_t hourH;
+    uint8_t hourL;
+    uint8_t minH;
+    uint8_t minL;
+    uint8_t secH;
+    uint8_t secL;
+    uint8_t colon;
 };
 
 #define WORD_COUNT 16
 struct RgbType {
-    u8 red[WORD_COUNT];
-    u8 green[WORD_COUNT];
-    u8 blue[WORD_COUNT];
+    uint8_t red[WORD_COUNT];
+    uint8_t green[WORD_COUNT];
+    uint8_t blue[WORD_COUNT];
 };
 
 typedef union {
-    u16 flag;
+    uint16_t flag;
     struct {
-        u32 hubA : 1;
-        u32 hubB : 1;
-        u32 hubC : 1;
-        u32 hubD : 1;
-        u32 hubR1 : 1;
-        u32 hubG1 : 1;
-        u32 hubB1 : 1;
-        u32 hubR2 : 1;
-        u32 hubG2 : 1;
-        u32 hubB2 : 1;
+        uint32_t hubA : 1;
+        uint32_t hubB : 1;
+        uint32_t hubC : 1;
+        uint32_t hubD : 1;
+        uint32_t hubR1 : 1;
+        uint32_t hubG1 : 1;
+        uint32_t hubB1 : 1;
+        uint32_t hubR2 : 1;
+        uint32_t hubG2 : 1;
+        uint32_t hubB2 : 1;
     } bit;
 } PinFlags;
 
 struct CalendarDecimal g_calendarDecimal;
 enum DispTorH g_dispTorH;
-static u16 g_displayOffCtr;
+static uint16_t g_displayOffCtr;
 
-static u8 const DateTable[] = {
+static uint8_t const DateTable[] = {
     0x00, 0x06, 0x09, 0x09, 0x09, 0x09, 0x09, 0x06, /* 0         */
     0x00, 0x02, 0x06, 0x02, 0x02, 0x02, 0x02, 0x07, /* 1         */
     0x00, 0x06, 0x09, 0x01, 0x02, 0x04, 0x08, 0x0f, /* 2         */
@@ -93,7 +92,7 @@ static u8 const DateTable[] = {
     0x00, 0x00, 0x80, 0x00, 0x30, 0x40, 0x40, 0x30, /* 19 .c 4x7 */
 };
 
-static u8 const HZ[] = {
+static uint8_t const HZ[] = {
     0x00, 0x3e, 0x22, 0x22, 0x3e, 0x22, 0x22, 0x3e, /* 0  日  */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x7e, 0x00, 0x00, /* 1  一  */
     0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x7e, 0x00, /* 2  二  */
@@ -107,7 +106,7 @@ static u8 const HZ[] = {
     0x08, 0x1f, 0x24, 0x1f, 0x14, 0x3f, 0x04, 0x04, /* 10  年 */
 };
 
-static u8 const DateD[][8] = {
+static uint8_t const DateD[][8] = {
     { 0x00, 0x70, 0x88, 0x88, 0x88, 0x88, 0x88, 0x70 }, /* 0       */
     { 0x00, 0x20, 0x60, 0x20, 0x20, 0x20, 0x20, 0x70 }, /* 1       */
     { 0x00, 0x70, 0x88, 0x08, 0x10, 0x20, 0x40, 0xf8 }, /* 2       */
@@ -126,7 +125,7 @@ static u8 const DateD[][8] = {
     { 0x00, 0xc8, 0xd0, 0x20, 0x58, 0x98, 0x00, 0x00 }, /* 15 %    */
 };
 
-static u8 const Time8Mul16Table[][16] = {
+static uint8_t const Time8Mul16Table[][16] = {
     { 0x3c, 0x7e, 0xe7, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xe7, 0x7e, 0x3c }, /* 0     */
     { 0x1c, 0x7c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x7f }, /* 1     */
     { 0x3c, 0x7e, 0xe7, 0xc3, 0xc3, 0xc3, 0x03, 0x03, 0x07, 0x0e, 0x1c, 0x38, 0x70, 0xe1, 0xff, 0xff }, /* 2     */
@@ -158,7 +157,7 @@ static u8 const Time8Mul16Table[][16] = {
     { 0x00, 0x00, 0xe0, 0xa0, 0xe0, 0x00, 0x1e, 0x23, 0x41, 0x40, 0x40, 0x40, 0x40, 0x41, 0x23, 0x1e }, /* 28 c  */
 };
 
-static u8 const TimeSecondTable[][16] = {
+static uint8_t const TimeSecondTable[][16] = {
     { 0x00, 0x00, 0x3e, 0x7f, 0x63, 0x63, 0x63, 0x63, 0x63, 0x63, 0x63, 0x63, 0x7f, 0x3e, 0x00, 0x00 }, /* 0    */
     { 0x00, 0x00, 0x1c, 0x3c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x3e, 0x00, 0x00 }, /* 1    */
     { 0x00, 0x00, 0x3e, 0x7f, 0x63, 0x63, 0x07, 0x0e, 0x1c, 0x38, 0x70, 0x60, 0x7f, 0x7f, 0x00, 0x00 }, /* 2    */
@@ -173,15 +172,15 @@ static u8 const TimeSecondTable[][16] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, /* 11   */
 };
 
-static inline void DispTime(struct CalendarDecimal *caleDeci, struct RgbType *rgb, u8 i)
+static inline void DispTime(struct CalendarDecimal *caleDeci, struct RgbType *rgb, uint8_t i)
 {
-    u8 h1 = caleDeci->hourH;
-    u8 h0 = caleDeci->hourL;
-    u8 m1 = caleDeci->minH;
-    u8 m0 = caleDeci->minL;
-    u8 s1 = caleDeci->secH;
-    u8 s0 = caleDeci->secL;
-    u8 sd = caleDeci->colon;
+    uint8_t h1 = caleDeci->hourH;
+    uint8_t h0 = caleDeci->hourL;
+    uint8_t m1 = caleDeci->minH;
+    uint8_t m0 = caleDeci->minL;
+    uint8_t s1 = caleDeci->secH;
+    uint8_t s0 = caleDeci->secL;
+    uint8_t sd = caleDeci->colon;
 
     if (h1 == 0) {
         h1 = 10;
@@ -221,22 +220,22 @@ static inline void DispTime(struct CalendarDecimal *caleDeci, struct RgbType *rg
     rgb->blue[7] |= TimeSecondTable[s0][i];
 }
 
-static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rgb, u8 i)
+static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rgb, uint8_t i)
 {
-    u8 y1 = caleDeci->yearH;
-    u8 y0 = caleDeci->yearL;
-    u8 m1 = caleDeci->monthH;
-    u8 m0 = caleDeci->monthL;
-    u8 d1 = caleDeci->dayH;
-    u8 d0 = caleDeci->dayL;
-    u8 wk = caleDeci->week;
+    uint8_t y1 = caleDeci->yearH;
+    uint8_t y0 = caleDeci->yearL;
+    uint8_t m1 = caleDeci->monthH;
+    uint8_t m0 = caleDeci->monthL;
+    uint8_t d1 = caleDeci->dayH;
+    uint8_t d0 = caleDeci->dayL;
+    uint8_t wk = caleDeci->week;
 
     rgb->green[8] |= (DateTable[2 * 8 + i] << 4);
     rgb->green[8] |= (DateTable[0 * 8 + i] >> 1);
     rgb->green[9] |= (DateTable[0 * 8 + i] << 7);
     rgb->green[9] |= (DateTable[y1 * 8 + i] << 2);
     rgb->green[9] |= (DateTable[y0 * 8 + i] >> 3);
-    for (u8 j = 8; j < 10; j++) {
+    for (uint8_t j = 8; j < 10; j++) {
         rgb->red[j] = rgb->green[j];
     }
     rgb->green[10] |= (DateTable[y0 * 8 + i] << 5);
@@ -267,14 +266,14 @@ static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rg
     rgb->red[15] |= HZ[(wk - 0) * 8 + i];
 }
 
-static inline void DispTemperatureHumidity(struct RgbType *rgb, u8 i)
+static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
 {
     bool sign = false;
-    u8 j = i - 8;
-    u8 t1, t0, td;
-    u16 tmp;
-    s16 temperature = GetTemperature();
-    u16 humidity = GetHumidity();
+    uint8_t j = i - 8;
+    uint8_t t1, t0, td;
+    uint16_t tmp;
+    int16_t temperature = HTU21D_GetTemperature();
+    uint16_t humidity = HTU21D_GetHumidity();
 
     if (g_dispTorH == DISP_T) {
         if (temperature < 0) {
@@ -325,14 +324,14 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, u8 i)
     }
 }
 
-static void DispLunarCalendar(struct RgbType *rgb, u8 i)
+static void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
 {
-    u8 j = i - 8;
+    uint8_t j = i - 8;
     struct LunarCalendarType *lcData = GetLunarCalendar();
-    u8 m1 = lcData->month / 10;
-    u8 m0 = lcData->month % 10;
-    u8 d1 = lcData->day / 10;
-    u8 d0 = lcData->day % 10;
+    uint8_t m1 = lcData->month / 10;
+    uint8_t m0 = lcData->month % 10;
+    uint8_t d1 = lcData->day / 10;
+    uint8_t d0 = lcData->day % 10;
 
     rgb->green[8] |= HZ[7 * 8 + j];
     if (m1 == 0) {
@@ -351,14 +350,14 @@ static void DispLunarCalendar(struct RgbType *rgb, u8 i)
     rgb->green[12] |= (HZ[8 * 8 + j] << 2);
 }
 
-static inline void SetScanPin(struct RgbType *rgb, u8 count)
+static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
 {
     PinFlags flags = { 0 };
 
     HUB_LAT = 0;
     HUB_OE = 1;
-    for (u8 i = 0; i < 8; i++) {
-        for (u8 j = 0; j < 8; j++) {
+    for (uint8_t i = 0; i < 8; i++) {
+        for (uint8_t j = 0; j < 8; j++) {
             flags.flag = 0x00;
             if (rgb->red[i + 8] & 0x80) {
                 flags.bit.hubR1 = 1;
@@ -421,7 +420,7 @@ static inline void SetScanPin(struct RgbType *rgb, u8 count)
 
 void HUB75D_DispScan(void)
 {
-    static u8 count = 0;
+    static uint8_t count = 0;
     struct RgbType rgb;
 
     memset(&rgb, 0, sizeof(struct RgbType));
@@ -442,8 +441,6 @@ void HUB75D_DispScan(void)
 
 void HUB75D_CalculateCalendar(struct TimeType *time)
 {
-    //struct CalendarDecimal *caleDeci = &g_calendarDecimal;
-
     g_calendarDecimal.hourL = time->hour % 10;
     g_calendarDecimal.hourH = time->hour / 10;
     g_calendarDecimal.minL = time->min % 10;
@@ -492,7 +489,7 @@ void HUB75D_DispOnOff(enum DispTime time)
 bool HUB75D_CtrDec(void)
 {
     bool standby = false;
-    static u8 changeCtr;
+    static uint8_t changeCtr;
 
     changeCtr++;
     if (changeCtr > TEMP_HUMI_DISP_TIME) {

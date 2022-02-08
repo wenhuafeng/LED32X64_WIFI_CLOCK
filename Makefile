@@ -61,14 +61,14 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 Core/Src/system_stm32f1xx.c \
 Core/Src/usart.c \
 Core/Src/dma.c \
-user/src/delay.c \
-user/src/emw3060_at.c \
-user/src/esp8266_at.c \
-user/src/htu21d.c \
-user/src/hub75d.c \
-user/src/lunar_calendar.c \
-user/src/time.c \
-user/src/wifi_uart_if.c
+user/delay/delay.c \
+user/emw3060/emw3060_at.c \
+user/esp8266/esp8266_at.c \
+user/htu21d/htu21d.c \
+user/hub75d/hub75d.c \
+user/lunar_calendar/lunar_calendar.c \
+user/time/time.c \
+user/wifi_uart_if/wifi_uart_if.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -130,8 +130,15 @@ C_INCLUDES =  \
 -IDrivers/STM32F1xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
 -IDrivers/CMSIS/Include \
--Iuser/inc
-
+-Iuser/inc \
+-Iuser/delay \
+-Iuser/emw3060 \
+-Iuser/esp8266 \
+-Iuser/htu21d \
+-Iuser/hub75d \
+-Iuser/lunar_calendar \
+-Iuser/time \
+-Iuser/wifi_uart_if
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
