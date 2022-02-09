@@ -61,7 +61,6 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 Core/Src/system_stm32f1xx.c \
 Core/Src/usart.c \
 Core/Src/dma.c \
-user/delay/delay.c \
 user/emw3060/emw3060_at.c \
 user/esp8266/esp8266_at.c \
 user/htu21d/htu21d.c \
@@ -131,7 +130,6 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
 -IDrivers/CMSIS/Include \
 -Iuser/inc \
--Iuser/delay \
 -Iuser/emw3060 \
 -Iuser/esp8266 \
 -Iuser/htu21d \

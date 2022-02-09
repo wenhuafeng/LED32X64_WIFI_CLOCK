@@ -67,7 +67,7 @@ typedef union {
 } PinFlags;
 
 struct CalendarDecimal g_calendarDecimal;
-enum DispTorH g_dispTorH;
+enum DispTorH g_displayTorH;
 static uint16_t g_displayOffCtr;
 
 static uint8_t const DateTable[] = {
@@ -275,7 +275,7 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
     int16_t temperature = HTU21D_GetTemperature();
     uint16_t humidity = HTU21D_GetHumidity();
 
-    if (g_dispTorH == DISP_T) {
+    if (g_displayTorH == DISP_T) {
         if (temperature < 0) {
             sign = true;
             tmp = ~temperature + 1;
@@ -317,14 +317,14 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
     rgb->green[14] |= (DateD[13][j] >> 4);
     rgb->red[14] |= (DateD[td][j] >> 5);
     rgb->red[15] |= (DateD[td][j] << 3);
-    if (g_dispTorH == DISP_T) {
+    if (g_displayTorH == DISP_T) {
         rgb->green[15] |= (DateD[14][j] >> 3); /* C */
     } else {
         rgb->green[15] |= (DateD[15][j] >> 3); /* % */
     }
 }
 
-static void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
+static inline void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
 {
     uint8_t j = i - 8;
     struct LunarCalendarType *lcData = GetLunarCalendar();
@@ -418,7 +418,7 @@ static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
     HUB_OE = 0;
 }
 
-void HUB75D_DispScan(void)
+void inline HUB75D_DispScan(void)
 {
     static uint8_t count = 0;
     struct RgbType rgb;
@@ -494,10 +494,10 @@ bool HUB75D_CtrDec(void)
     changeCtr++;
     if (changeCtr > TEMP_HUMI_DISP_TIME) {
         changeCtr = 0x00;
-        if (g_dispTorH == DISP_T) {
-            g_dispTorH = DISP_H;
+        if (g_displayTorH == DISP_T) {
+            g_displayTorH = DISP_H;
         } else {
-            g_dispTorH = DISP_T;
+            g_displayTorH = DISP_T;
         }
     }
 

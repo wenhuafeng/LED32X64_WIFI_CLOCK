@@ -5,13 +5,10 @@
 #include "stm32f1xx_hal.h"
 #include "main.h"
 
+#define HTU21D_I2C_DELAY 2
+
 #define Write 0
 #define Read 1
-
-#define HIGH 1
-#define LOW 0
-
-#define HTU21D_I2C_DELAY 2
 
 #define SlaveAddr 0x80
 #define resolution 0
@@ -56,8 +53,11 @@ enum SdaIoType {
         HAL_GPIO_WritePin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin, GPIO_PIN_RESET); \
     } while (0)
 
-static int16_t g_temperature;
-static uint16_t g_humidity;
+struct Htu21dDataType {
+    int16_t temperature;
+    uint16_t humidity;
+};
+struct Htu21dDataType g_thData;
 static uint8_t g_i2cFial;
 
 static void DelayUs(uint8_t c)
@@ -248,7 +248,7 @@ static uint8_t HTU21D_GetData(void)
     NoAckBus();
     StopBus();
     htu = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0);
-    g_humidity = (uint16_t)htu * 10;
+    g_thData.humidity = (uint16_t)htu * 10;
 
     HAL_Delay(10);
 
@@ -277,17 +277,17 @@ static uint8_t HTU21D_GetData(void)
     NoAckBus();
     StopBus();
     temp = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
-    g_temperature = (int16_t)temp;
+    g_thData.temperature = (int16_t)temp;
 
-    printf("\r\nHumi: %d \r\n", g_humidity);
-    printf("Temp: %d \r\n", g_temperature);
+    printf("\r\nHumi: %d \r\n", g_thData.humidity);
+    printf("Temp: %d \r\n", g_thData.temperature);
     g_i2cFial = 0;
 
     return true;
 
 i2c_fail:
-    g_temperature = 0x00;
-    g_humidity = 0x00;
+    g_thData.temperature = 0x00;
+    g_thData.humidity = 0x00;
     printf("\r\nTemp test fail. \r\n");
     g_i2cFial = 1;
     return false;
@@ -370,12 +370,12 @@ error:
 
 int16_t HTU21D_GetTemperature(void)
 {
-    return g_temperature;
+    return g_thData.temperature;
 }
 
 uint16_t HTU21D_GetHumidity(void)
 {
-    return g_humidity;
+    return g_thData.humidity;
 }
 
 void HTU21D_Sampling(void)

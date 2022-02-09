@@ -53,13 +53,15 @@ enum ConnectFlag {
 
 #define WIFI_NAME_PASSWD "AT+CWJAP_DEF=\"HSG2\",\"13537011631\"\r\n"
 
-static uint8_t g_powerOffCtr;
-static uint8_t g_getTimeCtr;
-static uint8_t g_renewInitCtr;
-static uint8_t g_renewInitCtr_1;
-
-static enum ConnectFlag g_connect;
-static bool g_timeDataOkFlag;
+struct Esp8266GetTimeType {
+    uint8_t powerOffCtr;
+    uint8_t getTimeCtr;
+    uint8_t renewInitCtr1;
+    uint8_t renewInitCtr2;
+    enum ConnectFlag connect;
+    bool okFlag;
+};
+struct Esp8266GetTimeType g_getTime;
 
 static uint8_t AscToHex(uint8_t asc)
 {
@@ -153,13 +155,13 @@ static uint8_t ProcessClock(char *cRxBuf)
         time.sec = second;
 
         HAL_UART_DeInit(&huart1);
-        g_powerOffCtr = 0x00;
+        g_getTime.powerOffCtr = 0x00;
         ESP8266_AT_POWER_PIN_LOW();
         SetTimeData(&time);
         SetClock(&time);
         CalculationLunarCalendar(&time);
     } else {
-        g_getTimeCtr = GET_TIME_10S;
+        g_getTime.getTimeCtr = GET_TIME_10S;
     }
 
     return status;
@@ -195,57 +197,57 @@ void WIFI_Init(void)
     //printf("AT+CWAUTOCONN=1\r\n");
     //HAL_Delay(1000);
 
-    printf("AT+CWJAP=\"HSG2\",\"13537011631\"\r\n");
+    printf(WIFI_NAME_PASSWD);
 }
 
 void WIFI_PowerOnOff(enum PowerFlag flag)
 {
     if (flag == POWER_ON) {
         ESP8266_AT_POWER_PIN_HIGH();
-        g_powerOffCtr = WIFI_OFF_TIME;
+        g_getTime.powerOffCtr = WIFI_OFF_TIME;
     } else {
         ESP8266_AT_POWER_PIN_LOW();
-        g_connect = DISCONNECT;
-        g_getTimeCtr = 0x00;
-        g_powerOffCtr = 0x00;
-        g_renewInitCtr = 0x00;
-        g_renewInitCtr_1 = 0x00;
+        g_getTime.connect = DISCONNECT;
+        g_getTime.getTimeCtr = 0x00;
+        g_getTime.powerOffCtr = 0x00;
+        g_getTime.renewInitCtr1 = 0x00;
+        g_getTime.renewInitCtr2 = 0x00;
     }
 }
 
 void WIFI_CtrDec(void)
 {
-    if (g_powerOffCtr) {
-        g_powerOffCtr--;
-        if (g_powerOffCtr == 0x00) {
+    if (g_getTime.powerOffCtr) {
+        g_getTime.powerOffCtr--;
+        if (g_getTime.powerOffCtr == 0x00) {
             WIFI_PowerOnOff(POWER_OFF);
         }
     }
 
-    if (g_getTimeCtr) {
-        g_getTimeCtr--;
-        if (g_getTimeCtr == GET_TIME_10S) {
+    if (g_getTime.getTimeCtr) {
+        g_getTime.getTimeCtr--;
+        if (g_getTime.getTimeCtr == GET_TIME_10S) {
             ESP8266_AT_SNTP_CFG();
-        } else if (g_getTimeCtr == GET_TIME_8S) {
+        } else if (g_getTime.getTimeCtr == GET_TIME_8S) {
             ESP8266_AT_GetTime();
-        } else if (g_getTimeCtr == GET_TIME_6S) {
+        } else if (g_getTime.getTimeCtr == GET_TIME_6S) {
             ESP8266_AT_GetTime();
-        } else if (g_getTimeCtr == 0x00) {
+        } else if (g_getTime.getTimeCtr == 0x00) {
             ESP8266_AT_GetTime();
         }
     }
 
-    if (g_renewInitCtr) {
-        g_renewInitCtr--;
-        if (g_renewInitCtr == 0x00) {
-            g_renewInitCtr_1 = 2;
+    if (g_getTime.renewInitCtr1) {
+        g_getTime.renewInitCtr1--;
+        if (g_getTime.renewInitCtr1 == 0x00) {
+            g_getTime.renewInitCtr2 = 2;
             WIFI_PowerOnOff(POWER_ON);
         }
     }
 
-    if (g_renewInitCtr_1) {
-        g_renewInitCtr_1--;
-        if (g_renewInitCtr_1 == 0x00) {
+    if (g_getTime.renewInitCtr2) {
+        g_getTime.renewInitCtr2--;
+        if (g_getTime.renewInitCtr2 == 0x00) {
             WIFI_Init();
         }
     }
@@ -258,37 +260,37 @@ void WIFI_ReceiveProcess(uint8_t *buf)
 
     str = "WIFI CON"; /* WIFI CONNECTED */
     if (strstr((char *)buf, str) != NULL) {
-        g_connect = CONNECT;
-        g_getTimeCtr = GET_TIME_14S;
+        g_getTime.connect = CONNECT;
+        g_getTime.getTimeCtr = GET_TIME_14S;
     }
     str = "WIFI DIS"; /* WIFI DISCONNECT */
     if (strstr((char *)buf, str) != NULL) {
         WIFI_PowerOnOff(POWER_OFF);
-        g_renewInitCtr = 2;
+        g_getTime.renewInitCtr1 = 2;
     }
     str = "+CWJAP:2"; /* WIFI CONNECT FAIL */
     if (strstr((char *)buf, str) != NULL) {
         WIFI_PowerOnOff(POWER_OFF);
-        g_renewInitCtr = 2;
+        g_getTime.renewInitCtr1 = 2;
     }
-    if (g_connect == CONNECT) {
+    if (g_getTime.connect == CONNECT) {
         str = "+CIPSNTPTIME:";
         strPosition = strstr((char *)buf, str);
         if (strPosition != NULL) {
             ProcessClock(strPosition);
-            g_timeDataOkFlag = 1;
+            g_getTime.okFlag = 1;
         }
     }
 }
 
 bool WIFI_GetTimeDataFlag(void)
 {
-    return g_timeDataOkFlag;
+    return g_getTime.okFlag;
 }
 
 void WIFI_SetTimeDataFlag(bool value)
 {
-    g_timeDataOkFlag = value;
+    g_getTime.okFlag = value;
 }
 
 #endif

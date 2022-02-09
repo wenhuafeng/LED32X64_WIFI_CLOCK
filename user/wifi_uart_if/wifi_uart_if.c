@@ -38,13 +38,13 @@ PUTCHAR_PROTOTYPE
 
 #endif /* __GNUC__ */
 
-void Usart1ReceiveDmaInit(void)
+void USART1_ReceiveDmaInit(void)
 {
     HAL_UART_Receive_DMA(&huart1, g_usartType.buffer, RECEIVE_LENGTH);
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
 }
 
-void Usart1SendData_DMA(uint8_t *pdata, uint16_t Length)
+void USART1_SendData_DMA(uint8_t *pdata, uint16_t Length)
 {
     while (g_usartType.sendFlag == USART_DMA_SENDING);
     g_usartType.sendFlag = USART_DMA_SENDING;
@@ -59,7 +59,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
     }
 }
 
-void Usart1Receive_IDLE(UART_HandleTypeDef *huart)
+void USART1_Receive_IDLE(UART_HandleTypeDef *huart)
 {
     uint32_t temp;
 
@@ -77,7 +77,7 @@ void Usart1Receive_IDLE(UART_HandleTypeDef *huart)
     }
 }
 
-void HandlerUartData(void)
+void USART1_HandlerUartData(void)
 {
     if (g_usartType.receiveFlag) {
         g_usartType.receiveFlag = 0;

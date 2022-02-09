@@ -29,12 +29,14 @@ enum ConnectFlag {
 
 #define WIFI_NAME_PASSWD "AT+WJAP=HSG2,13537011631\r\n"
 
-static uint8_t g_powerOffCtr;
-static uint8_t g_getTimeCtr;
-static uint8_t g_renewInitCtr;
-static uint8_t g_renewInitCtr_1;
-
-static enum ConnectFlag g_connect;
+struct Esp8266GetTimeType {
+    uint8_t powerOffCtr;
+    uint8_t getTimeCtr;
+    uint8_t renewInitCtr1;
+    uint8_t renewInitCtr2;
+    enum ConnectFlag connect;
+};
+struct Esp8266GetTimeType g_getTime;
 
 static uint8_t AscToHex(uint8_t asc)
 {
@@ -86,11 +88,11 @@ static bool ProcessClock(char *cRxBuf)
         CalculateWeek(time.year, time.month, time.day, &time.week);
 
         HAL_UART_DeInit(&huart1);
-        g_powerOffCtr = 0x00;
+        g_getTime.powerOffCtr = 0x00;
         EMW3060_AT_POWER_PIN_LOW();
         SetClock(&time);
     } else {
-        g_getTimeCtr = GET_TIME_10S;
+        g_getTime.getTimeCtr = GET_TIME_10S;
     }
 
     return status;
@@ -124,48 +126,48 @@ void WIFI_PowerOnOff(enum PowerFlag flag)
 {
     if (flag == POWER_ON) {
         EMW3060_AT_POWER_PIN_HIGH();
-        g_powerOffCtr = WIFI_OFF_TIME;
+        g_getTime.powerOffCtr = WIFI_OFF_TIME;
     } else {
         EMW3060_AT_POWER_PIN_LOW();
-        g_connect = DISCONNECT;
-        g_getTimeCtr = 0x00;
-        g_powerOffCtr = 0x00;
-        g_renewInitCtr = 0x00;
-        g_renewInitCtr_1 = 0x00;
+        g_getTime.connect = DISCONNECT;
+        g_getTime.getTimeCtr = 0x00;
+        g_getTime.powerOffCtr = 0x00;
+        g_getTime.renewInitCtr1 = 0x00;
+        g_getTime.renewInitCtr2 = 0x00;
     }
 }
 
 void WIFI_CtrDec(void)
 {
-    if (g_powerOffCtr) {
-        g_powerOffCtr--;
-        if (g_powerOffCtr == 0x00) {
+    if (g_getTime.powerOffCtr) {
+        g_getTime.powerOffCtr--;
+        if (g_getTime.powerOffCtr == 0x00) {
             WIFI_PowerOnOff(POWER_OFF);
         }
     }
 
-    if (g_getTimeCtr) {
-        g_getTimeCtr--;
-        if (g_getTimeCtr == GET_TIME_14S) {
+    if (g_getTime.getTimeCtr) {
+        g_getTime.getTimeCtr--;
+        if (g_getTime.getTimeCtr == GET_TIME_14S) {
             EMW3060_AT_SNTP_CFG();
-        } else if (g_getTimeCtr == GET_TIME_8S) {
+        } else if (g_getTime.getTimeCtr == GET_TIME_8S) {
             EMW3060_AT_GetTime();
-        } else if (g_getTimeCtr == 0x00) {
+        } else if (g_getTime.getTimeCtr == 0x00) {
             EMW3060_AT_GetTime();
         }
     }
 
-    if (g_renewInitCtr) {
-        g_renewInitCtr--;
-        if (g_renewInitCtr == 0x00) {
-            g_renewInitCtr_1 = 2;
+    if (g_getTime.renewInitCtr1) {
+        g_getTime.renewInitCtr1--;
+        if (g_getTime.renewInitCtr1 == 0x00) {
+            g_getTime.renewInitCtr2 = 2;
             WIFI_PowerOnOff(POWER_ON);
         }
     }
 
-    if (g_renewInitCtr_1) {
-        g_renewInitCtr_1--;
-        if (g_renewInitCtr_1 == 0x00) {
+    if (g_getTime.renewInitCtr2) {
+        g_getTime.renewInitCtr2--;
+        if (g_getTime.renewInitCtr2 == 0x00) {
             WIFI_Init();
         }
     }
@@ -178,20 +180,20 @@ void WIFI_ReceiveProcess(uint8_t *buf)
 
     str = "+WEVENT:STATION_UP"; /* WIFI CONNECTED */
     if (strstr((char *)buf, str) != NULL) {
-        g_connect = CONNECT;
-        g_getTimeCtr = GET_TIME_16S;
+        g_getTime.connect = CONNECT;
+        g_getTime.getTimeCtr = GET_TIME_16S;
     }
     str = "+WEVENT:STATION_DOWN"; /* WIFI DISCONNECT */
     if (strstr((char *)buf, str) != NULL) {
         WIFI_PowerOnOff(POWER_OFF);
-        g_renewInitCtr = 2;
+        g_getTime.renewInitCtr1 = 2;
     }
     // str = "+CWJAP:2";//"WIFI CONNECT FAIL";
     // if (strstr(buf, str) != NULL) {
     //   WIFI_PowerOnOff(_POWER_OFF_);
     //   EMW3060_AT_RenewInitCtr = 2;
     // }
-    if (g_connect == CONNECT) {
+    if (g_getTime.connect == CONNECT) {
         str = "+SNTPTIME:20";
         strPosition = strstr((char *)buf, str);
         if (strPosition != NULL) {

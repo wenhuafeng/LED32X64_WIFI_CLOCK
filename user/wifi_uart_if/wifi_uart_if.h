@@ -4,10 +4,9 @@
 #include <stdint.h>
 #include "usart.h"
 
-void Usart1ReceiveDmaInit(void);
-void Usart1Receive_IDLE(UART_HandleTypeDef *huart);
-void Usart1SendData_DMA(uint8_t *pdata, uint16_t Length);
-
-void HandlerUartData(void);
+void USART1_ReceiveDmaInit(void);
+void USART1_Receive_IDLE(UART_HandleTypeDef *huart);
+void USART1_SendData_DMA(uint8_t *pdata, uint16_t Length);
+void USART1_HandlerUartData(void);
 
 #endif

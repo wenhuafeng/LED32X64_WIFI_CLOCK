@@ -6,7 +6,7 @@
 #include "lunar_calendar.h"
 
 struct TimeType g_time;
-bool g_1sFlag;
+static bool g_1sFlag;
 
 static uint8_t GetMaxDay(uint16_t year, uint8_t month)
 {

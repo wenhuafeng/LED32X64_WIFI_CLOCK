@@ -136,7 +136,7 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  Usart1ReceiveDmaInit();
+  USART1_ReceiveDmaInit();
   WIFI_PowerOnOff(POWER_ON);
   HAL_RTCEx_SetSecond_IT(&hrtc);
   HAL_Delay(200);
@@ -157,7 +157,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HandlerUartData();
+    USART1_HandlerUartData();
 
     if (Get1sFlag() == true) {
       Set1sFlag(false);
@@ -269,7 +269,7 @@ void EnterStandbyMode(void)
   WIFI_PowerOnOff(POWER_ON);
   HAL_Delay(100);
   WIFI_Init();
-  Usart1ReceiveDmaInit();
+  USART1_ReceiveDmaInit();
   //DISP power on
   HUB75D_DispOnOff(DISP_TIME_5MIN);
   HAL_Delay(100);
