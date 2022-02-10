@@ -5,6 +5,7 @@
         "main.h": "c",
         "htu21d.h": "c",
         "esp8266_at.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "time.h": "c"
     }
 }

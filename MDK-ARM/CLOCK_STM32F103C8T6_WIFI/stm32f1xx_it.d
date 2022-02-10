@@ -31,8 +31,8 @@ clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm
 clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../Core/Inc/stm32f1xx_it.h
-clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../Core/Inc/usart.h
-clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../user/inc/type_define.h
+clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../user/time/time.h
 clock_stm32f103c8t6_wifi\stm32f1xx_it.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../user/inc/HUB75D.h
-clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../user/inc/time.h
+clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../user/hub75d/hub75d.h
+clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../user/wifi_uart_if/wifi_uart_if.h
+clock_stm32f103c8t6_wifi\stm32f1xx_it.o: ../Core/Inc/usart.h

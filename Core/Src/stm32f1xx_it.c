@@ -39,7 +39,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "time.h"
-#include "HUB75D.h"
+#include "hub75d.h"
 #include "wifi_uart_if.h"
 /* USER CODE END Includes */
 

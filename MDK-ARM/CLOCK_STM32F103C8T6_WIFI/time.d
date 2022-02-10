@@ -1,7 +1,7 @@
-clock_stm32f103c8t6_wifi\time.o: ..\user\src\time.c
-clock_stm32f103c8t6_wifi\time.o: ../user/inc/time.h
+clock_stm32f103c8t6_wifi\time.o: ..\user\time\time.c
+clock_stm32f103c8t6_wifi\time.o: ..\user\time\time.h
+clock_stm32f103c8t6_wifi\time.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 clock_stm32f103c8t6_wifi\time.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-clock_stm32f103c8t6_wifi\time.o: ../user/inc/type_define.h
 clock_stm32f103c8t6_wifi\time.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 clock_stm32f103c8t6_wifi\time.o: ../Core/Inc/rtc.h
 clock_stm32f103c8t6_wifi\time.o: ../Core/Inc/main.h
@@ -12,7 +12,6 @@ clock_stm32f103c8t6_wifi\time.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_h
 clock_stm32f103c8t6_wifi\time.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h
 clock_stm32f103c8t6_wifi\time.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h
 clock_stm32f103c8t6_wifi\time.o: ../Drivers/CMSIS/Include/core_cm3.h
-clock_stm32f103c8t6_wifi\time.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 clock_stm32f103c8t6_wifi\time.o: ../Drivers/CMSIS/Include/cmsis_version.h
 clock_stm32f103c8t6_wifi\time.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 clock_stm32f103c8t6_wifi\time.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
@@ -35,5 +34,5 @@ clock_stm32f103c8t6_wifi\time.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_h
 clock_stm32f103c8t6_wifi\time.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 clock_stm32f103c8t6_wifi\time.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 clock_stm32f103c8t6_wifi\time.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-clock_stm32f103c8t6_wifi\time.o: ../user/inc/hub75d.h
-clock_stm32f103c8t6_wifi\time.o: ../user/inc/lunar_calendar.h
+clock_stm32f103c8t6_wifi\time.o: ../user/hub75d/hub75d.h
+clock_stm32f103c8t6_wifi\time.o: ../user/lunar_calendar/lunar_calendar.h

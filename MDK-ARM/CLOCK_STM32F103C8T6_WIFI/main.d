@@ -36,11 +36,10 @@ clock_stm32f103c8t6_wifi\main.o: ../Core/Inc/tim.h
 clock_stm32f103c8t6_wifi\main.o: ../Core/Inc/usart.h
 clock_stm32f103c8t6_wifi\main.o: ../Core/Inc/gpio.h
 clock_stm32f103c8t6_wifi\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-clock_stm32f103c8t6_wifi\main.o: ../user/inc/hub75d.h
-clock_stm32f103c8t6_wifi\main.o: ../user/inc/time.h
+clock_stm32f103c8t6_wifi\main.o: ../user/hub75d/hub75d.h
 clock_stm32f103c8t6_wifi\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-clock_stm32f103c8t6_wifi\main.o: ../user/inc/type_define.h
-clock_stm32f103c8t6_wifi\main.o: ../user/inc/htu21d.h
-clock_stm32f103c8t6_wifi\main.o: ../user/inc/lunar_calendar.h
-clock_stm32f103c8t6_wifi\main.o: ../user/inc/emw3060_at.h
-clock_stm32f103c8t6_wifi\main.o: ../user/inc/gpio_bit_ctrl.h
+clock_stm32f103c8t6_wifi\main.o: ../user/time/time.h
+clock_stm32f103c8t6_wifi\main.o: ../user/htu21d/htu21d.h
+clock_stm32f103c8t6_wifi\main.o: ../user/lunar_calendar/lunar_calendar.h
+clock_stm32f103c8t6_wifi\main.o: ../user/esp8266/esp8266_at.h
+clock_stm32f103c8t6_wifi\main.o: ../user/wifi_uart_if/wifi_uart_if.h

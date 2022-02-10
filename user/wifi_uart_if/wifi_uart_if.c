@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "main.h"
 #if (WIFI_MODULE == WIFI_ESP8266)
 #include "esp8266_at.h"

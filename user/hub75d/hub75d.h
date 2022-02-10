@@ -1,6 +1,7 @@
 #ifndef HUB75D_H
 #define HUB75D_H
 
+#include <stdbool.h>
 #include "time.h"
 
 enum DispTime {

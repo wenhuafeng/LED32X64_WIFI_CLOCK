@@ -31,4 +31,3 @@ clock_stm32f103c8t6_wifi\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_
 clock_stm32f103c8t6_wifi\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 clock_stm32f103c8t6_wifi\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 clock_stm32f103c8t6_wifi\usart.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-clock_stm32f103c8t6_wifi\usart.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

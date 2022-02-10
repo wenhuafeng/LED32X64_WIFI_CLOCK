@@ -80,9 +80,9 @@
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>D:\Keil_v5\ARM\ARMCC\bin\fromelf.exe --bin -o ./CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.bin ./CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.axf</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../user/inc</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../user/inc;../user/emw3060;../user/esp8266;../user/htu21d;../user/hub75d;../user/lunar_calendar;../user/time;../user/wifi_uart_if</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -531,39 +531,39 @@
           <GroupName>user</GroupName>
           <Files>
             <File>
-              <FileName>delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\user\src\delay.c</FilePath>
-            </File>
-            <File>
               <FileName>emw3060_at.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\user\src\emw3060_at.c</FilePath>
+              <FilePath>..\user\emw3060\emw3060_at.c</FilePath>
             </File>
             <File>
               <FileName>esp8266_at.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\user\src\esp8266_at.c</FilePath>
+              <FilePath>..\user\esp8266\esp8266_at.c</FilePath>
             </File>
             <File>
               <FileName>htu21d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\user\src\htu21d.c</FilePath>
+              <FilePath>..\user\htu21d\htu21d.c</FilePath>
             </File>
             <File>
               <FileName>hub75d.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\user\src\hub75d.c</FilePath>
+              <FilePath>..\user\hub75d\hub75d.c</FilePath>
             </File>
             <File>
               <FileName>lunar_calendar.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\user\src\lunar_calendar.c</FilePath>
+              <FilePath>..\user\lunar_calendar\lunar_calendar.c</FilePath>
             </File>
             <File>
               <FileName>time.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\user\src\time.c</FilePath>
+              <FilePath>..\user\time\time.c</FilePath>
+            </File>
+            <File>
+              <FileName>wifi_uart_if.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\wifi_uart_if\wifi_uart_if.c</FilePath>
             </File>
           </Files>
         </Group>

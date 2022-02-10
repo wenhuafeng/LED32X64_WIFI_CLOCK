@@ -1,5 +1,6 @@
 #include "lunar_calendar.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 #define YEAR_TABLE_NUM 199
 

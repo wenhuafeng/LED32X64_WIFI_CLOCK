@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "gpio_bit_ctrl.h"
 
 enum PowerFlag {
     POWER_OFF,
