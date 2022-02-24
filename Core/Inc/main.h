@@ -120,8 +120,7 @@ void Error_Handler(void);
 #define HTU21D_SDA_Pin GPIO_PIN_7
 #define HTU21D_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-
-void EnterStandbyMode(void);
+void SystemClock_Config(void);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

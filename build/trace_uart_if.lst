@@ -1,0 +1,870 @@
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"trace_uart_if.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.COM_Init,"ax",%progbits
+  18              		.align	1
+  19              		.p2align 2,,3
+  20              		.global	COM_Init
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	COM_Init:
+  26              	.LVL0:
+  27              	.LFB65:
+  28              		.file 1 "user/trace/trace_uart_if.c"
+   1:user/trace/trace_uart_if.c **** #include "trace_uart_if.h"
+   2:user/trace/trace_uart_if.c **** #include <stdbool.h>
+   3:user/trace/trace_uart_if.c **** #include "dma.h"
+   4:user/trace/trace_uart_if.c **** 
+   5:user/trace/trace_uart_if.c **** extern DMA_HandleTypeDef hdma_usart2_tx;
+   6:user/trace/trace_uart_if.c **** extern UART_HandleTypeDef huart2;
+   7:user/trace/trace_uart_if.c **** 
+   8:user/trace/trace_uart_if.c **** #define RX_BUFFER_LEN 50
+   9:user/trace/trace_uart_if.c **** struct ReceiveType {
+  10:user/trace/trace_uart_if.c ****     uint8_t rxFlag : 1;
+  11:user/trace/trace_uart_if.c ****     uint8_t txFlag : 1;
+  12:user/trace/trace_uart_if.c ****     uint16_t rxLength;
+  13:user/trace/trace_uart_if.c ****     uint8_t rxBuffer[RX_BUFFER_LEN];
+  14:user/trace/trace_uart_if.c **** };
+  15:user/trace/trace_uart_if.c **** 
+  16:user/trace/trace_uart_if.c **** static struct ReceiveType g_rxType;
+  17:user/trace/trace_uart_if.c **** static bool g_rxComplete;
+  18:user/trace/trace_uart_if.c **** 
+  19:user/trace/trace_uart_if.c **** static void (*TxCpltCallback)(void *);
+  20:user/trace/trace_uart_if.c **** static void (*RxCpltCallback)(uint8_t *rx, uint16_t len, uint8_t error);
+  21:user/trace/trace_uart_if.c **** 
+  22:user/trace/trace_uart_if.c **** enum TraceStatus COM_Init(void (*cb)(void *));
+  23:user/trace/trace_uart_if.c **** enum TraceStatus COM_ReceiveInit(void (*RxCb)(uint8_t *rxChar, uint16_t size, uint8_t error));
+  24:user/trace/trace_uart_if.c **** enum TraceStatus COM_DeInit(void);
+  25:user/trace/trace_uart_if.c **** void COM_Resume(void);
+  26:user/trace/trace_uart_if.c **** void COM_Trace(uint8_t *p_data, uint16_t size);
+  27:user/trace/trace_uart_if.c **** enum TraceStatus COM_TraceDMA(uint8_t *p_data, uint16_t size);
+  28:user/trace/trace_uart_if.c **** 
+  29:user/trace/trace_uart_if.c **** struct TraceDriverType TraceDriver = {
+  30:user/trace/trace_uart_if.c ****     COM_Init,
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 2
+
+
+  31:user/trace/trace_uart_if.c ****     COM_DeInit,
+  32:user/trace/trace_uart_if.c ****     COM_ReceiveInit,
+  33:user/trace/trace_uart_if.c ****     COM_TraceDMA,
+  34:user/trace/trace_uart_if.c **** };
+  35:user/trace/trace_uart_if.c **** 
+  36:user/trace/trace_uart_if.c **** enum TraceStatus COM_Init(void (*cb)(void *))
+  37:user/trace/trace_uart_if.c **** {
+  29              		.loc 1 37 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  38:user/trace/trace_uart_if.c ****     TxCpltCallback = cb;
+  34              		.loc 1 38 5 view .LVU1
+  37:user/trace/trace_uart_if.c ****     TxCpltCallback = cb;
+  35              		.loc 1 37 1 is_stmt 0 view .LVU2
+  36 0000 0246     		mov	r2, r0
+  37              		.loc 1 38 20 view .LVU3
+  38 0002 024B     		ldr	r3, .L3
+  39:user/trace/trace_uart_if.c ****     //MX_DMA_Init();
+  40:user/trace/trace_uart_if.c ****     //MX_USART2_UART_Init();
+  41:user/trace/trace_uart_if.c **** 
+  42:user/trace/trace_uart_if.c ****     return UTIL_ADV_TRACE_OK;
+  43:user/trace/trace_uart_if.c **** }
+  39              		.loc 1 43 1 view .LVU4
+  40 0004 0020     		movs	r0, #0
+  41              	.LVL1:
+  38:user/trace/trace_uart_if.c ****     //MX_DMA_Init();
+  42              		.loc 1 38 20 view .LVU5
+  43 0006 1A60     		str	r2, [r3]
+  42:user/trace/trace_uart_if.c **** }
+  44              		.loc 1 42 5 is_stmt 1 view .LVU6
+  45              		.loc 1 43 1 is_stmt 0 view .LVU7
+  46 0008 7047     		bx	lr
+  47              	.L4:
+  48 000a 00BF     		.align	2
+  49              	.L3:
+  50 000c 00000000 		.word	.LANCHOR0
+  51              		.cfi_endproc
+  52              	.LFE65:
+  54              		.section	.text.COM_DeInit,"ax",%progbits
+  55              		.align	1
+  56              		.p2align 2,,3
+  57              		.global	COM_DeInit
+  58              		.syntax unified
+  59              		.thumb
+  60              		.thumb_func
+  62              	COM_DeInit:
+  63              	.LFB66:
+  44:user/trace/trace_uart_if.c **** 
+  45:user/trace/trace_uart_if.c **** enum TraceStatus COM_DeInit(void)
+  46:user/trace/trace_uart_if.c **** {
+  64              		.loc 1 46 1 is_stmt 1 view -0
+  65              		.cfi_startproc
+  66              		@ args = 0, pretend = 0, frame = 0
+  67              		@ frame_needed = 0, uses_anonymous_args = 0
+  47:user/trace/trace_uart_if.c ****     /* -1- Reset peripherals */
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 3
+
+
+  48:user/trace/trace_uart_if.c ****     __HAL_RCC_USART2_FORCE_RESET();
+  68              		.loc 1 48 5 view .LVU9
+  46:user/trace/trace_uart_if.c ****     /* -1- Reset peripherals */
+  69              		.loc 1 46 1 is_stmt 0 view .LVU10
+  70 0000 08B5     		push	{r3, lr}
+  71              	.LCFI0:
+  72              		.cfi_def_cfa_offset 8
+  73              		.cfi_offset 3, -8
+  74              		.cfi_offset 14, -4
+  75              		.loc 1 48 5 view .LVU11
+  76 0002 0A4B     		ldr	r3, .L7
+  49:user/trace/trace_uart_if.c ****     __HAL_RCC_USART2_RELEASE_RESET();
+  50:user/trace/trace_uart_if.c **** 
+  51:user/trace/trace_uart_if.c ****     /* -2- MspDeInit */
+  52:user/trace/trace_uart_if.c ****     HAL_UART_MspDeInit(&huart2);
+  77              		.loc 1 52 5 view .LVU12
+  78 0004 0A48     		ldr	r0, .L7+4
+  48:user/trace/trace_uart_if.c ****     __HAL_RCC_USART2_RELEASE_RESET();
+  79              		.loc 1 48 5 view .LVU13
+  80 0006 1A69     		ldr	r2, [r3, #16]
+  81 0008 42F40032 		orr	r2, r2, #131072
+  82 000c 1A61     		str	r2, [r3, #16]
+  49:user/trace/trace_uart_if.c ****     __HAL_RCC_USART2_RELEASE_RESET();
+  83              		.loc 1 49 5 is_stmt 1 view .LVU14
+  84 000e 1A69     		ldr	r2, [r3, #16]
+  85 0010 22F40032 		bic	r2, r2, #131072
+  86 0014 1A61     		str	r2, [r3, #16]
+  87              		.loc 1 52 5 view .LVU15
+  88 0016 FFF7FEFF 		bl	HAL_UART_MspDeInit
+  89              	.LVL2:
+  53:user/trace/trace_uart_if.c **** 
+  54:user/trace/trace_uart_if.c ****     /* -3- Disable the NVIC for DMA */
+  55:user/trace/trace_uart_if.c ****     /* USER CODE BEGIN 1 */
+  56:user/trace/trace_uart_if.c ****     HAL_NVIC_DisableIRQ(DMA1_Channel6_IRQn);
+  90              		.loc 1 56 5 view .LVU16
+  91 001a 1020     		movs	r0, #16
+  92 001c FFF7FEFF 		bl	HAL_NVIC_DisableIRQ
+  93              	.LVL3:
+  57:user/trace/trace_uart_if.c ****     HAL_NVIC_DisableIRQ(DMA1_Channel7_IRQn);
+  94              		.loc 1 57 5 view .LVU17
+  95 0020 1120     		movs	r0, #17
+  96 0022 FFF7FEFF 		bl	HAL_NVIC_DisableIRQ
+  97              	.LVL4:
+  58:user/trace/trace_uart_if.c **** 
+  59:user/trace/trace_uart_if.c ****     return UTIL_ADV_TRACE_OK;
+  98              		.loc 1 59 5 view .LVU18
+  60:user/trace/trace_uart_if.c **** }
+  99              		.loc 1 60 1 is_stmt 0 view .LVU19
+ 100 0026 0020     		movs	r0, #0
+ 101 0028 08BD     		pop	{r3, pc}
+ 102              	.L8:
+ 103 002a 00BF     		.align	2
+ 104              	.L7:
+ 105 002c 00100240 		.word	1073876992
+ 106 0030 00000000 		.word	huart2
+ 107              		.cfi_endproc
+ 108              	.LFE66:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 4
+
+
+ 110              		.section	.text.COM_TraceDMA,"ax",%progbits
+ 111              		.align	1
+ 112              		.p2align 2,,3
+ 113              		.global	COM_TraceDMA
+ 114              		.syntax unified
+ 115              		.thumb
+ 116              		.thumb_func
+ 118              	COM_TraceDMA:
+ 119              	.LVL5:
+ 120              	.LFB68:
+  61:user/trace/trace_uart_if.c **** 
+  62:user/trace/trace_uart_if.c **** void COM_Trace(uint8_t *inData, uint16_t size)
+  63:user/trace/trace_uart_if.c **** {
+  64:user/trace/trace_uart_if.c ****     HAL_UART_Transmit(&huart2, inData, size, 1000);
+  65:user/trace/trace_uart_if.c **** }
+  66:user/trace/trace_uart_if.c **** 
+  67:user/trace/trace_uart_if.c **** enum TraceStatus COM_TraceDMA(uint8_t *inData, uint16_t size)
+  68:user/trace/trace_uart_if.c **** {
+ 121              		.loc 1 68 1 is_stmt 1 view -0
+ 122              		.cfi_startproc
+ 123              		@ args = 0, pretend = 0, frame = 0
+ 124              		@ frame_needed = 0, uses_anonymous_args = 0
+  69:user/trace/trace_uart_if.c ****     HAL_UART_Transmit_DMA(&huart2, inData, size);
+ 125              		.loc 1 69 5 view .LVU21
+  68:user/trace/trace_uart_if.c ****     HAL_UART_Transmit_DMA(&huart2, inData, size);
+ 126              		.loc 1 68 1 is_stmt 0 view .LVU22
+ 127 0000 08B5     		push	{r3, lr}
+ 128              	.LCFI1:
+ 129              		.cfi_def_cfa_offset 8
+ 130              		.cfi_offset 3, -8
+ 131              		.cfi_offset 14, -4
+  68:user/trace/trace_uart_if.c ****     HAL_UART_Transmit_DMA(&huart2, inData, size);
+ 132              		.loc 1 68 1 view .LVU23
+ 133 0002 0346     		mov	r3, r0
+ 134 0004 0A46     		mov	r2, r1
+ 135              		.loc 1 69 5 view .LVU24
+ 136 0006 0348     		ldr	r0, .L11
+ 137              	.LVL6:
+ 138              		.loc 1 69 5 view .LVU25
+ 139 0008 1946     		mov	r1, r3
+ 140              	.LVL7:
+ 141              		.loc 1 69 5 view .LVU26
+ 142 000a FFF7FEFF 		bl	HAL_UART_Transmit_DMA
+ 143              	.LVL8:
+  70:user/trace/trace_uart_if.c ****     return UTIL_ADV_TRACE_OK;
+ 144              		.loc 1 70 5 is_stmt 1 view .LVU27
+  71:user/trace/trace_uart_if.c **** }
+ 145              		.loc 1 71 1 is_stmt 0 view .LVU28
+ 146 000e 0020     		movs	r0, #0
+ 147 0010 08BD     		pop	{r3, pc}
+ 148              	.L12:
+ 149 0012 00BF     		.align	2
+ 150              	.L11:
+ 151 0014 00000000 		.word	huart2
+ 152              		.cfi_endproc
+ 153              	.LFE68:
+ 155              		.section	.text.COM_ReceiveInit,"ax",%progbits
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 5
+
+
+ 156              		.align	1
+ 157              		.p2align 2,,3
+ 158              		.global	COM_ReceiveInit
+ 159              		.syntax unified
+ 160              		.thumb
+ 161              		.thumb_func
+ 163              	COM_ReceiveInit:
+ 164              	.LVL9:
+ 165              	.LFB69:
+  72:user/trace/trace_uart_if.c **** 
+  73:user/trace/trace_uart_if.c **** enum TraceStatus COM_ReceiveInit(void (*RxCb)(uint8_t *rx, uint16_t len, uint8_t error))
+  74:user/trace/trace_uart_if.c **** {
+ 166              		.loc 1 74 1 is_stmt 1 view -0
+ 167              		.cfi_startproc
+ 168              		@ args = 0, pretend = 0, frame = 0
+ 169              		@ frame_needed = 0, uses_anonymous_args = 0
+  75:user/trace/trace_uart_if.c ****     RxCpltCallback = RxCb;
+ 170              		.loc 1 75 5 view .LVU30
+  74:user/trace/trace_uart_if.c ****     RxCpltCallback = RxCb;
+ 171              		.loc 1 74 1 is_stmt 0 view .LVU31
+ 172 0000 10B5     		push	{r4, lr}
+ 173              	.LCFI2:
+ 174              		.cfi_def_cfa_offset 8
+ 175              		.cfi_offset 4, -8
+ 176              		.cfi_offset 14, -4
+  76:user/trace/trace_uart_if.c **** 
+  77:user/trace/trace_uart_if.c ****     /* Make sure that no UART transfer is on-going */
+  78:user/trace/trace_uart_if.c ****     while (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_TC) == RESET)
+ 177              		.loc 1 78 12 view .LVU32
+ 178 0002 094C     		ldr	r4, .L18
+  75:user/trace/trace_uart_if.c **** 
+ 179              		.loc 1 75 20 view .LVU33
+ 180 0004 094B     		ldr	r3, .L18+4
+ 181              		.loc 1 78 12 view .LVU34
+ 182 0006 2268     		ldr	r2, [r4]
+  75:user/trace/trace_uart_if.c **** 
+ 183              		.loc 1 75 20 view .LVU35
+ 184 0008 1860     		str	r0, [r3]
+ 185              		.loc 1 78 5 is_stmt 1 view .LVU36
+ 186              	.L14:
+  79:user/trace/trace_uart_if.c ****         ;
+ 187              		.loc 1 79 9 discriminator 1 view .LVU37
+  78:user/trace/trace_uart_if.c ****         ;
+ 188              		.loc 1 78 11 discriminator 1 view .LVU38
+  78:user/trace/trace_uart_if.c ****         ;
+ 189              		.loc 1 78 12 is_stmt 0 discriminator 1 view .LVU39
+ 190 000a 1368     		ldr	r3, [r2]
+  78:user/trace/trace_uart_if.c ****         ;
+ 191              		.loc 1 78 11 discriminator 1 view .LVU40
+ 192 000c 5B06     		lsls	r3, r3, #25
+ 193 000e FCD5     		bpl	.L14
+  80:user/trace/trace_uart_if.c **** 
+  81:user/trace/trace_uart_if.c ****     HAL_UARTEx_ReceiveToIdle_DMA(&huart2, g_rxType.rxBuffer, sizeof(g_rxType.rxBuffer));
+ 194              		.loc 1 81 5 is_stmt 1 view .LVU41
+ 195 0010 3222     		movs	r2, #50
+ 196 0012 0749     		ldr	r1, .L18+8
+ 197 0014 0448     		ldr	r0, .L18
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 6
+
+
+ 198              	.LVL10:
+ 199              		.loc 1 81 5 is_stmt 0 view .LVU42
+ 200 0016 FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_DMA
+ 201              	.LVL11:
+  82:user/trace/trace_uart_if.c ****     __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+ 202              		.loc 1 82 5 is_stmt 1 view .LVU43
+ 203 001a 2268     		ldr	r2, [r4]
+  83:user/trace/trace_uart_if.c **** 
+  84:user/trace/trace_uart_if.c ****     return UTIL_ADV_TRACE_OK;
+  85:user/trace/trace_uart_if.c **** }
+ 204              		.loc 1 85 1 is_stmt 0 view .LVU44
+ 205 001c 0020     		movs	r0, #0
+  82:user/trace/trace_uart_if.c ****     __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+ 206              		.loc 1 82 5 view .LVU45
+ 207 001e D368     		ldr	r3, [r2, #12]
+ 208 0020 43F01003 		orr	r3, r3, #16
+ 209 0024 D360     		str	r3, [r2, #12]
+  84:user/trace/trace_uart_if.c **** }
+ 210              		.loc 1 84 5 is_stmt 1 view .LVU46
+ 211              		.loc 1 85 1 is_stmt 0 view .LVU47
+ 212 0026 10BD     		pop	{r4, pc}
+ 213              	.L19:
+ 214              		.align	2
+ 215              	.L18:
+ 216 0028 00000000 		.word	huart2
+ 217 002c 00000000 		.word	.LANCHOR1
+ 218 0030 04000000 		.word	.LANCHOR2+4
+ 219              		.cfi_endproc
+ 220              	.LFE69:
+ 222              		.section	.text.COM_Trace,"ax",%progbits
+ 223              		.align	1
+ 224              		.p2align 2,,3
+ 225              		.global	COM_Trace
+ 226              		.syntax unified
+ 227              		.thumb
+ 228              		.thumb_func
+ 230              	COM_Trace:
+ 231              	.LVL12:
+ 232              	.LFB67:
+  63:user/trace/trace_uart_if.c ****     HAL_UART_Transmit(&huart2, inData, size, 1000);
+ 233              		.loc 1 63 1 is_stmt 1 view -0
+ 234              		.cfi_startproc
+ 235              		@ args = 0, pretend = 0, frame = 0
+ 236              		@ frame_needed = 0, uses_anonymous_args = 0
+ 237              		@ link register save eliminated.
+  64:user/trace/trace_uart_if.c **** }
+ 238              		.loc 1 64 5 view .LVU49
+  63:user/trace/trace_uart_if.c ****     HAL_UART_Transmit(&huart2, inData, size, 1000);
+ 239              		.loc 1 63 1 is_stmt 0 view .LVU50
+ 240 0000 8446     		mov	ip, r0
+ 241 0002 0A46     		mov	r2, r1
+  64:user/trace/trace_uart_if.c **** }
+ 242              		.loc 1 64 5 view .LVU51
+ 243 0004 4FF47A73 		mov	r3, #1000
+ 244 0008 6146     		mov	r1, ip
+ 245              	.LVL13:
+  64:user/trace/trace_uart_if.c **** }
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 7
+
+
+ 246              		.loc 1 64 5 view .LVU52
+ 247 000a 0148     		ldr	r0, .L21
+ 248              	.LVL14:
+  64:user/trace/trace_uart_if.c **** }
+ 249              		.loc 1 64 5 view .LVU53
+ 250 000c FFF7FEBF 		b	HAL_UART_Transmit
+ 251              	.LVL15:
+ 252              	.L22:
+  64:user/trace/trace_uart_if.c **** }
+ 253              		.loc 1 64 5 view .LVU54
+ 254              		.align	2
+ 255              	.L21:
+ 256 0010 00000000 		.word	huart2
+ 257              		.cfi_endproc
+ 258              	.LFE67:
+ 260              		.section	.text.COM_Resume,"ax",%progbits
+ 261              		.align	1
+ 262              		.p2align 2,,3
+ 263              		.global	COM_Resume
+ 264              		.syntax unified
+ 265              		.thumb
+ 266              		.thumb_func
+ 268              	COM_Resume:
+ 269              	.LFB70:
+  86:user/trace/trace_uart_if.c **** 
+  87:user/trace/trace_uart_if.c **** void COM_Resume(void)
+  88:user/trace/trace_uart_if.c **** {
+ 270              		.loc 1 88 1 is_stmt 1 view -0
+ 271              		.cfi_startproc
+ 272              		@ args = 0, pretend = 0, frame = 0
+ 273              		@ frame_needed = 0, uses_anonymous_args = 0
+  89:user/trace/trace_uart_if.c ****     /* to re-enable lost DMA settings */
+  90:user/trace/trace_uart_if.c ****     if (HAL_DMA_Init(&hdma_usart2_tx) != HAL_OK) {
+ 274              		.loc 1 90 5 view .LVU56
+  88:user/trace/trace_uart_if.c ****     /* to re-enable lost DMA settings */
+ 275              		.loc 1 88 1 is_stmt 0 view .LVU57
+ 276 0000 08B5     		push	{r3, lr}
+ 277              	.LCFI3:
+ 278              		.cfi_def_cfa_offset 8
+ 279              		.cfi_offset 3, -8
+ 280              		.cfi_offset 14, -4
+ 281              		.loc 1 90 9 view .LVU58
+ 282 0002 0448     		ldr	r0, .L27
+ 283 0004 FFF7FEFF 		bl	HAL_DMA_Init
+ 284              	.LVL16:
+ 285              		.loc 1 90 8 view .LVU59
+ 286 0008 00B9     		cbnz	r0, .L26
+  91:user/trace/trace_uart_if.c ****         Error_Handler();
+  92:user/trace/trace_uart_if.c ****     }
+  93:user/trace/trace_uart_if.c **** }
+ 287              		.loc 1 93 1 view .LVU60
+ 288 000a 08BD     		pop	{r3, pc}
+ 289              	.L26:
+  91:user/trace/trace_uart_if.c ****         Error_Handler();
+ 290              		.loc 1 91 9 is_stmt 1 view .LVU61
+ 291              		.loc 1 93 1 is_stmt 0 view .LVU62
+ 292 000c BDE80840 		pop	{r3, lr}
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 8
+
+
+ 293              	.LCFI4:
+ 294              		.cfi_restore 14
+ 295              		.cfi_restore 3
+ 296              		.cfi_def_cfa_offset 0
+  91:user/trace/trace_uart_if.c ****         Error_Handler();
+ 297              		.loc 1 91 9 view .LVU63
+ 298 0010 FFF7FEBF 		b	Error_Handler
+ 299              	.LVL17:
+ 300              	.L28:
+ 301              		.align	2
+ 302              	.L27:
+ 303 0014 00000000 		.word	hdma_usart2_tx
+ 304              		.cfi_endproc
+ 305              	.LFE70:
+ 307              		.section	.text.TRACE_UART_GetDriver,"ax",%progbits
+ 308              		.align	1
+ 309              		.p2align 2,,3
+ 310              		.global	TRACE_UART_GetDriver
+ 311              		.syntax unified
+ 312              		.thumb
+ 313              		.thumb_func
+ 315              	TRACE_UART_GetDriver:
+ 316              	.LFB71:
+  94:user/trace/trace_uart_if.c **** 
+  95:user/trace/trace_uart_if.c **** struct TraceDriverType *TRACE_UART_GetDriver(void)
+  96:user/trace/trace_uart_if.c **** {
+ 317              		.loc 1 96 1 is_stmt 1 view -0
+ 318              		.cfi_startproc
+ 319              		@ args = 0, pretend = 0, frame = 0
+ 320              		@ frame_needed = 0, uses_anonymous_args = 0
+ 321              		@ link register save eliminated.
+  97:user/trace/trace_uart_if.c ****     return &TraceDriver;
+ 322              		.loc 1 97 5 view .LVU65
+  98:user/trace/trace_uart_if.c **** }
+ 323              		.loc 1 98 1 is_stmt 0 view .LVU66
+ 324 0000 0048     		ldr	r0, .L30
+ 325 0002 7047     		bx	lr
+ 326              	.L31:
+ 327              		.align	2
+ 328              	.L30:
+ 329 0004 00000000 		.word	.LANCHOR3
+ 330              		.cfi_endproc
+ 331              	.LFE71:
+ 333              		.section	.text.TRACE_UART_ReceiveIDLE,"ax",%progbits
+ 334              		.align	1
+ 335              		.p2align 2,,3
+ 336              		.global	TRACE_UART_ReceiveIDLE
+ 337              		.syntax unified
+ 338              		.thumb
+ 339              		.thumb_func
+ 341              	TRACE_UART_ReceiveIDLE:
+ 342              	.LVL18:
+ 343              	.LFB72:
+  99:user/trace/trace_uart_if.c **** 
+ 100:user/trace/trace_uart_if.c **** void TRACE_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
+ 101:user/trace/trace_uart_if.c **** {
+ 344              		.loc 1 101 1 is_stmt 1 view -0
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 9
+
+
+ 345              		.cfi_startproc
+ 346              		@ args = 0, pretend = 0, frame = 8
+ 347              		@ frame_needed = 0, uses_anonymous_args = 0
+ 102:user/trace/trace_uart_if.c ****     if ((__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) != RESET)) {
+ 348              		.loc 1 102 5 view .LVU68
+ 349              		.loc 1 102 10 is_stmt 0 view .LVU69
+ 350 0000 0368     		ldr	r3, [r0]
+ 351 0002 1A68     		ldr	r2, [r3]
+ 352              		.loc 1 102 8 view .LVU70
+ 353 0004 D206     		lsls	r2, r2, #27
+ 354 0006 00D4     		bmi	.L41
+ 355 0008 7047     		bx	lr
+ 356              	.L41:
+ 103:user/trace/trace_uart_if.c ****         __HAL_UART_CLEAR_IDLEFLAG(huart);
+ 357              		.loc 1 103 9 is_stmt 1 view .LVU71
+ 358              	.LBB2:
+ 359              		.loc 1 103 9 view .LVU72
+ 360 000a 0022     		movs	r2, #0
+ 361              	.LBE2:
+ 101:user/trace/trace_uart_if.c ****     if ((__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) != RESET)) {
+ 362              		.loc 1 101 1 is_stmt 0 view .LVU73
+ 363 000c 10B5     		push	{r4, lr}
+ 364              	.LCFI5:
+ 365              		.cfi_def_cfa_offset 8
+ 366              		.cfi_offset 4, -8
+ 367              		.cfi_offset 14, -4
+ 368 000e 0446     		mov	r4, r0
+ 369 0010 82B0     		sub	sp, sp, #8
+ 370              	.LCFI6:
+ 371              		.cfi_def_cfa_offset 16
+ 372              	.LBB3:
+ 373              		.loc 1 103 9 view .LVU74
+ 374 0012 0192     		str	r2, [sp, #4]
+ 375              		.loc 1 103 9 is_stmt 1 view .LVU75
+ 376 0014 1A68     		ldr	r2, [r3]
+ 377 0016 0192     		str	r2, [sp, #4]
+ 378              		.loc 1 103 9 view .LVU76
+ 379 0018 5B68     		ldr	r3, [r3, #4]
+ 380 001a 0193     		str	r3, [sp, #4]
+ 381              		.loc 1 103 9 view .LVU77
+ 382 001c 019B     		ldr	r3, [sp, #4]
+ 383              	.LBE3:
+ 384              		.loc 1 103 9 view .LVU78
+ 104:user/trace/trace_uart_if.c ****         HAL_UART_DMAStop(huart);
+ 385              		.loc 1 104 9 view .LVU79
+ 386 001e FFF7FEFF 		bl	HAL_UART_DMAStop
+ 387              	.LVL19:
+ 105:user/trace/trace_uart_if.c ****         g_rxType.rxLength = sizeof(g_rxType.rxBuffer) - huart->hdmarx->Instance->CNDTR;
+ 388              		.loc 1 105 9 view .LVU80
+ 389              		.loc 1 105 70 is_stmt 0 view .LVU81
+ 390 0022 A36B     		ldr	r3, [r4, #56]
+ 391              		.loc 1 105 27 view .LVU82
+ 392 0024 0E4A     		ldr	r2, .L42
+ 393              		.loc 1 105 70 view .LVU83
+ 394 0026 1B68     		ldr	r3, [r3]
+ 106:user/trace/trace_uart_if.c ****         g_rxType.rxFlag = 1;
+ 107:user/trace/trace_uart_if.c ****         if ((RxCpltCallback != NULL) && (huart->ErrorCode == HAL_UART_ERROR_NONE) &&
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 10
+
+
+ 395              		.loc 1 107 29 view .LVU84
+ 396 0028 0E48     		ldr	r0, .L42+4
+ 105:user/trace/trace_uart_if.c ****         g_rxType.rxLength = sizeof(g_rxType.rxBuffer) - huart->hdmarx->Instance->CNDTR;
+ 397              		.loc 1 105 80 view .LVU85
+ 398 002a 5B68     		ldr	r3, [r3, #4]
+ 106:user/trace/trace_uart_if.c ****         g_rxType.rxFlag = 1;
+ 399              		.loc 1 106 25 view .LVU86
+ 400 002c 1178     		ldrb	r1, [r2]	@ zero_extendqisi2
+ 105:user/trace/trace_uart_if.c ****         g_rxType.rxLength = sizeof(g_rxType.rxBuffer) - huart->hdmarx->Instance->CNDTR;
+ 401              		.loc 1 105 55 view .LVU87
+ 402 002e C3F13203 		rsb	r3, r3, #50
+ 403              		.loc 1 107 12 view .LVU88
+ 404 0032 0068     		ldr	r0, [r0]
+ 105:user/trace/trace_uart_if.c ****         g_rxType.rxLength = sizeof(g_rxType.rxBuffer) - huart->hdmarx->Instance->CNDTR;
+ 405              		.loc 1 105 55 view .LVU89
+ 406 0034 9BB2     		uxth	r3, r3
+ 106:user/trace/trace_uart_if.c ****         g_rxType.rxFlag = 1;
+ 407              		.loc 1 106 25 view .LVU90
+ 408 0036 41F00101 		orr	r1, r1, #1
+ 105:user/trace/trace_uart_if.c ****         g_rxType.rxLength = sizeof(g_rxType.rxBuffer) - huart->hdmarx->Instance->CNDTR;
+ 409              		.loc 1 105 27 view .LVU91
+ 410 003a 5380     		strh	r3, [r2, #2]	@ movhi
+ 106:user/trace/trace_uart_if.c ****         g_rxType.rxFlag = 1;
+ 411              		.loc 1 106 9 is_stmt 1 view .LVU92
+ 106:user/trace/trace_uart_if.c ****         g_rxType.rxFlag = 1;
+ 412              		.loc 1 106 25 is_stmt 0 view .LVU93
+ 413 003c 1170     		strb	r1, [r2]
+ 414              		.loc 1 107 9 is_stmt 1 view .LVU94
+ 415              		.loc 1 107 12 is_stmt 0 view .LVU95
+ 416 003e 30B1     		cbz	r0, .L34
+ 417              		.loc 1 107 47 discriminator 1 view .LVU96
+ 418 0040 226C     		ldr	r2, [r4, #64]
+ 419              		.loc 1 107 38 discriminator 1 view .LVU97
+ 420 0042 22B9     		cbnz	r2, .L34
+ 421              		.loc 1 107 83 discriminator 2 view .LVU98
+ 422 0044 312B     		cmp	r3, #49
+ 423 0046 02D8     		bhi	.L34
+ 108:user/trace/trace_uart_if.c ****             (sizeof(g_rxType.rxBuffer) > g_rxType.rxLength)) {
+ 109:user/trace/trace_uart_if.c ****             g_rxComplete = true;
+ 424              		.loc 1 109 13 is_stmt 1 view .LVU99
+ 425              		.loc 1 109 26 is_stmt 0 view .LVU100
+ 426 0048 0122     		movs	r2, #1
+ 427 004a 074B     		ldr	r3, .L42+8
+ 428 004c 1A70     		strb	r2, [r3]
+ 429              	.L34:
+ 110:user/trace/trace_uart_if.c ****         }
+ 111:user/trace/trace_uart_if.c ****         HAL_UARTEx_ReceiveToIdle_DMA(huart, g_rxType.rxBuffer, sizeof(g_rxType.rxBuffer));
+ 430              		.loc 1 111 9 is_stmt 1 view .LVU101
+ 431 004e 3222     		movs	r2, #50
+ 432 0050 2046     		mov	r0, r4
+ 433 0052 0649     		ldr	r1, .L42+12
+ 112:user/trace/trace_uart_if.c ****     }
+ 113:user/trace/trace_uart_if.c **** }
+ 434              		.loc 1 113 1 is_stmt 0 view .LVU102
+ 435 0054 02B0     		add	sp, sp, #8
+ 436              	.LCFI7:
+ 437              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 11
+
+
+ 438              		@ sp needed
+ 439 0056 BDE81040 		pop	{r4, lr}
+ 440              	.LCFI8:
+ 441              		.cfi_restore 14
+ 442              		.cfi_restore 4
+ 443              		.cfi_def_cfa_offset 0
+ 444              	.LVL20:
+ 111:user/trace/trace_uart_if.c ****     }
+ 445              		.loc 1 111 9 view .LVU103
+ 446 005a FFF7FEBF 		b	HAL_UARTEx_ReceiveToIdle_DMA
+ 447              	.LVL21:
+ 448              	.L43:
+ 111:user/trace/trace_uart_if.c ****     }
+ 449              		.loc 1 111 9 view .LVU104
+ 450 005e 00BF     		.align	2
+ 451              	.L42:
+ 452 0060 00000000 		.word	.LANCHOR2
+ 453 0064 00000000 		.word	.LANCHOR1
+ 454 0068 00000000 		.word	.LANCHOR4
+ 455 006c 04000000 		.word	.LANCHOR2+4
+ 456              		.cfi_endproc
+ 457              	.LFE72:
+ 459              		.section	.text.TRACE_UART_DataProcess,"ax",%progbits
+ 460              		.align	1
+ 461              		.p2align 2,,3
+ 462              		.global	TRACE_UART_DataProcess
+ 463              		.syntax unified
+ 464              		.thumb
+ 465              		.thumb_func
+ 467              	TRACE_UART_DataProcess:
+ 468              	.LFB73:
+ 114:user/trace/trace_uart_if.c **** 
+ 115:user/trace/trace_uart_if.c **** void TRACE_UART_DataProcess(void)
+ 116:user/trace/trace_uart_if.c **** {
+ 469              		.loc 1 116 1 is_stmt 1 view -0
+ 470              		.cfi_startproc
+ 471              		@ args = 0, pretend = 0, frame = 0
+ 472              		@ frame_needed = 0, uses_anonymous_args = 0
+ 473              		@ link register save eliminated.
+ 117:user/trace/trace_uart_if.c ****     if (g_rxComplete == false) {
+ 474              		.loc 1 117 5 view .LVU106
+ 475              		.loc 1 117 22 is_stmt 0 view .LVU107
+ 476 0000 074B     		ldr	r3, .L49
+ 477              		.loc 1 117 8 view .LVU108
+ 478 0002 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 479 0004 52B1     		cbz	r2, .L44
+ 118:user/trace/trace_uart_if.c ****         return;
+ 119:user/trace/trace_uart_if.c ****     }
+ 120:user/trace/trace_uart_if.c ****     g_rxComplete = false;
+ 480              		.loc 1 120 5 is_stmt 1 view .LVU109
+ 481              		.loc 1 120 18 is_stmt 0 view .LVU110
+ 482 0006 0022     		movs	r2, #0
+ 121:user/trace/trace_uart_if.c **** 
+ 122:user/trace/trace_uart_if.c ****     RxCpltCallback(g_rxType.rxBuffer, g_rxType.rxLength, 0);
+ 483              		.loc 1 122 5 view .LVU111
+ 484 0008 0649     		ldr	r1, .L49+4
+ 116:user/trace/trace_uart_if.c ****     if (g_rxComplete == false) {
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 12
+
+
+ 485              		.loc 1 116 1 view .LVU112
+ 486 000a 10B4     		push	{r4}
+ 487              	.LCFI9:
+ 488              		.cfi_def_cfa_offset 4
+ 489              		.cfi_offset 4, -4
+ 490              		.loc 1 122 5 view .LVU113
+ 491 000c 0648     		ldr	r0, .L49+8
+ 492 000e 0C68     		ldr	r4, [r1]
+ 120:user/trace/trace_uart_if.c **** 
+ 493              		.loc 1 120 18 view .LVU114
+ 494 0010 1A70     		strb	r2, [r3]
+ 495              		.loc 1 122 5 is_stmt 1 view .LVU115
+ 496 0012 4188     		ldrh	r1, [r0, #2]
+ 497 0014 2346     		mov	r3, r4
+ 498 0016 0430     		adds	r0, r0, #4
+ 123:user/trace/trace_uart_if.c **** }
+ 499              		.loc 1 123 1 is_stmt 0 view .LVU116
+ 500 0018 10BC     		pop	{r4}
+ 501              	.LCFI10:
+ 502              		.cfi_restore 4
+ 503              		.cfi_def_cfa_offset 0
+ 122:user/trace/trace_uart_if.c **** }
+ 504              		.loc 1 122 5 view .LVU117
+ 505 001a 1847     		bx	r3	@ indirect register sibling call
+ 506              	.LVL22:
+ 507              	.L44:
+ 508 001c 7047     		bx	lr
+ 509              	.L50:
+ 510 001e 00BF     		.align	2
+ 511              	.L49:
+ 512 0020 00000000 		.word	.LANCHOR4
+ 513 0024 00000000 		.word	.LANCHOR1
+ 514 0028 00000000 		.word	.LANCHOR2
+ 515              		.cfi_endproc
+ 516              	.LFE73:
+ 518              		.section	.text.TRACE_UART_TxCpltCallback,"ax",%progbits
+ 519              		.align	1
+ 520              		.p2align 2,,3
+ 521              		.global	TRACE_UART_TxCpltCallback
+ 522              		.syntax unified
+ 523              		.thumb
+ 524              		.thumb_func
+ 526              	TRACE_UART_TxCpltCallback:
+ 527              	.LVL23:
+ 528              	.LFB74:
+ 124:user/trace/trace_uart_if.c **** 
+ 125:user/trace/trace_uart_if.c **** void TRACE_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+ 126:user/trace/trace_uart_if.c **** {
+ 529              		.loc 1 126 1 is_stmt 1 view -0
+ 530              		.cfi_startproc
+ 531              		@ args = 0, pretend = 0, frame = 0
+ 532              		@ frame_needed = 0, uses_anonymous_args = 0
+ 533              		@ link register save eliminated.
+ 127:user/trace/trace_uart_if.c ****     /* buffer transmission complete */
+ 128:user/trace/trace_uart_if.c ****     TxCpltCallback(NULL);
+ 534              		.loc 1 128 5 view .LVU119
+ 535 0000 014B     		ldr	r3, .L52
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 13
+
+
+ 536 0002 0020     		movs	r0, #0
+ 537              	.LVL24:
+ 538              		.loc 1 128 5 is_stmt 0 view .LVU120
+ 539 0004 1B68     		ldr	r3, [r3]
+ 540 0006 1847     		bx	r3	@ indirect register sibling call
+ 541              	.LVL25:
+ 542              	.L53:
+ 543              		.align	2
+ 544              	.L52:
+ 545 0008 00000000 		.word	.LANCHOR0
+ 546              		.cfi_endproc
+ 547              	.LFE74:
+ 549              		.section	.text.TRACE_UART_RxCpltCallback,"ax",%progbits
+ 550              		.align	1
+ 551              		.p2align 2,,3
+ 552              		.global	TRACE_UART_RxCpltCallback
+ 553              		.syntax unified
+ 554              		.thumb
+ 555              		.thumb_func
+ 557              	TRACE_UART_RxCpltCallback:
+ 558              	.LVL26:
+ 559              	.LFB75:
+ 129:user/trace/trace_uart_if.c **** }
+ 130:user/trace/trace_uart_if.c **** 
+ 131:user/trace/trace_uart_if.c **** void TRACE_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+ 132:user/trace/trace_uart_if.c **** {
+ 560              		.loc 1 132 1 is_stmt 1 view -0
+ 561              		.cfi_startproc
+ 562              		@ args = 0, pretend = 0, frame = 0
+ 563              		@ frame_needed = 0, uses_anonymous_args = 0
+ 564              		@ link register save eliminated.
+ 133:user/trace/trace_uart_if.c ****     //if ((RxCpltCallback != NULL) && (huart->ErrorCode == HAL_UART_ERROR_NONE)) {
+ 134:user/trace/trace_uart_if.c ****     //    RxCpltCallback(rxBuffer, sizeof(rxBuffer), 0);
+ 135:user/trace/trace_uart_if.c ****     //}
+ 136:user/trace/trace_uart_if.c ****     //HAL_UART_Receive_IT(huart, &charRx, 1);
+ 137:user/trace/trace_uart_if.c **** }
+ 565              		.loc 1 137 1 view .LVU122
+ 566 0000 7047     		bx	lr
+ 567              		.cfi_endproc
+ 568              	.LFE75:
+ 570              		.global	TraceDriver
+ 571 0002 00BF     		.section	.bss.RxCpltCallback,"aw",%nobits
+ 572              		.align	2
+ 573              		.set	.LANCHOR1,. + 0
+ 576              	RxCpltCallback:
+ 577 0000 00000000 		.space	4
+ 578              		.section	.bss.TxCpltCallback,"aw",%nobits
+ 579              		.align	2
+ 580              		.set	.LANCHOR0,. + 0
+ 583              	TxCpltCallback:
+ 584 0000 00000000 		.space	4
+ 585              		.section	.bss.g_rxComplete,"aw",%nobits
+ 586              		.set	.LANCHOR4,. + 0
+ 589              	g_rxComplete:
+ 590 0000 00       		.space	1
+ 591              		.section	.bss.g_rxType,"aw",%nobits
+ 592              		.align	2
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 14
+
+
+ 593              		.set	.LANCHOR2,. + 0
+ 596              	g_rxType:
+ 597 0000 00000000 		.space	54
+ 597      00000000 
+ 597      00000000 
+ 597      00000000 
+ 597      00000000 
+ 598              		.section	.data.TraceDriver,"aw"
+ 599              		.align	2
+ 600              		.set	.LANCHOR3,. + 0
+ 603              	TraceDriver:
+ 604 0000 00000000 		.word	COM_Init
+ 605 0004 00000000 		.word	COM_DeInit
+ 606 0008 00000000 		.word	COM_ReceiveInit
+ 607 000c 00000000 		.word	COM_TraceDMA
+ 608              		.text
+ 609              	.Letext0:
+ 610              		.file 2 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 611              		.file 3 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 612              		.file 4 "user/trace/trace.h"
+ 613              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 614              		.file 6 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h"
+ 615              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 616              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 617              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 618              		.file 10 "Core/Inc/usart.h"
+ 619              		.file 11 "Core/Inc/main.h"
+ 620              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h"
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 trace_uart_if.c
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:18     .text.COM_Init:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:25     .text.COM_Init:00000000 COM_Init
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:50     .text.COM_Init:0000000c $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:55     .text.COM_DeInit:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:62     .text.COM_DeInit:00000000 COM_DeInit
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:105    .text.COM_DeInit:0000002c $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:111    .text.COM_TraceDMA:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:118    .text.COM_TraceDMA:00000000 COM_TraceDMA
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:151    .text.COM_TraceDMA:00000014 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:156    .text.COM_ReceiveInit:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:163    .text.COM_ReceiveInit:00000000 COM_ReceiveInit
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:216    .text.COM_ReceiveInit:00000028 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:223    .text.COM_Trace:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:230    .text.COM_Trace:00000000 COM_Trace
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:256    .text.COM_Trace:00000010 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:261    .text.COM_Resume:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:268    .text.COM_Resume:00000000 COM_Resume
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:303    .text.COM_Resume:00000014 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:308    .text.TRACE_UART_GetDriver:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:315    .text.TRACE_UART_GetDriver:00000000 TRACE_UART_GetDriver
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:329    .text.TRACE_UART_GetDriver:00000004 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:334    .text.TRACE_UART_ReceiveIDLE:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:341    .text.TRACE_UART_ReceiveIDLE:00000000 TRACE_UART_ReceiveIDLE
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:452    .text.TRACE_UART_ReceiveIDLE:00000060 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:460    .text.TRACE_UART_DataProcess:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:467    .text.TRACE_UART_DataProcess:00000000 TRACE_UART_DataProcess
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:512    .text.TRACE_UART_DataProcess:00000020 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:519    .text.TRACE_UART_TxCpltCallback:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:526    .text.TRACE_UART_TxCpltCallback:00000000 TRACE_UART_TxCpltCallback
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:545    .text.TRACE_UART_TxCpltCallback:00000008 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:550    .text.TRACE_UART_RxCpltCallback:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:557    .text.TRACE_UART_RxCpltCallback:00000000 TRACE_UART_RxCpltCallback
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:603    .data.TraceDriver:00000000 TraceDriver
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:572    .bss.RxCpltCallback:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:576    .bss.RxCpltCallback:00000000 RxCpltCallback
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:579    .bss.TxCpltCallback:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:583    .bss.TxCpltCallback:00000000 TxCpltCallback
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:589    .bss.g_rxComplete:00000000 g_rxComplete
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:590    .bss.g_rxComplete:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:592    .bss.g_rxType:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:596    .bss.g_rxType:00000000 g_rxType
+C:\Users\WENHUA~1\AppData\Local\Temp\ccXzCqFU.s:599    .data.TraceDriver:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_UART_MspDeInit
+HAL_NVIC_DisableIRQ
+huart2
+HAL_UART_Transmit_DMA
+HAL_UARTEx_ReceiveToIdle_DMA
+HAL_UART_Transmit
+HAL_DMA_Init
+Error_Handler
+hdma_usart2_tx
+HAL_UART_DMAStop

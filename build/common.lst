@@ -1,0 +1,696 @@
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"common.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.COMMON_Init,"ax",%progbits
+  18              		.align	1
+  19              		.p2align 2,,3
+  20              		.global	COMMON_Init
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	COMMON_Init:
+  26              	.LFB69:
+  27              		.file 1 "user/common/common.c"
+   1:user/common/common.c **** #include "common.h"
+   2:user/common/common.c **** #include <stdio.h>
+   3:user/common/common.c **** #include "main.h"
+   4:user/common/common.c **** #include "gpio.h"
+   5:user/common/common.c **** #include "dma.h"
+   6:user/common/common.c **** #include "tim.h"
+   7:user/common/common.c **** #include "rtc.h"
+   8:user/common/common.c **** #include "hub75d.h"
+   9:user/common/common.c **** #include "htu21d.h"
+  10:user/common/common.c **** #include "lunar_calendar.h"
+  11:user/common/common.c **** #if (WIFI_MODULE==WIFI_ESP8266)
+  12:user/common/common.c **** #include "esp8266_at.h"
+  13:user/common/common.c **** #elif (WIFI_MODULE==WIFI_EMW3060)
+  14:user/common/common.c **** #include "emw3060_at.h"
+  15:user/common/common.c **** #endif
+  16:user/common/common.c **** #include "wifi_uart_if.h"
+  17:user/common/common.c **** #include "trace_uart_if.h"
+  18:user/common/common.c **** 
+  19:user/common/common.c **** static void COMMON_EnterStandbyMode(void)
+  20:user/common/common.c **** {
+  21:user/common/common.c ****   printf("Enter_Stop_Mode\n\r");
+  22:user/common/common.c **** 
+  23:user/common/common.c ****   /* wifi off */
+  24:user/common/common.c ****   WIFI_PowerOnOff(POWER_OFF);
+  25:user/common/common.c ****   /* display off */
+  26:user/common/common.c ****   HUB75D_DispOnOff(DISP_TIME_OFF);
+  27:user/common/common.c ****   /* LED off */
+  28:user/common/common.c ****   HAL_GPIO_WritePin(WORK_LED_GPIO_Port, WORK_LED_Pin, GPIO_PIN_SET);
+  29:user/common/common.c **** 
+  30:user/common/common.c ****   HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+  31:user/common/common.c **** 
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 2
+
+
+  32:user/common/common.c ****   HAL_Init();
+  33:user/common/common.c ****   /* Configure the system clock */
+  34:user/common/common.c ****   SystemClock_Config();
+  35:user/common/common.c ****   /* Initialize all configured peripherals */
+  36:user/common/common.c ****   MX_GPIO_Init();
+  37:user/common/common.c ****   MX_DMA_Init();
+  38:user/common/common.c ****   MX_USART1_UART_Init();
+  39:user/common/common.c ****   /* Initialize interrupts */
+  40:user/common/common.c ****   //MX_NVIC_Init();
+  41:user/common/common.c ****   HAL_RTCEx_SetSecond_IT(&hrtc);
+  42:user/common/common.c ****   GetClock();
+  43:user/common/common.c ****   HAL_Delay(200);
+  44:user/common/common.c ****   HTU21D_Init();
+  45:user/common/common.c ****   /* wifi init */
+  46:user/common/common.c ****   WIFI_PowerOnOff(POWER_ON);
+  47:user/common/common.c ****   HAL_Delay(100);
+  48:user/common/common.c ****   WIFI_Init();
+  49:user/common/common.c ****   WIFI_ReceiveDmaInit();
+  50:user/common/common.c ****   //DISP power on
+  51:user/common/common.c ****   HUB75D_DispOnOff(DISP_TIME_5MIN);
+  52:user/common/common.c ****   HAL_Delay(100);
+  53:user/common/common.c ****   MX_TIM4_Init();
+  54:user/common/common.c ****   HAL_TIM_Base_Start_IT(&htim4);
+  55:user/common/common.c **** 
+  56:user/common/common.c ****   printf("Exit_Stop_Mode\n\r");
+  57:user/common/common.c **** }
+  58:user/common/common.c **** 
+  59:user/common/common.c **** void COMMON_Init(void)
+  60:user/common/common.c **** {
+  28              		.loc 1 60 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  61:user/common/common.c ****     WIFI_ReceiveDmaInit();
+  32              		.loc 1 61 5 view .LVU1
+  60:user/common/common.c ****     WIFI_ReceiveDmaInit();
+  33              		.loc 1 60 1 is_stmt 0 view .LVU2
+  34 0000 08B5     		push	{r3, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 3, -8
+  38              		.cfi_offset 14, -4
+  39              		.loc 1 61 5 view .LVU3
+  40 0002 FFF7FEFF 		bl	WIFI_ReceiveDmaInit
+  41              	.LVL0:
+  62:user/common/common.c ****     WIFI_PowerOnOff(POWER_ON);
+  42              		.loc 1 62 5 is_stmt 1 view .LVU4
+  43 0006 0120     		movs	r0, #1
+  44 0008 FFF7FEFF 		bl	WIFI_PowerOnOff
+  45              	.LVL1:
+  63:user/common/common.c ****     HAL_RTCEx_SetSecond_IT(&hrtc);
+  46              		.loc 1 63 5 view .LVU5
+  47 000c 0D48     		ldr	r0, .L4
+  48 000e FFF7FEFF 		bl	HAL_RTCEx_SetSecond_IT
+  49              	.LVL2:
+  64:user/common/common.c ****     HAL_Delay(200);
+  50              		.loc 1 64 5 view .LVU6
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 3
+
+
+  51 0012 C820     		movs	r0, #200
+  52 0014 FFF7FEFF 		bl	HAL_Delay
+  53              	.LVL3:
+  65:user/common/common.c ****     HTU21D_Init();
+  54              		.loc 1 65 5 view .LVU7
+  55 0018 FFF7FEFF 		bl	HTU21D_Init
+  56              	.LVL4:
+  66:user/common/common.c ****     HAL_Delay(100);
+  57              		.loc 1 66 5 view .LVU8
+  58 001c 6420     		movs	r0, #100
+  59 001e FFF7FEFF 		bl	HAL_Delay
+  60              	.LVL5:
+  67:user/common/common.c ****     GetClock();
+  61              		.loc 1 67 5 view .LVU9
+  62 0022 FFF7FEFF 		bl	GetClock
+  63              	.LVL6:
+  68:user/common/common.c ****     CalculationLunarCalendar(GetTimeData());
+  64              		.loc 1 68 5 view .LVU10
+  65 0026 FFF7FEFF 		bl	GetTimeData
+  66              	.LVL7:
+  67 002a FFF7FEFF 		bl	CalculationLunarCalendar
+  68              	.LVL8:
+  69:user/common/common.c ****     HUB75D_DispOnOff(DISP_TIME_5MIN);
+  69              		.loc 1 69 5 view .LVU11
+  70 002e 4FF49670 		mov	r0, #300
+  71 0032 FFF7FEFF 		bl	HUB75D_DispOnOff
+  72              	.LVL9:
+  70:user/common/common.c ****     HAL_TIM_Base_Start_IT(&htim4);
+  73              		.loc 1 70 5 view .LVU12
+  74 0036 0448     		ldr	r0, .L4+4
+  75 0038 FFF7FEFF 		bl	HAL_TIM_Base_Start_IT
+  76              	.LVL10:
+  71:user/common/common.c ****     WIFI_Init();
+  77              		.loc 1 71 5 view .LVU13
+  72:user/common/common.c **** }
+  78              		.loc 1 72 1 is_stmt 0 view .LVU14
+  79 003c BDE80840 		pop	{r3, lr}
+  80              	.LCFI1:
+  81              		.cfi_restore 14
+  82              		.cfi_restore 3
+  83              		.cfi_def_cfa_offset 0
+  71:user/common/common.c ****     WIFI_Init();
+  84              		.loc 1 71 5 view .LVU15
+  85 0040 FFF7FEBF 		b	WIFI_Init
+  86              	.LVL11:
+  87              	.L5:
+  88              		.align	2
+  89              	.L4:
+  90 0044 00000000 		.word	hrtc
+  91 0048 00000000 		.word	htim4
+  92              		.cfi_endproc
+  93              	.LFE69:
+  95              		.section	.rodata.COMMON_Process.str1.4,"aMS",%progbits,1
+  96              		.align	2
+  97              	.LC0:
+  98 0000 456E7465 		.ascii	"Enter_Stop_Mode\012\015\000"
+  98      725F5374 
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 4
+
+
+  98      6F705F4D 
+  98      6F64650A 
+  98      0D00
+  99 0012 0000     		.align	2
+ 100              	.LC1:
+ 101 0014 45786974 		.ascii	"Exit_Stop_Mode\012\015\000"
+ 101      5F53746F 
+ 101      705F4D6F 
+ 101      64650A0D 
+ 101      00
+ 102              		.section	.text.COMMON_Process,"ax",%progbits
+ 103              		.align	1
+ 104              		.p2align 2,,3
+ 105              		.global	COMMON_Process
+ 106              		.syntax unified
+ 107              		.thumb
+ 108              		.thumb_func
+ 110              	COMMON_Process:
+ 111              	.LFB70:
+  73:user/common/common.c **** 
+  74:user/common/common.c **** void COMMON_Process(void)
+  75:user/common/common.c **** {
+ 112              		.loc 1 75 1 is_stmt 1 view -0
+ 113              		.cfi_startproc
+ 114              		@ args = 0, pretend = 0, frame = 0
+ 115              		@ frame_needed = 0, uses_anonymous_args = 0
+  76:user/common/common.c ****     WIFI_HandlerUartData();
+ 116              		.loc 1 76 5 view .LVU17
+  75:user/common/common.c ****     WIFI_HandlerUartData();
+ 117              		.loc 1 75 1 is_stmt 0 view .LVU18
+ 118 0000 08B5     		push	{r3, lr}
+ 119              	.LCFI2:
+ 120              		.cfi_def_cfa_offset 8
+ 121              		.cfi_offset 3, -8
+ 122              		.cfi_offset 14, -4
+ 123              		.loc 1 76 5 view .LVU19
+ 124 0002 FFF7FEFF 		bl	WIFI_HandlerUartData
+ 125              	.LVL12:
+  77:user/common/common.c ****     if (Get1sFlag() == true) {
+ 126              		.loc 1 77 5 is_stmt 1 view .LVU20
+ 127              		.loc 1 77 9 is_stmt 0 view .LVU21
+ 128 0006 FFF7FEFF 		bl	Get1sFlag
+ 129              	.LVL13:
+ 130              		.loc 1 77 8 view .LVU22
+ 131 000a 00B9     		cbnz	r0, .L18
+ 132              	.L6:
+  78:user/common/common.c ****       Set1sFlag(false);
+  79:user/common/common.c ****       WIFI_CtrDec();
+  80:user/common/common.c ****       HTU21D_Sampling();
+  81:user/common/common.c ****       if (ClockRun() == true) {
+  82:user/common/common.c ****         CalculationLunarCalendar(GetTimeData());
+  83:user/common/common.c ****       }
+  84:user/common/common.c ****       HUB75D_CalculateCalendar(GetTimeData());
+  85:user/common/common.c ****       if (HUB75D_CtrDec() == true) {
+  86:user/common/common.c ****         COMMON_EnterStandbyMode();
+  87:user/common/common.c ****       }
+  88:user/common/common.c ****     }
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 5
+
+
+  89:user/common/common.c **** }
+ 133              		.loc 1 89 1 view .LVU23
+ 134 000c 08BD     		pop	{r3, pc}
+ 135              	.L18:
+  78:user/common/common.c ****       Set1sFlag(false);
+ 136              		.loc 1 78 7 is_stmt 1 view .LVU24
+ 137 000e 0020     		movs	r0, #0
+ 138 0010 FFF7FEFF 		bl	Set1sFlag
+ 139              	.LVL14:
+  79:user/common/common.c ****       HTU21D_Sampling();
+ 140              		.loc 1 79 7 view .LVU25
+ 141 0014 FFF7FEFF 		bl	WIFI_CtrDec
+ 142              	.LVL15:
+  80:user/common/common.c ****       if (ClockRun() == true) {
+ 143              		.loc 1 80 7 view .LVU26
+ 144 0018 FFF7FEFF 		bl	HTU21D_Sampling
+ 145              	.LVL16:
+  81:user/common/common.c ****         CalculationLunarCalendar(GetTimeData());
+ 146              		.loc 1 81 7 view .LVU27
+  81:user/common/common.c ****         CalculationLunarCalendar(GetTimeData());
+ 147              		.loc 1 81 11 is_stmt 0 view .LVU28
+ 148 001c FFF7FEFF 		bl	ClockRun
+ 149              	.LVL17:
+  81:user/common/common.c ****         CalculationLunarCalendar(GetTimeData());
+ 150              		.loc 1 81 10 view .LVU29
+ 151 0020 0028     		cmp	r0, #0
+ 152 0022 49D1     		bne	.L19
+ 153              	.L9:
+  84:user/common/common.c ****       if (HUB75D_CtrDec() == true) {
+ 154              		.loc 1 84 7 is_stmt 1 view .LVU30
+ 155 0024 FFF7FEFF 		bl	GetTimeData
+ 156              	.LVL18:
+ 157 0028 FFF7FEFF 		bl	HUB75D_CalculateCalendar
+ 158              	.LVL19:
+  85:user/common/common.c ****         COMMON_EnterStandbyMode();
+ 159              		.loc 1 85 7 view .LVU31
+  85:user/common/common.c ****         COMMON_EnterStandbyMode();
+ 160              		.loc 1 85 11 is_stmt 0 view .LVU32
+ 161 002c FFF7FEFF 		bl	HUB75D_CtrDec
+ 162              	.LVL20:
+  85:user/common/common.c ****         COMMON_EnterStandbyMode();
+ 163              		.loc 1 85 10 view .LVU33
+ 164 0030 0028     		cmp	r0, #0
+ 165 0032 EBD0     		beq	.L6
+  86:user/common/common.c ****       }
+ 166              		.loc 1 86 9 is_stmt 1 view .LVU34
+ 167              	.LBB4:
+ 168              	.LBI4:
+  19:user/common/common.c **** {
+ 169              		.loc 1 19 13 view .LVU35
+ 170              	.LBB5:
+  21:user/common/common.c **** 
+ 171              		.loc 1 21 3 view .LVU36
+ 172 0034 2348     		ldr	r0, .L20
+ 173 0036 FFF7FEFF 		bl	printf
+ 174              	.LVL21:
+  24:user/common/common.c ****   /* display off */
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 6
+
+
+ 175              		.loc 1 24 3 view .LVU37
+ 176 003a 0020     		movs	r0, #0
+ 177 003c FFF7FEFF 		bl	WIFI_PowerOnOff
+ 178              	.LVL22:
+  26:user/common/common.c ****   /* LED off */
+ 179              		.loc 1 26 3 view .LVU38
+ 180 0040 0020     		movs	r0, #0
+ 181 0042 FFF7FEFF 		bl	HUB75D_DispOnOff
+ 182              	.LVL23:
+  28:user/common/common.c **** 
+ 183              		.loc 1 28 3 view .LVU39
+ 184 0046 0122     		movs	r2, #1
+ 185 0048 4FF48051 		mov	r1, #4096
+ 186 004c 1E48     		ldr	r0, .L20+4
+ 187 004e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 188              	.LVL24:
+  30:user/common/common.c **** 
+ 189              		.loc 1 30 3 view .LVU40
+ 190 0052 0121     		movs	r1, #1
+ 191 0054 0846     		mov	r0, r1
+ 192 0056 FFF7FEFF 		bl	HAL_PWR_EnterSTOPMode
+ 193              	.LVL25:
+  32:user/common/common.c ****   /* Configure the system clock */
+ 194              		.loc 1 32 3 view .LVU41
+ 195 005a FFF7FEFF 		bl	HAL_Init
+ 196              	.LVL26:
+  34:user/common/common.c ****   /* Initialize all configured peripherals */
+ 197              		.loc 1 34 3 view .LVU42
+ 198 005e FFF7FEFF 		bl	SystemClock_Config
+ 199              	.LVL27:
+  36:user/common/common.c ****   MX_DMA_Init();
+ 200              		.loc 1 36 3 view .LVU43
+ 201 0062 FFF7FEFF 		bl	MX_GPIO_Init
+ 202              	.LVL28:
+  37:user/common/common.c ****   MX_USART1_UART_Init();
+ 203              		.loc 1 37 3 view .LVU44
+ 204 0066 FFF7FEFF 		bl	MX_DMA_Init
+ 205              	.LVL29:
+  38:user/common/common.c ****   /* Initialize interrupts */
+ 206              		.loc 1 38 3 view .LVU45
+ 207 006a FFF7FEFF 		bl	MX_USART1_UART_Init
+ 208              	.LVL30:
+  41:user/common/common.c ****   GetClock();
+ 209              		.loc 1 41 3 view .LVU46
+ 210 006e 1748     		ldr	r0, .L20+8
+ 211 0070 FFF7FEFF 		bl	HAL_RTCEx_SetSecond_IT
+ 212              	.LVL31:
+  42:user/common/common.c ****   HAL_Delay(200);
+ 213              		.loc 1 42 3 view .LVU47
+ 214 0074 FFF7FEFF 		bl	GetClock
+ 215              	.LVL32:
+  43:user/common/common.c ****   HTU21D_Init();
+ 216              		.loc 1 43 3 view .LVU48
+ 217 0078 C820     		movs	r0, #200
+ 218 007a FFF7FEFF 		bl	HAL_Delay
+ 219              	.LVL33:
+  44:user/common/common.c ****   /* wifi init */
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 7
+
+
+ 220              		.loc 1 44 3 view .LVU49
+ 221 007e FFF7FEFF 		bl	HTU21D_Init
+ 222              	.LVL34:
+  46:user/common/common.c ****   HAL_Delay(100);
+ 223              		.loc 1 46 3 view .LVU50
+ 224 0082 0120     		movs	r0, #1
+ 225 0084 FFF7FEFF 		bl	WIFI_PowerOnOff
+ 226              	.LVL35:
+  47:user/common/common.c ****   WIFI_Init();
+ 227              		.loc 1 47 3 view .LVU51
+ 228 0088 6420     		movs	r0, #100
+ 229 008a FFF7FEFF 		bl	HAL_Delay
+ 230              	.LVL36:
+  48:user/common/common.c ****   WIFI_ReceiveDmaInit();
+ 231              		.loc 1 48 3 view .LVU52
+ 232 008e FFF7FEFF 		bl	WIFI_Init
+ 233              	.LVL37:
+  49:user/common/common.c ****   //DISP power on
+ 234              		.loc 1 49 3 view .LVU53
+ 235 0092 FFF7FEFF 		bl	WIFI_ReceiveDmaInit
+ 236              	.LVL38:
+  51:user/common/common.c ****   HAL_Delay(100);
+ 237              		.loc 1 51 3 view .LVU54
+ 238 0096 4FF49670 		mov	r0, #300
+ 239 009a FFF7FEFF 		bl	HUB75D_DispOnOff
+ 240              	.LVL39:
+  52:user/common/common.c ****   MX_TIM4_Init();
+ 241              		.loc 1 52 3 view .LVU55
+ 242 009e 6420     		movs	r0, #100
+ 243 00a0 FFF7FEFF 		bl	HAL_Delay
+ 244              	.LVL40:
+  53:user/common/common.c ****   HAL_TIM_Base_Start_IT(&htim4);
+ 245              		.loc 1 53 3 view .LVU56
+ 246 00a4 FFF7FEFF 		bl	MX_TIM4_Init
+ 247              	.LVL41:
+  54:user/common/common.c **** 
+ 248              		.loc 1 54 3 view .LVU57
+ 249 00a8 0948     		ldr	r0, .L20+12
+ 250 00aa FFF7FEFF 		bl	HAL_TIM_Base_Start_IT
+ 251              	.LVL42:
+  56:user/common/common.c **** }
+ 252              		.loc 1 56 3 view .LVU58
+ 253              	.LBE5:
+ 254              	.LBE4:
+ 255              		.loc 1 89 1 is_stmt 0 view .LVU59
+ 256 00ae BDE80840 		pop	{r3, lr}
+ 257              	.LCFI3:
+ 258              		.cfi_remember_state
+ 259              		.cfi_restore 14
+ 260              		.cfi_restore 3
+ 261              		.cfi_def_cfa_offset 0
+ 262              	.LBB7:
+ 263              	.LBB6:
+  56:user/common/common.c **** }
+ 264              		.loc 1 56 3 view .LVU60
+ 265 00b2 0848     		ldr	r0, .L20+16
+ 266 00b4 FFF7FEBF 		b	printf
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 8
+
+
+ 267              	.LVL43:
+ 268              	.L19:
+ 269              	.LCFI4:
+ 270              		.cfi_restore_state
+ 271              	.LBE6:
+ 272              	.LBE7:
+  82:user/common/common.c ****       }
+ 273              		.loc 1 82 9 is_stmt 1 view .LVU61
+ 274 00b8 FFF7FEFF 		bl	GetTimeData
+ 275              	.LVL44:
+ 276 00bc FFF7FEFF 		bl	CalculationLunarCalendar
+ 277              	.LVL45:
+ 278 00c0 B0E7     		b	.L9
+ 279              	.L21:
+ 280 00c2 00BF     		.align	2
+ 281              	.L20:
+ 282 00c4 00000000 		.word	.LC0
+ 283 00c8 000C0140 		.word	1073810432
+ 284 00cc 00000000 		.word	hrtc
+ 285 00d0 00000000 		.word	htim4
+ 286 00d4 14000000 		.word	.LC1
+ 287              		.cfi_endproc
+ 288              	.LFE70:
+ 290              		.section	.text.HAL_GPIO_EXTI_Callback,"ax",%progbits
+ 291              		.align	1
+ 292              		.p2align 2,,3
+ 293              		.global	HAL_GPIO_EXTI_Callback
+ 294              		.syntax unified
+ 295              		.thumb
+ 296              		.thumb_func
+ 298              	HAL_GPIO_EXTI_Callback:
+ 299              	.LVL46:
+ 300              	.LFB71:
+  90:user/common/common.c **** 
+  91:user/common/common.c **** void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+  92:user/common/common.c **** {
+ 301              		.loc 1 92 1 view -0
+ 302              		.cfi_startproc
+ 303              		@ args = 0, pretend = 0, frame = 0
+ 304              		@ frame_needed = 0, uses_anonymous_args = 0
+ 305              		@ link register save eliminated.
+  93:user/common/common.c ****   if (GPIO_Pin == GPIO_PIN_0) {
+ 306              		.loc 1 93 3 view .LVU63
+ 307              		.loc 1 93 6 is_stmt 0 view .LVU64
+ 308 0000 0128     		cmp	r0, #1
+ 309 0002 00D0     		beq	.L24
+  94:user/common/common.c ****     HUB75D_SetDispOffCtr(DISP_TIME_5MIN);
+  95:user/common/common.c ****     //asm("nop");
+  96:user/common/common.c ****   }
+  97:user/common/common.c **** }
+ 310              		.loc 1 97 1 view .LVU65
+ 311 0004 7047     		bx	lr
+ 312              	.L24:
+  94:user/common/common.c ****     HUB75D_SetDispOffCtr(DISP_TIME_5MIN);
+ 313              		.loc 1 94 5 is_stmt 1 view .LVU66
+ 314 0006 4FF49670 		mov	r0, #300
+ 315              	.LVL47:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 9
+
+
+  94:user/common/common.c ****     HUB75D_SetDispOffCtr(DISP_TIME_5MIN);
+ 316              		.loc 1 94 5 is_stmt 0 view .LVU67
+ 317 000a FFF7FEBF 		b	HUB75D_SetDispOffCtr
+ 318              	.LVL48:
+ 319              		.cfi_endproc
+ 320              	.LFE71:
+ 322 000e 00BF     		.section	.text.HAL_UART_TxCpltCallback,"ax",%progbits
+ 323              		.align	1
+ 324              		.p2align 2,,3
+ 325              		.global	HAL_UART_TxCpltCallback
+ 326              		.syntax unified
+ 327              		.thumb
+ 328              		.thumb_func
+ 330              	HAL_UART_TxCpltCallback:
+ 331              	.LVL49:
+ 332              	.LFB72:
+  98:user/common/common.c **** 
+  99:user/common/common.c **** void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+ 100:user/common/common.c **** {
+ 333              		.loc 1 100 1 is_stmt 1 view -0
+ 334              		.cfi_startproc
+ 335              		@ args = 0, pretend = 0, frame = 0
+ 336              		@ frame_needed = 0, uses_anonymous_args = 0
+ 337              		@ link register save eliminated.
+ 101:user/common/common.c ****     if (huart->Instance == USART1) {
+ 338              		.loc 1 101 5 view .LVU69
+ 339              		.loc 1 101 8 is_stmt 0 view .LVU70
+ 340 0000 054A     		ldr	r2, .L30
+ 341              		.loc 1 101 14 view .LVU71
+ 342 0002 0368     		ldr	r3, [r0]
+ 343              		.loc 1 101 8 view .LVU72
+ 344 0004 9342     		cmp	r3, r2
+ 345 0006 03D0     		beq	.L28
+ 102:user/common/common.c ****         WIFI_UART_TxCpltCallback(huart);
+ 103:user/common/common.c ****     } else if (huart->Instance == USART2) {
+ 346              		.loc 1 103 12 is_stmt 1 view .LVU73
+ 347              		.loc 1 103 15 is_stmt 0 view .LVU74
+ 348 0008 044A     		ldr	r2, .L30+4
+ 349 000a 9342     		cmp	r3, r2
+ 350 000c 02D0     		beq	.L29
+ 104:user/common/common.c ****         TRACE_UART_TxCpltCallback(huart);
+ 105:user/common/common.c ****     }
+ 106:user/common/common.c **** }
+ 351              		.loc 1 106 1 view .LVU75
+ 352 000e 7047     		bx	lr
+ 353              	.L28:
+ 102:user/common/common.c ****         WIFI_UART_TxCpltCallback(huart);
+ 354              		.loc 1 102 9 is_stmt 1 view .LVU76
+ 355 0010 FFF7FEBF 		b	WIFI_UART_TxCpltCallback
+ 356              	.LVL50:
+ 357              	.L29:
+ 104:user/common/common.c ****         TRACE_UART_TxCpltCallback(huart);
+ 358              		.loc 1 104 9 view .LVU77
+ 359 0014 FFF7FEBF 		b	TRACE_UART_TxCpltCallback
+ 360              	.LVL51:
+ 361              	.L31:
+ 104:user/common/common.c ****         TRACE_UART_TxCpltCallback(huart);
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 10
+
+
+ 362              		.loc 1 104 9 is_stmt 0 view .LVU78
+ 363              		.align	2
+ 364              	.L30:
+ 365 0018 00380140 		.word	1073821696
+ 366 001c 00440040 		.word	1073759232
+ 367              		.cfi_endproc
+ 368              	.LFE72:
+ 370              		.section	.text.HAL_UART_RxCpltCallback,"ax",%progbits
+ 371              		.align	1
+ 372              		.p2align 2,,3
+ 373              		.global	HAL_UART_RxCpltCallback
+ 374              		.syntax unified
+ 375              		.thumb
+ 376              		.thumb_func
+ 378              	HAL_UART_RxCpltCallback:
+ 379              	.LVL52:
+ 380              	.LFB73:
+ 107:user/common/common.c **** 
+ 108:user/common/common.c **** void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+ 109:user/common/common.c **** {
+ 381              		.loc 1 109 1 is_stmt 1 view -0
+ 382              		.cfi_startproc
+ 383              		@ args = 0, pretend = 0, frame = 0
+ 384              		@ frame_needed = 0, uses_anonymous_args = 0
+ 385              		@ link register save eliminated.
+ 110:user/common/common.c ****     if (huart->Instance == USART1) {
+ 386              		.loc 1 110 5 view .LVU80
+ 387              		.loc 1 110 8 is_stmt 0 view .LVU81
+ 388 0000 054A     		ldr	r2, .L37
+ 389              		.loc 1 110 14 view .LVU82
+ 390 0002 0368     		ldr	r3, [r0]
+ 391              		.loc 1 110 8 view .LVU83
+ 392 0004 9342     		cmp	r3, r2
+ 393 0006 03D0     		beq	.L35
+ 111:user/common/common.c ****         WIFI_UART_RxCpltCallback(huart);
+ 112:user/common/common.c ****     } else if (huart->Instance == USART2) {
+ 394              		.loc 1 112 12 is_stmt 1 view .LVU84
+ 395              		.loc 1 112 15 is_stmt 0 view .LVU85
+ 396 0008 044A     		ldr	r2, .L37+4
+ 397 000a 9342     		cmp	r3, r2
+ 398 000c 02D0     		beq	.L36
+ 113:user/common/common.c ****         TRACE_UART_RxCpltCallback(huart);
+ 114:user/common/common.c ****     }
+ 115:user/common/common.c **** }...
+ 399              		.loc 1 115 1 view .LVU86
+ 400 000e 7047     		bx	lr
+ 401              	.L35:
+ 111:user/common/common.c ****         WIFI_UART_RxCpltCallback(huart);
+ 402              		.loc 1 111 9 is_stmt 1 view .LVU87
+ 403 0010 FFF7FEBF 		b	WIFI_UART_RxCpltCallback
+ 404              	.LVL53:
+ 405              	.L36:
+ 113:user/common/common.c ****         TRACE_UART_RxCpltCallback(huart);
+ 406              		.loc 1 113 9 view .LVU88
+ 407 0014 FFF7FEBF 		b	TRACE_UART_RxCpltCallback
+ 408              	.LVL54:
+ 409              	.L38:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 11
+
+
+ 113:user/common/common.c ****         TRACE_UART_RxCpltCallback(huart);
+ 410              		.loc 1 113 9 is_stmt 0 view .LVU89
+ 411              		.align	2
+ 412              	.L37:
+ 413 0018 00380140 		.word	1073821696
+ 414 001c 00440040 		.word	1073759232
+ 415              		.cfi_endproc
+ 416              	.LFE73:
+ 418              		.text
+ 419              	.Letext0:
+ 420              		.file 2 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 421              		.file 3 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 422              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 423              		.file 5 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 424              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 425              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 426              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h"
+ 427              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
+ 428              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
+ 429              		.file 11 "Core/Inc/tim.h"
+ 430              		.file 12 "Core/Inc/rtc.h"
+ 431              		.file 13 "user/hub75d/hub75d.h"
+ 432              		.file 14 "user/esp8266/esp8266_at.h"
+ 433              		.file 15 "user/wifi_uart_if/wifi_uart_if.h"
+ 434              		.file 16 "user/trace/trace_uart_if.h"
+ 435              		.file 17 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\
+ 436              		.file 18 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h"
+ 437              		.file 19 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 438              		.file 20 "Core/Inc/main.h"
+ 439              		.file 21 "Core/Inc/gpio.h"
+ 440              		.file 22 "Core/Inc/dma.h"
+ 441              		.file 23 "Core/Inc/usart.h"
+ 442              		.file 24 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h"
+ 443              		.file 25 "user/time/time.h"
+ 444              		.file 26 "user/htu21d/htu21d.h"
+ 445              		.file 27 "user/lunar_calendar/lunar_calendar.h"
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 common.c
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:18     .text.COMMON_Init:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:25     .text.COMMON_Init:00000000 COMMON_Init
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:90     .text.COMMON_Init:00000044 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:96     .rodata.COMMON_Process.str1.4:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:103    .text.COMMON_Process:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:110    .text.COMMON_Process:00000000 COMMON_Process
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:282    .text.COMMON_Process:000000c4 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:291    .text.HAL_GPIO_EXTI_Callback:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:298    .text.HAL_GPIO_EXTI_Callback:00000000 HAL_GPIO_EXTI_Callback
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:323    .text.HAL_UART_TxCpltCallback:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:330    .text.HAL_UART_TxCpltCallback:00000000 HAL_UART_TxCpltCallback
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:365    .text.HAL_UART_TxCpltCallback:00000018 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:371    .text.HAL_UART_RxCpltCallback:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:378    .text.HAL_UART_RxCpltCallback:00000000 HAL_UART_RxCpltCallback
+C:\Users\WENHUA~1\AppData\Local\Temp\ccL7wlgF.s:413    .text.HAL_UART_RxCpltCallback:00000018 $d
+
+UNDEFINED SYMBOLS
+WIFI_ReceiveDmaInit
+WIFI_PowerOnOff
+HAL_RTCEx_SetSecond_IT
+HAL_Delay
+HTU21D_Init
+GetClock
+GetTimeData
+CalculationLunarCalendar
+HUB75D_DispOnOff
+HAL_TIM_Base_Start_IT
+WIFI_Init
+hrtc
+htim4
+WIFI_HandlerUartData
+Get1sFlag
+Set1sFlag
+WIFI_CtrDec
+HTU21D_Sampling
+ClockRun
+HUB75D_CalculateCalendar
+HUB75D_CtrDec
+printf
+HAL_GPIO_WritePin
+HAL_PWR_EnterSTOPMode
+HAL_Init
+SystemClock_Config
+MX_GPIO_Init
+MX_DMA_Init
+MX_USART1_UART_Init
+MX_TIM4_Init
+HUB75D_SetDispOffCtr
+WIFI_UART_TxCpltCallback
+TRACE_UART_TxCpltCallback
+WIFI_UART_RxCpltCallback
+TRACE_UART_RxCpltCallback

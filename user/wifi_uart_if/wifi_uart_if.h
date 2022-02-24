@@ -4,9 +4,11 @@
 #include <stdint.h>
 #include "usart.h"
 
-void USART1_ReceiveDmaInit(void);
-void USART1_Receive_IDLE(UART_HandleTypeDef *huart);
-void USART1_SendData_DMA(uint8_t *pdata, uint16_t Length);
-void USART1_HandlerUartData(void);
+void WIFI_ReceiveDmaInit(void);
+void WIFI_ReceiveIDLE(UART_HandleTypeDef *huart);
+void WIFI_SendDataDMA(uint8_t *pdata, uint16_t Length);
+void WIFI_HandlerUartData(void);
+void WIFI_UART_TxCpltCallback(UART_HandleTypeDef *huart);
+void WIFI_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 
 #endif
