@@ -4,6 +4,7 @@
 #include "rtc.h"
 #include "hub75d.h"
 #include "lunar_calendar.h"
+#include "trace_printf.h"
 
 struct TimeType g_time;
 static bool g_1sFlag;
@@ -137,7 +138,7 @@ void GetClock(void)
     HUB75D_CalculateCalendar(&g_time);
     CalculationLunarCalendar(&g_time);
 
-    printf("\r\nTime: %d-%d-%d %02d:%02d:%02d \r\n", g_time.year, g_time.month, g_time.day, g_time.hour, g_time.min,
+    TRACE_PRINTF("\r\nget time: %d-%d-%d %02d:%02d:%02d \r\n", g_time.year, g_time.month, g_time.day, g_time.hour, g_time.min,
            g_time.sec);
 }
 
@@ -158,6 +159,6 @@ void SetClock(struct TimeType *time)
     HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-    printf("\r\nTime: %d-%d-%d   %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
+    TRACE_PRINTF("\r\nset time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
            time->sec);
 }

@@ -4,6 +4,7 @@
 #include "main.h"
 #include "usart.h"
 #include "time.h"
+#include "trace_printf.h"
 
 #if (WIFI_MODULE == WIFI_EMW3060)
 
@@ -91,6 +92,8 @@ static bool ProcessClock(char *cRxBuf)
         g_getTime.powerOffCtr = 0x00;
         EMW3060_AT_POWER_PIN_LOW();
         SetClock(&time);
+        TRACE_PRINTF("\r\nupdate time: %d-%d-%d %02d:%02d:%02d \r\n", time.year, time.month, time.day, time.hour,
+                     time.min, time.sec);
     } else {
         g_getTime.getTimeCtr = GET_TIME_10S;
     }

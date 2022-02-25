@@ -1,0 +1,305 @@
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"mem.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.UTIL_MEM_cpy_8,"ax",%progbits
+  18              		.align	1
+  19              		.p2align 2,,3
+  20              		.global	UTIL_MEM_cpy_8
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	UTIL_MEM_cpy_8:
+  26              	.LVL0:
+  27              	.LFB44:
+  28              		.file 1 "user/trace/mem.c"
+   1:user/trace/mem.c **** #include "mem.h"
+   2:user/trace/mem.c **** #include <stdint.h>
+   3:user/trace/mem.c **** 
+   4:user/trace/mem.c **** void UTIL_MEM_cpy_8(void *dst, const void *src, uint16_t size)
+   5:user/trace/mem.c **** {
+  29              		.loc 1 5 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+   6:user/trace/mem.c ****     uint8_t *dst8 = (uint8_t *)dst;
+  33              		.loc 1 6 5 view .LVU1
+   7:user/trace/mem.c ****     uint8_t *src8 = (uint8_t *)src;
+  34              		.loc 1 7 5 view .LVU2
+   8:user/trace/mem.c **** 
+   9:user/trace/mem.c ****     while (size--) {
+  35              		.loc 1 9 5 view .LVU3
+  36              		.loc 1 9 11 view .LVU4
+  37              		.loc 1 9 11 is_stmt 0 view .LVU5
+  38 0000 DAB3     		cbz	r2, .L26
+  39 0002 4B1C     		adds	r3, r1, #1
+   5:user/trace/mem.c ****     uint8_t *dst8 = (uint8_t *)dst;
+  40              		.loc 1 5 1 view .LVU6
+  41 0004 30B5     		push	{r4, r5, lr}
+  42              	.LCFI0:
+  43              		.cfi_def_cfa_offset 12
+  44              		.cfi_offset 4, -12
+  45              		.cfi_offset 5, -8
+  46              		.cfi_offset 14, -4
+  47 0006 C51A     		subs	r5, r0, r3
+  48 0008 022D     		cmp	r5, #2
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s 			page 2
+
+
+  49 000a 2BD9     		bls	.L3
+  50 000c 541E     		subs	r4, r2, #1
+  51 000e A4B2     		uxth	r4, r4
+  52 0010 072C     		cmp	r4, #7
+  53 0012 27D9     		bls	.L3
+  54 0014 0B46     		mov	r3, r1
+  55 0016 8446     		mov	ip, r0
+  56 0018 9508     		lsrs	r5, r2, #2
+  57 001a 013D     		subs	r5, r5, #1
+  58 001c 1FFA85FE 		uxth	lr, r5
+  59 0020 0D1D     		adds	r5, r1, #4
+  60 0022 05EB8E05 		add	r5, r5, lr, lsl #2
+  61              	.LVL1:
+  62              	.L4:
+  10:user/trace/mem.c ****         *dst8++ = *src8++;
+  63              		.loc 1 10 9 is_stmt 1 view .LVU7
+  64              		.loc 1 10 19 is_stmt 0 view .LVU8
+  65 0026 53F804EB 		ldr	lr, [r3], #4	@ unaligned
+  66 002a AB42     		cmp	r3, r5
+  67              		.loc 1 10 17 view .LVU9
+  68 002c 4CF804EB 		str	lr, [ip], #4	@ unaligned
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+  69              		.loc 1 9 11 is_stmt 1 view .LVU10
+  70 0030 F9D1     		bne	.L4
+  71 0032 22F00303 		bic	r3, r2, #3
+  72 0036 E41A     		subs	r4, r4, r3
+  73 0038 9A42     		cmp	r2, r3
+  74 003a A4B2     		uxth	r4, r4
+  75 003c 9DB2     		uxth	r5, r3
+  76 003e 00EB030C 		add	ip, r0, r3
+  77 0042 01EB030E 		add	lr, r1, r3
+  78 0046 0CD0     		beq	.L1
+  79              	.LVL2:
+  80              		.loc 1 10 9 view .LVU11
+  81              		.loc 1 10 19 is_stmt 0 view .LVU12
+  82 0048 4B5D     		ldrb	r3, [r1, r5]	@ zero_extendqisi2
+  83              		.loc 1 10 17 view .LVU13
+  84 004a 4355     		strb	r3, [r0, r5]
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+  85              		.loc 1 9 11 is_stmt 1 view .LVU14
+  86              	.LVL3:
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+  87              		.loc 1 9 11 is_stmt 0 view .LVU15
+  88 004c 4CB1     		cbz	r4, .L1
+  89              		.loc 1 10 9 is_stmt 1 view .LVU16
+  90              	.LVL4:
+  91              		.loc 1 10 19 is_stmt 0 view .LVU17
+  92 004e 9EF80130 		ldrb	r3, [lr, #1]	@ zero_extendqisi2
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+  93              		.loc 1 9 11 view .LVU18
+  94 0052 012C     		cmp	r4, #1
+  95              		.loc 1 10 17 view .LVU19
+  96 0054 8CF80130 		strb	r3, [ip, #1]
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+  97              		.loc 1 9 11 is_stmt 1 view .LVU20
+  98              	.LVL5:
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s 			page 3
+
+
+  99              		.loc 1 9 11 is_stmt 0 view .LVU21
+ 100 0058 03D0     		beq	.L1
+ 101              		.loc 1 10 9 is_stmt 1 view .LVU22
+ 102              	.LVL6:
+ 103              		.loc 1 10 19 is_stmt 0 view .LVU23
+ 104 005a 9EF80230 		ldrb	r3, [lr, #2]	@ zero_extendqisi2
+ 105              		.loc 1 10 17 view .LVU24
+ 106 005e 8CF80230 		strb	r3, [ip, #2]
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+ 107              		.loc 1 9 11 is_stmt 1 view .LVU25
+ 108              	.LVL7:
+ 109              	.L1:
+  11:user/trace/mem.c ****     }
+  12:user/trace/mem.c **** }
+ 110              		.loc 1 12 1 is_stmt 0 view .LVU26
+ 111 0062 30BD     		pop	{r4, r5, pc}
+ 112              	.LVL8:
+ 113              	.L3:
+ 114              		.loc 1 12 1 view .LVU27
+ 115 0064 0138     		subs	r0, r0, #1
+ 116              	.LVL9:
+ 117              		.loc 1 12 1 view .LVU28
+ 118 0066 1144     		add	r1, r1, r2
+ 119              	.LVL10:
+ 120              		.loc 1 12 1 view .LVU29
+ 121 0068 00E0     		b	.L6
+ 122              	.LVL11:
+ 123              	.L31:
+ 124              		.loc 1 12 1 view .LVU30
+ 125 006a 0133     		adds	r3, r3, #1
+ 126              	.LVL12:
+ 127              	.L6:
+  10:user/trace/mem.c ****     }
+ 128              		.loc 1 10 9 is_stmt 1 view .LVU31
+  10:user/trace/mem.c ****     }
+ 129              		.loc 1 10 19 is_stmt 0 view .LVU32
+ 130 006c 13F8012C 		ldrb	r2, [r3, #-1]	@ zero_extendqisi2
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+ 131              		.loc 1 9 11 view .LVU33
+ 132 0070 8B42     		cmp	r3, r1
+  10:user/trace/mem.c ****     }
+ 133              		.loc 1 10 17 view .LVU34
+ 134 0072 00F8012F 		strb	r2, [r0, #1]!
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+ 135              		.loc 1 9 11 is_stmt 1 view .LVU35
+   9:user/trace/mem.c ****         *dst8++ = *src8++;
+ 136              		.loc 1 9 11 is_stmt 0 view .LVU36
+ 137 0076 F8D1     		bne	.L31
+ 138              		.loc 1 12 1 view .LVU37
+ 139 0078 30BD     		pop	{r4, r5, pc}
+ 140              	.LVL13:
+ 141              	.L26:
+ 142              	.LCFI1:
+ 143              		.cfi_def_cfa_offset 0
+ 144              		.cfi_restore 4
+ 145              		.cfi_restore 5
+ 146              		.cfi_restore 14
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s 			page 4
+
+
+ 147              		.loc 1 12 1 view .LVU38
+ 148 007a 7047     		bx	lr
+ 149              		.cfi_endproc
+ 150              	.LFE44:
+ 152              		.section	.text.UTIL_MEM_cpyr_8,"ax",%progbits
+ 153              		.align	1
+ 154              		.p2align 2,,3
+ 155              		.global	UTIL_MEM_cpyr_8
+ 156              		.syntax unified
+ 157              		.thumb
+ 158              		.thumb_func
+ 160              	UTIL_MEM_cpyr_8:
+ 161              	.LVL14:
+ 162              	.LFB45:
+  13:user/trace/mem.c **** 
+  14:user/trace/mem.c **** void UTIL_MEM_cpyr_8(void *dst, const void *src, uint16_t size)
+  15:user/trace/mem.c **** {
+ 163              		.loc 1 15 1 is_stmt 1 view -0
+ 164              		.cfi_startproc
+ 165              		@ args = 0, pretend = 0, frame = 0
+ 166              		@ frame_needed = 0, uses_anonymous_args = 0
+ 167              		@ link register save eliminated.
+  16:user/trace/mem.c ****     uint8_t *dst8 = (uint8_t *)dst;
+ 168              		.loc 1 16 5 view .LVU40
+  17:user/trace/mem.c ****     uint8_t *src8 = (uint8_t *)src;
+ 169              		.loc 1 17 5 view .LVU41
+  18:user/trace/mem.c **** 
+  19:user/trace/mem.c ****     dst8 = dst8 + (size - 1);
+ 170              		.loc 1 19 5 view .LVU42
+  20:user/trace/mem.c ****     while (size--) {
+ 171              		.loc 1 20 5 view .LVU43
+ 172              		.loc 1 20 11 view .LVU44
+ 173              		.loc 1 20 11 is_stmt 0 view .LVU45
+ 174 0000 3AB1     		cbz	r2, .L32
+ 175 0002 1044     		add	r0, r0, r2
+ 176              	.LVL15:
+ 177              		.loc 1 20 11 view .LVU46
+ 178 0004 0A44     		add	r2, r2, r1
+ 179              	.LVL16:
+ 180              	.L34:
+  21:user/trace/mem.c ****         *dst8-- = *src8++;
+ 181              		.loc 1 21 9 is_stmt 1 view .LVU47
+ 182              		.loc 1 21 19 is_stmt 0 view .LVU48
+ 183 0006 11F8013B 		ldrb	r3, [r1], #1	@ zero_extendqisi2
+ 184              	.LVL17:
+  20:user/trace/mem.c ****     while (size--) {
+ 185              		.loc 1 20 11 view .LVU49
+ 186 000a 9142     		cmp	r1, r2
+ 187              		.loc 1 21 17 view .LVU50
+ 188 000c 00F8013D 		strb	r3, [r0, #-1]!
+ 189              	.LVL18:
+  20:user/trace/mem.c ****     while (size--) {
+ 190              		.loc 1 20 11 is_stmt 1 view .LVU51
+  20:user/trace/mem.c ****     while (size--) {
+ 191              		.loc 1 20 11 is_stmt 0 view .LVU52
+ 192 0010 F9D1     		bne	.L34
+ 193              	.LVL19:
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s 			page 5
+
+
+ 194              	.L32:
+  22:user/trace/mem.c ****     }
+  23:user/trace/mem.c **** }
+ 195              		.loc 1 23 1 view .LVU53
+ 196 0012 7047     		bx	lr
+ 197              		.cfi_endproc
+ 198              	.LFE45:
+ 200              		.section	.text.UTIL_MEM_set_8,"ax",%progbits
+ 201              		.align	1
+ 202              		.p2align 2,,3
+ 203              		.global	UTIL_MEM_set_8
+ 204              		.syntax unified
+ 205              		.thumb
+ 206              		.thumb_func
+ 208              	UTIL_MEM_set_8:
+ 209              	.LVL20:
+ 210              	.LFB46:
+  24:user/trace/mem.c **** 
+  25:user/trace/mem.c **** void UTIL_MEM_set_8(void *dst, uint8_t value, uint16_t size)
+  26:user/trace/mem.c **** {
+ 211              		.loc 1 26 1 is_stmt 1 view -0
+ 212              		.cfi_startproc
+ 213              		@ args = 0, pretend = 0, frame = 0
+ 214              		@ frame_needed = 0, uses_anonymous_args = 0
+ 215              		@ link register save eliminated.
+  27:user/trace/mem.c ****     uint8_t *dst8 = (uint8_t *)dst;
+ 216              		.loc 1 27 5 view .LVU55
+  28:user/trace/mem.c ****     while (size--) {
+ 217              		.loc 1 28 5 view .LVU56
+ 218              		.loc 1 28 11 view .LVU57
+ 219              		.loc 1 28 11 is_stmt 0 view .LVU58
+ 220 0000 0AB1     		cbz	r2, .L39
+  29:user/trace/mem.c ****         *dst8++ = value;
+ 221              		.loc 1 29 17 view .LVU59
+ 222 0002 FFF7FEBF 		b	memset
+ 223              	.LVL21:
+ 224              	.L39:
+  30:user/trace/mem.c ****     }
+  31:user/trace/mem.c **** }
+ 225              		.loc 1 31 1 view .LVU60
+ 226 0006 7047     		bx	lr
+ 227              		.cfi_endproc
+ 228              	.LFE46:
+ 230              		.text
+ 231              	.Letext0:
+ 232              		.file 2 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 233              		.file 3 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 234              		.file 4 "<built-in>"
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 mem.c
+C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s:18     .text.UTIL_MEM_cpy_8:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s:25     .text.UTIL_MEM_cpy_8:00000000 UTIL_MEM_cpy_8
+C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s:153    .text.UTIL_MEM_cpyr_8:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s:160    .text.UTIL_MEM_cpyr_8:00000000 UTIL_MEM_cpyr_8
+C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s:201    .text.UTIL_MEM_set_8:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\ccDD4gpH.s:208    .text.UTIL_MEM_set_8:00000000 UTIL_MEM_set_8
+
+UNDEFINED SYMBOLS
+memset

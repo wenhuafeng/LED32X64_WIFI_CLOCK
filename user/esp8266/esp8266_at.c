@@ -7,6 +7,7 @@
 #include "usart.h"
 #include "time.h"
 #include "lunar_calendar.h"
+#include "trace_printf.h"
 
 #if (WIFI_MODULE == WIFI_ESP8266)
 
@@ -160,6 +161,8 @@ static uint8_t ProcessClock(char *cRxBuf)
         SetTimeData(&time);
         SetClock(&time);
         CalculationLunarCalendar(&time);
+        TRACE_PRINTF("\r\nupdate time: %d-%d-%d %02d:%02d:%02d \r\n", time.year, time.month, time.day, time.hour,
+                     time.min, time.sec);
     } else {
         g_getTime.getTimeCtr = GET_TIME_10S;
     }

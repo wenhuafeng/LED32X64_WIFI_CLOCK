@@ -1,0 +1,1015 @@
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"lunar_calendar.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.CalculationLunarCalendar,"ax",%progbits
+  18              		.align	1
+  19              		.p2align 2,,3
+  20              		.global	CalculationLunarCalendar
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	CalculationLunarCalendar:
+  26              	.LVL0:
+  27              	.LFB1:
+  28              		.file 1 "user/lunar_calendar/lunar_calendar.c"
+   1:user/lunar_calendar/lunar_calendar.c **** #include "lunar_calendar.h"
+   2:user/lunar_calendar/lunar_calendar.c **** #include <stdint.h>
+   3:user/lunar_calendar/lunar_calendar.c **** #include <stdbool.h>
+   4:user/lunar_calendar/lunar_calendar.c **** 
+   5:user/lunar_calendar/lunar_calendar.c **** #define YEAR_TABLE_NUM 199
+   6:user/lunar_calendar/lunar_calendar.c **** 
+   7:user/lunar_calendar/lunar_calendar.c **** static const uint32_t g_lunarCalendarTable[YEAR_TABLE_NUM] = {
+   8:user/lunar_calendar/lunar_calendar.c ****     0x04AE53, 0x0A5748, 0x5526BD, 0x0D2650, 0x0D9544, 0x46AAB9, 0x056A4D, 0x09AD42, 0x24AEB6, 0x04A
+   9:user/lunar_calendar/lunar_calendar.c ****     0x6A4DBE, 0x0A4D52, 0x0D2546, 0x5D52BA, 0x0B544E, 0x0D6A43, 0x296D37, 0x095B4B, 0x749BC1, 0x049
+  10:user/lunar_calendar/lunar_calendar.c ****     0x0A4B48, 0x5B25BC, 0x06A550, 0x06D445, 0x4ADAB8, 0x02B64D, 0x095742, 0x2497B7, 0x04974A, 0x664
+  11:user/lunar_calendar/lunar_calendar.c ****     0x0D4A51, 0x0EA546, 0x56D4BA, 0x05AD4E, 0x02B644, 0x393738, 0x092E4B, 0x7C96BF, 0x0C9553, 0x0D4
+  12:user/lunar_calendar/lunar_calendar.c ****     0x6DA53B, 0x0B554F, 0x056A45, 0x4AADB9, 0x025D4D, 0x092D42, 0x2C95B6, 0x0A954A, 0x7B4ABD, 0x06C
+  13:user/lunar_calendar/lunar_calendar.c ****     0x0B5546, 0x555ABB, 0x04DA4E, 0x0A5B43, 0x352BB8, 0x052B4C, 0x8A953F, 0x0E9552, 0x06AA48, 0x6AD
+  14:user/lunar_calendar/lunar_calendar.c ****     0x0AB54F, 0x04B645, 0x4A5739, 0x0A574D, 0x052642, 0x3E9335, 0x0D9549, 0x75AABE, 0x056A51, 0x096
+  15:user/lunar_calendar/lunar_calendar.c ****     0x54AEBB, 0x04AD4F, 0x0A4D43, 0x4D26B7, 0x0D254B, 0x8D52BF, 0x0B5452, 0x0B6A47, 0x696D3C, 0x095
+  16:user/lunar_calendar/lunar_calendar.c ****     0x049B45, 0x4A4BB9, 0x0A4B4D, 0xAB25C2, 0x06A554, 0x06D449, 0x6ADA3D, 0x0AB651, 0x093746, 0x549
+  17:user/lunar_calendar/lunar_calendar.c ****     0x04974F, 0x064B44, 0x36A537, 0x0EA54A, 0x86B2BF, 0x05AC53, 0x0AB647, 0x5936BC, 0x092E50, 0x0C9
+  18:user/lunar_calendar/lunar_calendar.c ****     0x4D4AB8, 0x0D4A4C, 0x0DA541, 0x25AAB6, 0x056A49, 0x7AADBD, 0x025D52, 0x092D47, 0x5C95BA, 0x0A9
+  19:user/lunar_calendar/lunar_calendar.c ****     0x0B4A43, 0x4B5537, 0x0AD54A, 0x955ABF, 0x04BA53, 0x0A5B48, 0x652BBC, 0x052B50, 0x0A9345, 0x474
+  20:user/lunar_calendar/lunar_calendar.c ****     0x06AA4C, 0x0AD541, 0x24DAB6, 0x04B64A, 0x69573D, 0x0A4E51, 0x0D2646, 0x5E933A, 0x0D534D, 0x05A
+  21:user/lunar_calendar/lunar_calendar.c ****     0x36B537, 0x096D4B, 0xB4AEBF, 0x04AD53, 0x0A4D48, 0x6D25BC, 0x0D254F, 0x0D5244, 0x5DAA38, 0x0B5
+  22:user/lunar_calendar/lunar_calendar.c ****     0x056D41, 0x24ADB6, 0x049B4A, 0x7A4BBE, 0x0A4B51, 0x0AA546, 0x5B52BA, 0x06D24E, 0x0ADA42, 0x355
+  23:user/lunar_calendar/lunar_calendar.c ****     0x09374B, 0x8497C1, 0x049753, 0x064B48, 0x66A53C, 0x0EA54F, 0x06B244, 0x4AB638, 0x0AAE4C, 0x092
+  24:user/lunar_calendar/lunar_calendar.c ****     0x3C9735, 0x0C9649, 0x7D4ABD, 0x0D4A51, 0x0DA545, 0x55AABA, 0x056A4E, 0x0A6D43, 0x452EB7, 0x052
+  25:user/lunar_calendar/lunar_calendar.c ****     0x8A95BF, 0x0A9553, 0x0B4A47, 0x6B553B, 0x0AD54F, 0x055A45, 0x4A5D38, 0x0A5B4C, 0x052B42, 0x3A9
+  26:user/lunar_calendar/lunar_calendar.c ****     0x069349, 0x7729BD, 0x06AA51, 0x0AD546, 0x54DABA, 0x04B64E, 0x0A5743, 0x452738, 0x0D264A, 0x8E9
+  27:user/lunar_calendar/lunar_calendar.c ****     0x0D5252, 0x0DAA47, 0x66B53B, 0x056D4F, 0x04AE45, 0x4A4EB9, 0x0A4D4C, 0x0D1541, 0x2D92B5       
+  28:user/lunar_calendar/lunar_calendar.c **** };
+  29:user/lunar_calendar/lunar_calendar.c **** static const uint16_t g_monthAdd[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+  30:user/lunar_calendar/lunar_calendar.c **** 
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 2
+
+
+  31:user/lunar_calendar/lunar_calendar.c **** struct LunarCalendarType g_lunarCalendarData;
+  32:user/lunar_calendar/lunar_calendar.c **** 
+  33:user/lunar_calendar/lunar_calendar.c **** static bool LunarCalendar(struct TimeType *time, struct LunarCalendarType *lcData)
+  34:user/lunar_calendar/lunar_calendar.c **** {
+  35:user/lunar_calendar/lunar_calendar.c ****     uint16_t springToNY; /* 记录春节离当年元旦的天数 */
+  36:user/lunar_calendar/lunar_calendar.c ****     uint16_t sunToNY;    /* 记录阳历日离当年元旦的天数 */
+  37:user/lunar_calendar/lunar_calendar.c ****     uint8_t dayCount;    /* 记录大小月的天数29或30*/
+  38:user/lunar_calendar/lunar_calendar.c ****     uint8_t index;       /* 记录从哪个月开始来计算 */
+  39:user/lunar_calendar/lunar_calendar.c ****     uint8_t flag;        /* 用来对闰月的特殊处理 */
+  40:user/lunar_calendar/lunar_calendar.c ****     uint16_t year = time->year;
+  41:user/lunar_calendar/lunar_calendar.c ****     uint8_t month = time->month;
+  42:user/lunar_calendar/lunar_calendar.c ****     uint8_t day = time->day;
+  43:user/lunar_calendar/lunar_calendar.c **** 
+  44:user/lunar_calendar/lunar_calendar.c ****     if (((g_lunarCalendarTable[year - 1901] & 0x0060) >> 5) == 1) {
+  45:user/lunar_calendar/lunar_calendar.c ****         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1;
+  46:user/lunar_calendar/lunar_calendar.c ****     } else {
+  47:user/lunar_calendar/lunar_calendar.c ****         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1 + 31;
+  48:user/lunar_calendar/lunar_calendar.c ****     }
+  49:user/lunar_calendar/lunar_calendar.c ****     sunToNY = g_monthAdd[month - 1] + day - 1;
+  50:user/lunar_calendar/lunar_calendar.c ****     if (((year % 4) == 0) && (month > 2)) {
+  51:user/lunar_calendar/lunar_calendar.c ****         sunToNY++;
+  52:user/lunar_calendar/lunar_calendar.c ****     }
+  53:user/lunar_calendar/lunar_calendar.c **** 
+  54:user/lunar_calendar/lunar_calendar.c ****     if (sunToNY >= springToNY) { /* 阳历日在春节后（含春节那天） */
+  55:user/lunar_calendar/lunar_calendar.c ****         sunToNY -= springToNY;
+  56:user/lunar_calendar/lunar_calendar.c ****         month = 1;
+  57:user/lunar_calendar/lunar_calendar.c ****         index = 1;
+  58:user/lunar_calendar/lunar_calendar.c ****         flag = 0;
+  59:user/lunar_calendar/lunar_calendar.c ****         if ((g_lunarCalendarTable[year - 1901] & (0x80000 >> (index - 1))) == 0) {
+  60:user/lunar_calendar/lunar_calendar.c ****             dayCount = 29;
+  61:user/lunar_calendar/lunar_calendar.c ****         } else {
+  62:user/lunar_calendar/lunar_calendar.c ****             dayCount = 30;
+  63:user/lunar_calendar/lunar_calendar.c ****         }
+  64:user/lunar_calendar/lunar_calendar.c ****         while (sunToNY >= dayCount) {
+  65:user/lunar_calendar/lunar_calendar.c ****             sunToNY -= dayCount;
+  66:user/lunar_calendar/lunar_calendar.c ****             index++;
+  67:user/lunar_calendar/lunar_calendar.c ****             if (month == ((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20)) {
+  68:user/lunar_calendar/lunar_calendar.c ****                 flag = ~flag;
+  69:user/lunar_calendar/lunar_calendar.c ****                 if (flag == 0) {
+  70:user/lunar_calendar/lunar_calendar.c ****                     month++;
+  71:user/lunar_calendar/lunar_calendar.c ****                 }
+  72:user/lunar_calendar/lunar_calendar.c ****             } else {
+  73:user/lunar_calendar/lunar_calendar.c ****                 month++;
+  74:user/lunar_calendar/lunar_calendar.c ****             }
+  75:user/lunar_calendar/lunar_calendar.c ****             if ((g_lunarCalendarTable[year - 1901] & (0x80000 >> (index - 1))) == 0) {
+  76:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+  77:user/lunar_calendar/lunar_calendar.c ****             } else {
+  78:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 30;
+  79:user/lunar_calendar/lunar_calendar.c ****             }
+  80:user/lunar_calendar/lunar_calendar.c ****         }
+  81:user/lunar_calendar/lunar_calendar.c ****         day = sunToNY + 1;
+  82:user/lunar_calendar/lunar_calendar.c ****     } else { /* 阳历日在春节前 */
+  83:user/lunar_calendar/lunar_calendar.c ****         springToNY -= sunToNY;
+  84:user/lunar_calendar/lunar_calendar.c ****         year--;
+  85:user/lunar_calendar/lunar_calendar.c ****         month = 12;
+  86:user/lunar_calendar/lunar_calendar.c ****         if (((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20) == 0) {
+  87:user/lunar_calendar/lunar_calendar.c ****             index = 12;
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 3
+
+
+  88:user/lunar_calendar/lunar_calendar.c ****         } else {
+  89:user/lunar_calendar/lunar_calendar.c ****             index = 13;
+  90:user/lunar_calendar/lunar_calendar.c ****         }
+  91:user/lunar_calendar/lunar_calendar.c ****         flag = 0;
+  92:user/lunar_calendar/lunar_calendar.c ****         if ((g_lunarCalendarTable[year - 1901] & (0x80000 >> (index - 1))) == 0) {
+  93:user/lunar_calendar/lunar_calendar.c ****             dayCount = 29;
+  94:user/lunar_calendar/lunar_calendar.c ****         } else {
+  95:user/lunar_calendar/lunar_calendar.c ****             dayCount = 30;
+  96:user/lunar_calendar/lunar_calendar.c ****         }
+  97:user/lunar_calendar/lunar_calendar.c ****         while (springToNY > dayCount) {
+  98:user/lunar_calendar/lunar_calendar.c ****             springToNY -= dayCount;
+  99:user/lunar_calendar/lunar_calendar.c ****             index--;
+ 100:user/lunar_calendar/lunar_calendar.c ****             if (flag == 0) {
+ 101:user/lunar_calendar/lunar_calendar.c ****                 month--;
+ 102:user/lunar_calendar/lunar_calendar.c ****             }
+ 103:user/lunar_calendar/lunar_calendar.c ****             if (month == ((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20)) {
+ 104:user/lunar_calendar/lunar_calendar.c ****                 flag = ~flag;
+ 105:user/lunar_calendar/lunar_calendar.c ****             }
+ 106:user/lunar_calendar/lunar_calendar.c ****             if ((g_lunarCalendarTable[year - 1901] & (0x80000 >> (index - 1))) == 0) {
+ 107:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 108:user/lunar_calendar/lunar_calendar.c ****             } else {
+ 109:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 30;
+ 110:user/lunar_calendar/lunar_calendar.c ****             }
+ 111:user/lunar_calendar/lunar_calendar.c ****         }
+ 112:user/lunar_calendar/lunar_calendar.c ****         day = dayCount - springToNY + 1;
+ 113:user/lunar_calendar/lunar_calendar.c ****     }
+ 114:user/lunar_calendar/lunar_calendar.c ****     lcData->year = year;
+ 115:user/lunar_calendar/lunar_calendar.c ****     lcData->month = month;
+ 116:user/lunar_calendar/lunar_calendar.c ****     lcData->day = day;
+ 117:user/lunar_calendar/lunar_calendar.c **** 
+ 118:user/lunar_calendar/lunar_calendar.c ****     return (month == ((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20)) ? 1 : 0;
+ 119:user/lunar_calendar/lunar_calendar.c **** }
+ 120:user/lunar_calendar/lunar_calendar.c **** 
+ 121:user/lunar_calendar/lunar_calendar.c **** void CalculationLunarCalendar(struct TimeType *time)
+ 122:user/lunar_calendar/lunar_calendar.c **** {
+  29              		.loc 1 122 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 122 1 is_stmt 0 view .LVU1
+  34 0000 B0F806C0 		ldrh	ip, [r0, #6]
+  35 0004 F0B5     		push	{r4, r5, r6, r7, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 20
+  38              		.cfi_offset 4, -20
+  39              		.cfi_offset 5, -16
+  40              		.cfi_offset 6, -12
+  41              		.cfi_offset 7, -8
+  42              		.cfi_offset 14, -4
+  43              	.LBB4:
+  44              	.LBB5:
+  44:user/lunar_calendar/lunar_calendar.c ****         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1;
+  45              		.loc 1 44 31 view .LVU2
+  46 0006 544D     		ldr	r5, .L35
+  47              	.LBE5:
+  48              	.LBE4:
+ 123:user/lunar_calendar/lunar_calendar.c ****     (void)LunarCalendar(time, &g_lunarCalendarData);
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 4
+
+
+  49              		.loc 1 123 5 is_stmt 1 view .LVU3
+  50              	.LBB9:
+  51              	.LBI4:
+  33:user/lunar_calendar/lunar_calendar.c **** {
+  52              		.loc 1 33 13 view .LVU4
+  53              	.LVL1:
+  54              	.LBB6:
+  35:user/lunar_calendar/lunar_calendar.c ****     uint16_t sunToNY;    /* 记录阳历日离当年元旦的天数 */
+  55              		.loc 1 35 5 view .LVU5
+  36:user/lunar_calendar/lunar_calendar.c ****     uint8_t dayCount;    /* 记录大小月的天数29或30*/
+  56              		.loc 1 36 5 view .LVU6
+  37:user/lunar_calendar/lunar_calendar.c ****     uint8_t index;       /* 记录从哪个月开始来计算 */
+  57              		.loc 1 37 5 view .LVU7
+  38:user/lunar_calendar/lunar_calendar.c ****     uint8_t flag;        /* 用来对闰月的特殊处理 */
+  58              		.loc 1 38 5 view .LVU8
+  39:user/lunar_calendar/lunar_calendar.c ****     uint16_t year = time->year;
+  59              		.loc 1 39 5 view .LVU9
+  40:user/lunar_calendar/lunar_calendar.c ****     uint8_t month = time->month;
+  60              		.loc 1 40 5 view .LVU10
+  41:user/lunar_calendar/lunar_calendar.c ****     uint8_t day = time->day;
+  61              		.loc 1 41 5 view .LVU11
+  44:user/lunar_calendar/lunar_calendar.c ****         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1;
+  62              		.loc 1 44 31 is_stmt 0 view .LVU12
+  63 0008 ACF26D73 		subw	r3, ip, #1901
+  64 000c 55F82340 		ldr	r4, [r5, r3, lsl #2]
+  65 0010 C178     		ldrb	r1, [r0, #3]	@ zero_extendqisi2
+  44:user/lunar_calendar/lunar_calendar.c ****         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1;
+  66              		.loc 1 44 55 view .LVU13
+  67 0012 C4F34113 		ubfx	r3, r4, #5, #2
+  45:user/lunar_calendar/lunar_calendar.c ****     } else {
+  68              		.loc 1 45 57 view .LVU14
+  69 0016 04F01F02 		and	r2, r4, #31
+  44:user/lunar_calendar/lunar_calendar.c ****         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1;
+  70              		.loc 1 44 8 view .LVU15
+  71 001a 012B     		cmp	r3, #1
+  45:user/lunar_calendar/lunar_calendar.c ****     } else {
+  72              		.loc 1 45 20 view .LVU16
+  73 001c 08BF     		it	eq
+  74 001e 02F1FF32 		addeq	r2, r2, #-1
+  75 0022 4079     		ldrb	r0, [r0, #5]	@ zero_extendqisi2
+  76              	.LVL2:
+  42:user/lunar_calendar/lunar_calendar.c **** 
+  77              		.loc 1 42 5 is_stmt 1 view .LVU17
+  44:user/lunar_calendar/lunar_calendar.c ****         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1;
+  78              		.loc 1 44 5 view .LVU18
+  45:user/lunar_calendar/lunar_calendar.c ****     } else {
+  79              		.loc 1 45 9 view .LVU19
+  45:user/lunar_calendar/lunar_calendar.c ****     } else {
+  80              		.loc 1 45 20 is_stmt 0 view .LVU20
+  81 0024 0CBF     		ite	eq
+  82 0026 93B2     		uxtheq	r3, r2
+  83              	.LVL3:
+  47:user/lunar_calendar/lunar_calendar.c ****     }
+  84              		.loc 1 47 9 is_stmt 1 view .LVU21
+  47:user/lunar_calendar/lunar_calendar.c ****     }
+  85              		.loc 1 47 20 is_stmt 0 view .LVU22
+  86 0028 02F11E03 		addne	r3, r2, #30
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 5
+
+
+  87              	.LVL4:
+  49:user/lunar_calendar/lunar_calendar.c ****     if (((year % 4) == 0) && (month > 2)) {
+  88              		.loc 1 49 5 is_stmt 1 view .LVU23
+  49:user/lunar_calendar/lunar_calendar.c ****     if (((year % 4) == 0) && (month > 2)) {
+  89              		.loc 1 49 25 is_stmt 0 view .LVU24
+  90 002c 4B4A     		ldr	r2, .L35+4
+  91 002e 461E     		subs	r6, r0, #1
+  49:user/lunar_calendar/lunar_calendar.c ****     if (((year % 4) == 0) && (month > 2)) {
+  92              		.loc 1 49 37 view .LVU25
+  93 0030 32F81620 		ldrh	r2, [r2, r6, lsl #1]
+  50:user/lunar_calendar/lunar_calendar.c ****         sunToNY++;
+  94              		.loc 1 50 8 view .LVU26
+  95 0034 1CF0030F 		tst	ip, #3
+  49:user/lunar_calendar/lunar_calendar.c ****     if (((year % 4) == 0) && (month > 2)) {
+  96              		.loc 1 49 37 view .LVU27
+  97 0038 1144     		add	r1, r1, r2
+  98              	.LVL5:
+  49:user/lunar_calendar/lunar_calendar.c ****     if (((year % 4) == 0) && (month > 2)) {
+  99              		.loc 1 49 37 view .LVU28
+ 100 003a 89B2     		uxth	r1, r1
+  49:user/lunar_calendar/lunar_calendar.c ****     if (((year % 4) == 0) && (month > 2)) {
+ 101              		.loc 1 49 13 view .LVU29
+ 102 003c 01F1FF32 		add	r2, r1, #-1
+ 103 0040 92B2     		uxth	r2, r2
+ 104              	.LVL6:
+  50:user/lunar_calendar/lunar_calendar.c ****         sunToNY++;
+ 105              		.loc 1 50 5 is_stmt 1 view .LVU30
+  50:user/lunar_calendar/lunar_calendar.c ****         sunToNY++;
+ 106              		.loc 1 50 8 is_stmt 0 view .LVU31
+ 107 0042 02D1     		bne	.L4
+  51:user/lunar_calendar/lunar_calendar.c ****     }
+ 108              		.loc 1 51 16 view .LVU32
+ 109 0044 0228     		cmp	r0, #2
+ 110 0046 88BF     		it	hi
+ 111 0048 0A46     		movhi	r2, r1
+ 112              	.LVL7:
+ 113              	.L4:
+  54:user/lunar_calendar/lunar_calendar.c ****         sunToNY -= springToNY;
+ 114              		.loc 1 54 5 is_stmt 1 view .LVU33
+  54:user/lunar_calendar/lunar_calendar.c ****         sunToNY -= springToNY;
+ 115              		.loc 1 54 8 is_stmt 0 view .LVU34
+ 116 004a 9342     		cmp	r3, r2
+ 117 004c 23D8     		bhi	.L5
+  55:user/lunar_calendar/lunar_calendar.c ****         month = 1;
+ 118              		.loc 1 55 9 is_stmt 1 view .LVU35
+  59:user/lunar_calendar/lunar_calendar.c ****             dayCount = 29;
+ 119              		.loc 1 59 12 is_stmt 0 view .LVU36
+ 120 004e 14F4002F 		tst	r4, #524288
+ 121 0052 0CBF     		ite	eq
+ 122 0054 1D20     		moveq	r0, #29
+ 123              	.LVL8:
+  59:user/lunar_calendar/lunar_calendar.c ****             dayCount = 29;
+ 124              		.loc 1 59 12 view .LVU37
+ 125 0056 1E20     		movne	r0, #30
+  55:user/lunar_calendar/lunar_calendar.c ****         month = 1;
+ 126              		.loc 1 55 17 view .LVU38
+ 127 0058 D21A     		subs	r2, r2, r3
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 6
+
+
+ 128              	.LVL9:
+  55:user/lunar_calendar/lunar_calendar.c ****         month = 1;
+ 129              		.loc 1 55 17 view .LVU39
+ 130 005a 93B2     		uxth	r3, r2
+ 131              	.LVL10:
+  56:user/lunar_calendar/lunar_calendar.c ****         index = 1;
+ 132              		.loc 1 56 9 is_stmt 1 view .LVU40
+  57:user/lunar_calendar/lunar_calendar.c ****         flag = 0;
+ 133              		.loc 1 57 9 view .LVU41
+  58:user/lunar_calendar/lunar_calendar.c ****         if ((g_lunarCalendarTable[year - 1901] & (0x80000 >> (index - 1))) == 0) {
+ 134              		.loc 1 58 9 view .LVU42
+  59:user/lunar_calendar/lunar_calendar.c ****             dayCount = 29;
+ 135              		.loc 1 59 9 view .LVU43
+  64:user/lunar_calendar/lunar_calendar.c ****             sunToNY -= dayCount;
+ 136              		.loc 1 64 15 view .LVU44
+ 137 005c 8342     		cmp	r3, r0
+ 138 005e 65D3     		bcc	.L23
+  67:user/lunar_calendar/lunar_calendar.c ****                 flag = ~flag;
+ 139              		.loc 1 67 74 is_stmt 0 view .LVU45
+ 140 0060 0121     		movs	r1, #1
+ 141 0062 0026     		movs	r6, #0
+  75:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 142              		.loc 1 75 63 view .LVU46
+ 143 0064 4FF40025 		mov	r5, #524288
+  67:user/lunar_calendar/lunar_calendar.c ****                 flag = ~flag;
+ 144              		.loc 1 67 74 view .LVU47
+ 145 0068 0A46     		mov	r2, r1
+ 146 006a C4F3035E 		ubfx	lr, r4, #20, #4
+  70:user/lunar_calendar/lunar_calendar.c ****                 }
+ 147              		.loc 1 70 26 view .LVU48
+ 148 006e 0EEB0107 		add	r7, lr, r1
+ 149              	.LVL11:
+ 150              	.L12:
+  65:user/lunar_calendar/lunar_calendar.c ****             index++;
+ 151              		.loc 1 65 13 is_stmt 1 view .LVU49
+  73:user/lunar_calendar/lunar_calendar.c ****             }
+ 152              		.loc 1 73 17 view .LVU50
+  65:user/lunar_calendar/lunar_calendar.c ****             index++;
+ 153              		.loc 1 65 21 is_stmt 0 view .LVU51
+ 154 0072 1B1A     		subs	r3, r3, r0
+ 155              	.LVL12:
+  66:user/lunar_calendar/lunar_calendar.c ****             if (month == ((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20)) {
+ 156              		.loc 1 66 18 view .LVU52
+ 157 0074 0132     		adds	r2, r2, #1
+ 158              	.LVL13:
+  67:user/lunar_calendar/lunar_calendar.c ****                 flag = ~flag;
+ 159              		.loc 1 67 16 view .LVU53
+ 160 0076 8E45     		cmp	lr, r1
+  65:user/lunar_calendar/lunar_calendar.c ****             index++;
+ 161              		.loc 1 65 21 view .LVU54
+ 162 0078 9BB2     		uxth	r3, r3
+ 163              	.LVL14:
+  66:user/lunar_calendar/lunar_calendar.c ****             if (month == ((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20)) {
+ 164              		.loc 1 66 13 is_stmt 1 view .LVU55
+  66:user/lunar_calendar/lunar_calendar.c ****             if (month == ((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20)) {
+ 165              		.loc 1 66 18 is_stmt 0 view .LVU56
+ 166 007a D2B2     		uxtb	r2, r2
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 7
+
+
+ 167              	.LVL15:
+  67:user/lunar_calendar/lunar_calendar.c ****                 flag = ~flag;
+ 168              		.loc 1 67 13 is_stmt 1 view .LVU57
+  73:user/lunar_calendar/lunar_calendar.c ****             }
+ 169              		.loc 1 73 22 is_stmt 0 view .LVU58
+ 170 007c 01F10100 		add	r0, r1, #1
+  67:user/lunar_calendar/lunar_calendar.c ****                 flag = ~flag;
+ 171              		.loc 1 67 16 view .LVU59
+ 172 0080 4DD0     		beq	.L33
+  73:user/lunar_calendar/lunar_calendar.c ****             }
+ 173              		.loc 1 73 22 view .LVU60
+ 174 0082 C1B2     		uxtb	r1, r0
+ 175              	.LVL16:
+ 176              	.L9:
+  75:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 177              		.loc 1 75 13 is_stmt 1 view .LVU61
+  64:user/lunar_calendar/lunar_calendar.c ****             sunToNY -= dayCount;
+ 178              		.loc 1 64 15 view .LVU62
+  64:user/lunar_calendar/lunar_calendar.c ****             sunToNY -= dayCount;
+ 179              		.loc 1 64 15 view .LVU63
+  75:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 180              		.loc 1 75 73 is_stmt 0 view .LVU64
+ 181 0084 501E     		subs	r0, r2, #1
+  75:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 182              		.loc 1 75 63 view .LVU65
+ 183 0086 45FA00F0 		asr	r0, r5, r0
+  75:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 184              		.loc 1 75 16 view .LVU66
+ 185 008a 2042     		tst	r0, r4
+ 186 008c 43D1     		bne	.L10
+  64:user/lunar_calendar/lunar_calendar.c ****             sunToNY -= dayCount;
+ 187              		.loc 1 64 15 view .LVU67
+ 188 008e 1C2B     		cmp	r3, #28
+ 189 0090 4DD9     		bls	.L7
+ 190 0092 1D20     		movs	r0, #29
+ 191 0094 EDE7     		b	.L12
+ 192              	.LVL17:
+ 193              	.L5:
+  83:user/lunar_calendar/lunar_calendar.c ****         year--;
+ 194              		.loc 1 83 9 is_stmt 1 view .LVU68
+  84:user/lunar_calendar/lunar_calendar.c ****         month = 12;
+ 195              		.loc 1 84 13 is_stmt 0 view .LVU69
+ 196 0096 0CF1FF3C 		add	ip, ip, #-1
+ 197              	.LVL18:
+  84:user/lunar_calendar/lunar_calendar.c ****         month = 12;
+ 198              		.loc 1 84 13 view .LVU70
+ 199 009a 1FFA8CFC 		uxth	ip, ip
+ 200              	.LVL19:
+  86:user/lunar_calendar/lunar_calendar.c ****             index = 12;
+ 201              		.loc 1 86 35 view .LVU71
+ 202 009e ACF26D71 		subw	r1, ip, #1901
+ 203 00a2 55F82150 		ldr	r5, [r5, r1, lsl #2]
+  83:user/lunar_calendar/lunar_calendar.c ****         year--;
+ 204              		.loc 1 83 20 view .LVU72
+ 205 00a6 9A1A     		subs	r2, r3, r2
+ 206              	.LVL20:
+  86:user/lunar_calendar/lunar_calendar.c ****             index = 12;
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 8
+
+
+ 207              		.loc 1 86 61 view .LVU73
+ 208 00a8 C5F30356 		ubfx	r6, r5, #20, #4
+  86:user/lunar_calendar/lunar_calendar.c ****             index = 12;
+ 209              		.loc 1 86 12 view .LVU74
+ 210 00ac 002E     		cmp	r6, #0
+ 211 00ae 0CBF     		ite	eq
+ 212 00b0 4FF48073 		moveq	r3, #256
+ 213              	.LVL21:
+  86:user/lunar_calendar/lunar_calendar.c ****             index = 12;
+ 214              		.loc 1 86 12 view .LVU75
+ 215 00b4 8023     		movne	r3, #128
+  92:user/lunar_calendar/lunar_calendar.c ****             dayCount = 29;
+ 216              		.loc 1 92 48 view .LVU76
+ 217 00b6 03EA0503 		and	r3, r3, r5
+  86:user/lunar_calendar/lunar_calendar.c ****             index = 12;
+ 218              		.loc 1 86 12 view .LVU77
+ 219 00ba 0CBF     		ite	eq
+ 220 00bc 0C20     		moveq	r0, #12
+ 221              	.LVL22:
+  86:user/lunar_calendar/lunar_calendar.c ****             index = 12;
+ 222              		.loc 1 86 12 view .LVU78
+ 223 00be 0D20     		movne	r0, #13
+  92:user/lunar_calendar/lunar_calendar.c ****             dayCount = 29;
+ 224              		.loc 1 92 12 view .LVU79
+ 225 00c0 002B     		cmp	r3, #0
+ 226 00c2 14BF     		ite	ne
+ 227 00c4 4FF01E0E 		movne	lr, #30
+ 228 00c8 4FF01D0E 		moveq	lr, #29
+  83:user/lunar_calendar/lunar_calendar.c ****         year--;
+ 229              		.loc 1 83 20 view .LVU80
+ 230 00cc 92B2     		uxth	r2, r2
+ 231              	.LVL23:
+  84:user/lunar_calendar/lunar_calendar.c ****         month = 12;
+ 232              		.loc 1 84 9 is_stmt 1 view .LVU81
+  85:user/lunar_calendar/lunar_calendar.c ****         if (((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20) == 0) {
+ 233              		.loc 1 85 9 view .LVU82
+  86:user/lunar_calendar/lunar_calendar.c ****             index = 12;
+ 234              		.loc 1 86 9 view .LVU83
+  91:user/lunar_calendar/lunar_calendar.c ****         if ((g_lunarCalendarTable[year - 1901] & (0x80000 >> (index - 1))) == 0) {
+ 235              		.loc 1 91 9 view .LVU84
+  92:user/lunar_calendar/lunar_calendar.c ****             dayCount = 29;
+ 236              		.loc 1 92 9 view .LVU85
+  97:user/lunar_calendar/lunar_calendar.c ****             springToNY -= dayCount;
+ 237              		.loc 1 97 15 view .LVU86
+  92:user/lunar_calendar/lunar_calendar.c ****             dayCount = 29;
+ 238              		.loc 1 92 12 is_stmt 0 view .LVU87
+ 239 00ce 14BF     		ite	ne
+ 240 00d0 1F23     		movne	r3, #31
+ 241 00d2 1E23     		moveq	r3, #30
+  97:user/lunar_calendar/lunar_calendar.c ****             springToNY -= dayCount;
+ 242              		.loc 1 97 15 view .LVU88
+ 243 00d4 9645     		cmp	lr, r2
+ 244 00d6 3DD2     		bcs	.L28
+ 245 00d8 0C21     		movs	r1, #12
+ 246 00da 0024     		movs	r4, #0
+ 106:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 247              		.loc 1 106 63 view .LVU89
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 9
+
+
+ 248 00dc 4FF40027 		mov	r7, #524288
+ 249 00e0 0138     		subs	r0, r0, #1
+ 250              	.LVL24:
+ 251              	.L21:
+  98:user/lunar_calendar/lunar_calendar.c ****             index--;
+ 252              		.loc 1 98 13 is_stmt 1 view .LVU90
+  99:user/lunar_calendar/lunar_calendar.c ****             if (flag == 0) {
+ 253              		.loc 1 99 18 is_stmt 0 view .LVU91
+ 254 00e2 C0B2     		uxtb	r0, r0
+  98:user/lunar_calendar/lunar_calendar.c ****             index--;
+ 255              		.loc 1 98 24 view .LVU92
+ 256 00e4 A2EB0E03 		sub	r3, r2, lr
+ 106:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 257              		.loc 1 106 73 view .LVU93
+ 258 00e8 0138     		subs	r0, r0, #1
+  98:user/lunar_calendar/lunar_calendar.c ****             index--;
+ 259              		.loc 1 98 24 view .LVU94
+ 260 00ea 9AB2     		uxth	r2, r3
+ 261              	.LVL25:
+  99:user/lunar_calendar/lunar_calendar.c ****             if (flag == 0) {
+ 262              		.loc 1 99 13 is_stmt 1 view .LVU95
+ 101:user/lunar_calendar/lunar_calendar.c ****             }
+ 263              		.loc 1 101 17 view .LVU96
+ 100:user/lunar_calendar/lunar_calendar.c ****                 month--;
+ 264              		.loc 1 100 13 view .LVU97
+ 106:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 265              		.loc 1 106 63 is_stmt 0 view .LVU98
+ 266 00ec 47FA00F3 		asr	r3, r7, r0
+ 100:user/lunar_calendar/lunar_calendar.c ****                 month--;
+ 267              		.loc 1 100 16 view .LVU99
+ 268 00f0 0CB9     		cbnz	r4, .L17
+ 101:user/lunar_calendar/lunar_calendar.c ****             }
+ 269              		.loc 1 101 22 view .LVU100
+ 270 00f2 0139     		subs	r1, r1, #1
+ 271              	.LVL26:
+ 101:user/lunar_calendar/lunar_calendar.c ****             }
+ 272              		.loc 1 101 22 view .LVU101
+ 273 00f4 C9B2     		uxtb	r1, r1
+ 274              	.LVL27:
+ 275              	.L17:
+ 103:user/lunar_calendar/lunar_calendar.c ****                 flag = ~flag;
+ 276              		.loc 1 103 13 is_stmt 1 view .LVU102
+ 103:user/lunar_calendar/lunar_calendar.c ****                 flag = ~flag;
+ 277              		.loc 1 103 16 is_stmt 0 view .LVU103
+ 278 00f6 8E42     		cmp	r6, r1
+ 104:user/lunar_calendar/lunar_calendar.c ****             }
+ 279              		.loc 1 104 17 is_stmt 1 view .LVU104
+ 104:user/lunar_calendar/lunar_calendar.c ****             }
+ 280              		.loc 1 104 22 is_stmt 0 view .LVU105
+ 281 00f8 04BF     		itt	eq
+ 282 00fa E443     		mvneq	r4, r4
+ 283 00fc E4B2     		uxtbeq	r4, r4
+ 284              	.LVL28:
+ 106:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 285              		.loc 1 106 13 is_stmt 1 view .LVU106
+  97:user/lunar_calendar/lunar_calendar.c ****             springToNY -= dayCount;
+ 286              		.loc 1 97 15 view .LVU107
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 10
+
+
+  97:user/lunar_calendar/lunar_calendar.c ****             springToNY -= dayCount;
+ 287              		.loc 1 97 15 view .LVU108
+ 106:user/lunar_calendar/lunar_calendar.c ****                 dayCount = 29;
+ 288              		.loc 1 106 16 is_stmt 0 view .LVU109
+ 289 00fe 2B42     		tst	r3, r5
+ 290 0100 04D1     		bne	.L19
+  97:user/lunar_calendar/lunar_calendar.c ****             springToNY -= dayCount;
+ 291              		.loc 1 97 15 view .LVU110
+ 292 0102 1D2A     		cmp	r2, #29
+ 293 0104 24D9     		bls	.L34
+ 294 0106 4FF01D0E 		mov	lr, #29
+ 295 010a EAE7     		b	.L21
+ 296              	.L19:
+ 297 010c 1E2A     		cmp	r2, #30
+ 298 010e 16D9     		bls	.L30
+ 299 0110 4FF01E0E 		mov	lr, #30
+ 300 0114 E5E7     		b	.L21
+ 301              	.LVL29:
+ 302              	.L10:
+  64:user/lunar_calendar/lunar_calendar.c ****             sunToNY -= dayCount;
+ 303              		.loc 1 64 15 view .LVU111
+ 304 0116 1D2B     		cmp	r3, #29
+ 305 0118 09D9     		bls	.L7
+ 306 011a 1E20     		movs	r0, #30
+ 307 011c A9E7     		b	.L12
+ 308              	.L33:
+  68:user/lunar_calendar/lunar_calendar.c ****                 if (flag == 0) {
+ 309              		.loc 1 68 17 is_stmt 1 view .LVU112
+ 310              	.LVL30:
+  69:user/lunar_calendar/lunar_calendar.c ****                     month++;
+ 311              		.loc 1 69 17 view .LVU113
+  70:user/lunar_calendar/lunar_calendar.c ****                 }
+ 312              		.loc 1 70 21 view .LVU114
+  69:user/lunar_calendar/lunar_calendar.c ****                     month++;
+ 313              		.loc 1 69 20 is_stmt 0 view .LVU115
+ 314 011e FF2E     		cmp	r6, #255
+ 315 0120 02D1     		bne	.L24
+  70:user/lunar_calendar/lunar_calendar.c ****                 }
+ 316              		.loc 1 70 26 view .LVU116
+ 317 0122 3946     		mov	r1, r7
+ 318              	.LVL31:
+  68:user/lunar_calendar/lunar_calendar.c ****                 if (flag == 0) {
+ 319              		.loc 1 68 22 view .LVU117
+ 320 0124 0026     		movs	r6, #0
+ 321              	.LVL32:
+  68:user/lunar_calendar/lunar_calendar.c ****                 if (flag == 0) {
+ 322              		.loc 1 68 22 view .LVU118
+ 323 0126 ADE7     		b	.L9
+ 324              	.LVL33:
+ 325              	.L24:
+  69:user/lunar_calendar/lunar_calendar.c ****                     month++;
+ 326              		.loc 1 69 20 view .LVU119
+ 327 0128 FF26     		movs	r6, #255
+ 328              	.LVL34:
+  69:user/lunar_calendar/lunar_calendar.c ****                     month++;
+ 329              		.loc 1 69 20 view .LVU120
+ 330 012a ABE7     		b	.L9
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 11
+
+
+ 331              	.LVL35:
+ 332              	.L23:
+  64:user/lunar_calendar/lunar_calendar.c ****             sunToNY -= dayCount;
+ 333              		.loc 1 64 15 view .LVU121
+ 334 012c 0121     		movs	r1, #1
+ 335              	.LVL36:
+ 336              	.L7:
+  81:user/lunar_calendar/lunar_calendar.c ****     } else { /* 阳历日在春节前 */
+ 337              		.loc 1 81 9 is_stmt 1 view .LVU122
+ 114:user/lunar_calendar/lunar_calendar.c ****     lcData->month = month;
+ 338              		.loc 1 114 18 is_stmt 0 view .LVU123
+ 339 012e 0C4A     		ldr	r2, .L35+8
+  81:user/lunar_calendar/lunar_calendar.c ****     } else { /* 阳历日在春节前 */
+ 340              		.loc 1 81 13 view .LVU124
+ 341 0130 0133     		adds	r3, r3, #1
+ 342              	.LVL37:
+  81:user/lunar_calendar/lunar_calendar.c ****     } else { /* 阳历日在春节前 */
+ 343              		.loc 1 81 13 view .LVU125
+ 344 0132 DBB2     		uxtb	r3, r3
+ 345              	.LVL38:
+ 114:user/lunar_calendar/lunar_calendar.c ****     lcData->month = month;
+ 346              		.loc 1 114 5 is_stmt 1 view .LVU126
+ 114:user/lunar_calendar/lunar_calendar.c ****     lcData->month = month;
+ 347              		.loc 1 114 18 is_stmt 0 view .LVU127
+ 348 0134 82F800C0 		strb	ip, [r2]
+ 115:user/lunar_calendar/lunar_calendar.c ****     lcData->day = day;
+ 349              		.loc 1 115 5 is_stmt 1 view .LVU128
+ 115:user/lunar_calendar/lunar_calendar.c ****     lcData->day = day;
+ 350              		.loc 1 115 19 is_stmt 0 view .LVU129
+ 351 0138 5170     		strb	r1, [r2, #1]
+ 116:user/lunar_calendar/lunar_calendar.c **** 
+ 352              		.loc 1 116 5 is_stmt 1 view .LVU130
+ 116:user/lunar_calendar/lunar_calendar.c **** 
+ 353              		.loc 1 116 17 is_stmt 0 view .LVU131
+ 354 013a 9370     		strb	r3, [r2, #2]
+ 118:user/lunar_calendar/lunar_calendar.c **** }
+ 355              		.loc 1 118 5 is_stmt 1 view .LVU132
+ 356              	.LVL39:
+ 118:user/lunar_calendar/lunar_calendar.c **** }
+ 357              		.loc 1 118 5 is_stmt 0 view .LVU133
+ 358              	.LBE6:
+ 359              	.LBE9:
+ 124:user/lunar_calendar/lunar_calendar.c **** }
+ 360              		.loc 1 124 1 view .LVU134
+ 361 013c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 362              	.LVL40:
+ 363              	.L30:
+ 364              	.LBB10:
+ 365              	.LBB7:
+  97:user/lunar_calendar/lunar_calendar.c ****             springToNY -= dayCount;
+ 366              		.loc 1 97 15 view .LVU135
+ 367 013e 1F23     		movs	r3, #31
+ 368              	.LVL41:
+ 369              	.L16:
+ 112:user/lunar_calendar/lunar_calendar.c ****     }
+ 370              		.loc 1 112 9 is_stmt 1 view .LVU136
+ 112:user/lunar_calendar/lunar_calendar.c ****     }
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 12
+
+
+ 371              		.loc 1 112 13 is_stmt 0 view .LVU137
+ 372 0140 9B1A     		subs	r3, r3, r2
+ 114:user/lunar_calendar/lunar_calendar.c ****     lcData->month = month;
+ 373              		.loc 1 114 18 view .LVU138
+ 374 0142 074A     		ldr	r2, .L35+8
+ 375              	.LVL42:
+ 112:user/lunar_calendar/lunar_calendar.c ****     }
+ 376              		.loc 1 112 13 view .LVU139
+ 377 0144 DBB2     		uxtb	r3, r3
+ 378              	.LVL43:
+ 114:user/lunar_calendar/lunar_calendar.c ****     lcData->month = month;
+ 379              		.loc 1 114 5 is_stmt 1 view .LVU140
+ 114:user/lunar_calendar/lunar_calendar.c ****     lcData->month = month;
+ 380              		.loc 1 114 18 is_stmt 0 view .LVU141
+ 381 0146 82F800C0 		strb	ip, [r2]
+ 115:user/lunar_calendar/lunar_calendar.c ****     lcData->day = day;
+ 382              		.loc 1 115 5 is_stmt 1 view .LVU142
+ 115:user/lunar_calendar/lunar_calendar.c ****     lcData->day = day;
+ 383              		.loc 1 115 19 is_stmt 0 view .LVU143
+ 384 014a 5170     		strb	r1, [r2, #1]
+ 116:user/lunar_calendar/lunar_calendar.c **** 
+ 385              		.loc 1 116 5 is_stmt 1 view .LVU144
+ 116:user/lunar_calendar/lunar_calendar.c **** 
+ 386              		.loc 1 116 17 is_stmt 0 view .LVU145
+ 387 014c 9370     		strb	r3, [r2, #2]
+ 118:user/lunar_calendar/lunar_calendar.c **** }
+ 388              		.loc 1 118 5 is_stmt 1 view .LVU146
+ 389              	.LVL44:
+ 118:user/lunar_calendar/lunar_calendar.c **** }
+ 390              		.loc 1 118 5 is_stmt 0 view .LVU147
+ 391              	.LBE7:
+ 392              	.LBE10:
+ 393              		.loc 1 124 1 view .LVU148
+ 394 014e F0BD     		pop	{r4, r5, r6, r7, pc}
+ 395              	.LVL45:
+ 396              	.L34:
+ 397              	.LBB11:
+ 398              	.LBB8:
+  97:user/lunar_calendar/lunar_calendar.c ****             springToNY -= dayCount;
+ 399              		.loc 1 97 15 view .LVU149
+ 400 0150 1E23     		movs	r3, #30
+ 401 0152 F5E7     		b	.L16
+ 402              	.LVL46:
+ 403              	.L28:
+  97:user/lunar_calendar/lunar_calendar.c ****             springToNY -= dayCount;
+ 404              		.loc 1 97 15 view .LVU150
+ 405 0154 0C21     		movs	r1, #12
+ 406 0156 F3E7     		b	.L16
+ 407              	.L36:
+ 408              		.align	2
+ 409              	.L35:
+ 410 0158 00000000 		.word	.LANCHOR0
+ 411 015c 00000000 		.word	.LANCHOR1
+ 412 0160 00000000 		.word	.LANCHOR2
+ 413              	.LBE8:
+ 414              	.LBE11:
+ 415              		.cfi_endproc
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 13
+
+
+ 416              	.LFE1:
+ 418              		.section	.text.GetLunarCalendar,"ax",%progbits
+ 419              		.align	1
+ 420              		.p2align 2,,3
+ 421              		.global	GetLunarCalendar
+ 422              		.syntax unified
+ 423              		.thumb
+ 424              		.thumb_func
+ 426              	GetLunarCalendar:
+ 427              	.LFB2:
+ 125:user/lunar_calendar/lunar_calendar.c **** 
+ 126:user/lunar_calendar/lunar_calendar.c **** struct LunarCalendarType *GetLunarCalendar(void)
+ 127:user/lunar_calendar/lunar_calendar.c **** {
+ 428              		.loc 1 127 1 is_stmt 1 view -0
+ 429              		.cfi_startproc
+ 430              		@ args = 0, pretend = 0, frame = 0
+ 431              		@ frame_needed = 0, uses_anonymous_args = 0
+ 432              		@ link register save eliminated.
+ 128:user/lunar_calendar/lunar_calendar.c ****     return &g_lunarCalendarData;
+ 433              		.loc 1 128 5 view .LVU152
+ 129:user/lunar_calendar/lunar_calendar.c **** }
+ 434              		.loc 1 129 1 is_stmt 0 view .LVU153
+ 435 0000 0048     		ldr	r0, .L38
+ 436 0002 7047     		bx	lr
+ 437              	.L39:
+ 438              		.align	2
+ 439              	.L38:
+ 440 0004 00000000 		.word	.LANCHOR2
+ 441              		.cfi_endproc
+ 442              	.LFE2:
+ 444              		.global	g_lunarCalendarData
+ 445              		.section	.bss.g_lunarCalendarData,"aw",%nobits
+ 446              		.align	2
+ 447              		.set	.LANCHOR2,. + 0
+ 450              	g_lunarCalendarData:
+ 451 0000 000000   		.space	3
+ 452              		.section	.rodata.g_lunarCalendarTable,"a"
+ 453              		.align	2
+ 454              		.set	.LANCHOR0,. + 0
+ 457              	g_lunarCalendarTable:
+ 458 0000 53AE0400 		.word	306771
+ 459 0004 48570A00 		.word	677704
+ 460 0008 BD265500 		.word	5580477
+ 461 000c 50260D00 		.word	861776
+ 462 0010 44950D00 		.word	890180
+ 463 0014 B9AA4600 		.word	4631225
+ 464 0018 4D6A0500 		.word	354893
+ 465 001c 42AD0900 		.word	634178
+ 466 0020 B6AE2400 		.word	2404022
+ 467 0024 4AAE0400 		.word	306762
+ 468 0028 BE4D6A00 		.word	6966718
+ 469 002c 524D0A00 		.word	675154
+ 470 0030 46250D00 		.word	861510
+ 471 0034 BA525D00 		.word	6116026
+ 472 0038 4E540B00 		.word	742478
+ 473 003c 436A0D00 		.word	879171
+ 474 0040 376D2900 		.word	2714935
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 14
+
+
+ 475 0044 4B5B0900 		.word	613195
+ 476 0048 C19B7400 		.word	7642049
+ 477 004c 54970400 		.word	300884
+ 478 0050 484B0A00 		.word	674632
+ 479 0054 BC255B00 		.word	5973436
+ 480 0058 50A50600 		.word	435536
+ 481 005c 45D40600 		.word	447557
+ 482 0060 B8DA4A00 		.word	4905656
+ 483 0064 4DB60200 		.word	177741
+ 484 0068 42570900 		.word	612162
+ 485 006c B7972400 		.word	2398135
+ 486 0070 4A970400 		.word	300874
+ 487 0074 3E4B6600 		.word	6703934
+ 488 0078 514A0D00 		.word	870993
+ 489 007c 46A50E00 		.word	959814
+ 490 0080 BAD45600 		.word	5690554
+ 491 0084 4EAD0500 		.word	372046
+ 492 0088 44B60200 		.word	177732
+ 493 008c 38373900 		.word	3749688
+ 494 0090 4B2E0900 		.word	601675
+ 495 0094 BF967C00 		.word	8165055
+ 496 0098 53950C00 		.word	824659
+ 497 009c 484A0D00 		.word	870984
+ 498 00a0 3BA56D00 		.word	7185723
+ 499 00a4 4F550B00 		.word	742735
+ 500 00a8 456A0500 		.word	354885
+ 501 00ac B9AD4A00 		.word	4894137
+ 502 00b0 4D5D0200 		.word	154957
+ 503 00b4 422D0900 		.word	601410
+ 504 00b8 B6952C00 		.word	2921910
+ 505 00bc 4A950A00 		.word	693578
+ 506 00c0 BD4A7B00 		.word	8080061
+ 507 00c4 51CA0600 		.word	445009
+ 508 00c8 46550B00 		.word	742726
+ 509 00cc BB5A5500 		.word	5593787
+ 510 00d0 4EDA0400 		.word	318030
+ 511 00d4 435B0A00 		.word	678723
+ 512 00d8 B82B3500 		.word	3484600
+ 513 00dc 4C2B0500 		.word	338764
+ 514 00e0 3F958A00 		.word	9082175
+ 515 00e4 52950E00 		.word	955730
+ 516 00e8 48AA0600 		.word	436808
+ 517 00ec 3CD56A00 		.word	7001404
+ 518 00f0 4FB50A00 		.word	701775
+ 519 00f4 45B60400 		.word	308805
+ 520 00f8 39574A00 		.word	4871993
+ 521 00fc 4D570A00 		.word	677709
+ 522 0100 42260500 		.word	337474
+ 523 0104 35933E00 		.word	4100917
+ 524 0108 49950D00 		.word	890185
+ 525 010c BEAA7500 		.word	7711422
+ 526 0110 516A0500 		.word	354897
+ 527 0114 466D0900 		.word	617798
+ 528 0118 BBAE5400 		.word	5549755
+ 529 011c 4FAD0400 		.word	306511
+ 530 0120 434D0A00 		.word	675139
+ 531 0124 B7264D00 		.word	5056183
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 15
+
+
+ 532 0128 4B250D00 		.word	861515
+ 533 012c BF528D00 		.word	9261759
+ 534 0130 52540B00 		.word	742482
+ 535 0134 476A0B00 		.word	748103
+ 536 0138 3C6D6900 		.word	6909244
+ 537 013c 505B0900 		.word	613200
+ 538 0140 459B0400 		.word	301893
+ 539 0144 B94B4A00 		.word	4869049
+ 540 0148 4D4B0A00 		.word	674637
+ 541 014c C225AB00 		.word	11216322
+ 542 0150 54A50600 		.word	435540
+ 543 0154 49D40600 		.word	447561
+ 544 0158 3DDA6A00 		.word	7002685
+ 545 015c 51B60A00 		.word	702033
+ 546 0160 46370900 		.word	603974
+ 547 0164 BB975400 		.word	5543867
+ 548 0168 4F970400 		.word	300879
+ 549 016c 444B0600 		.word	412484
+ 550 0170 37A53600 		.word	3581239
+ 551 0174 4AA50E00 		.word	959818
+ 552 0178 BFB28600 		.word	8827583
+ 553 017c 53AC0500 		.word	371795
+ 554 0180 47B60A00 		.word	702023
+ 555 0184 BC365900 		.word	5846716
+ 556 0188 502E0900 		.word	601680
+ 557 018c 45960C00 		.word	824901
+ 558 0190 B84A4D00 		.word	5065400
+ 559 0194 4C4A0D00 		.word	870988
+ 560 0198 41A50D00 		.word	894273
+ 561 019c B6AA2500 		.word	2468534
+ 562 01a0 496A0500 		.word	354889
+ 563 01a4 BDAD7A00 		.word	8039869
+ 564 01a8 525D0200 		.word	154962
+ 565 01ac 472D0900 		.word	601415
+ 566 01b0 BA955C00 		.word	6067642
+ 567 01b4 4E950A00 		.word	693582
+ 568 01b8 434A0B00 		.word	739907
+ 569 01bc 37554B00 		.word	4937015
+ 570 01c0 4AD50A00 		.word	709962
+ 571 01c4 BF5A9500 		.word	9788095
+ 572 01c8 53BA0400 		.word	309843
+ 573 01cc 485B0A00 		.word	678728
+ 574 01d0 BC2B6500 		.word	6630332
+ 575 01d4 502B0500 		.word	338768
+ 576 01d8 45930A00 		.word	693061
+ 577 01dc B94A4700 		.word	4672185
+ 578 01e0 4CAA0600 		.word	436812
+ 579 01e4 41D50A00 		.word	709953
+ 580 01e8 B6DA2400 		.word	2415286
+ 581 01ec 4AB60400 		.word	308810
+ 582 01f0 3D576900 		.word	6903613
+ 583 01f4 514E0A00 		.word	675409
+ 584 01f8 46260D00 		.word	861766
+ 585 01fc 3A935E00 		.word	6198074
+ 586 0200 4D530D00 		.word	873293
+ 587 0204 43AA0500 		.word	371267
+ 588 0208 37B53600 		.word	3585335
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 16
+
+
+ 589 020c 4B6D0900 		.word	617803
+ 590 0210 BFAEB400 		.word	11841215
+ 591 0214 53AD0400 		.word	306515
+ 592 0218 484D0A00 		.word	675144
+ 593 021c BC256D00 		.word	7153084
+ 594 0220 4F250D00 		.word	861519
+ 595 0224 44520D00 		.word	873028
+ 596 0228 38AA5D00 		.word	6138424
+ 597 022c 4C5A0B00 		.word	744012
+ 598 0230 416D0500 		.word	355649
+ 599 0234 B6AD2400 		.word	2403766
+ 600 0238 4A9B0400 		.word	301898
+ 601 023c BE4B7A00 		.word	8014782
+ 602 0240 514B0A00 		.word	674641
+ 603 0244 46A50A00 		.word	697670
+ 604 0248 BA525B00 		.word	5984954
+ 605 024c 4ED20600 		.word	447054
+ 606 0250 42DA0A00 		.word	711234
+ 607 0254 375B3500 		.word	3496759
+ 608 0258 4B370900 		.word	603979
+ 609 025c C1978400 		.word	8689601
+ 610 0260 53970400 		.word	300883
+ 611 0264 484B0600 		.word	412488
+ 612 0268 3CA56600 		.word	6726972
+ 613 026c 4FA50E00 		.word	959823
+ 614 0270 44B20600 		.word	438852
+ 615 0274 38B64A00 		.word	4896312
+ 616 0278 4CAE0A00 		.word	699980
+ 617 027c 422E0900 		.word	601666
+ 618 0280 35973C00 		.word	3970869
+ 619 0284 49960C00 		.word	824905
+ 620 0288 BD4A7D00 		.word	8211133
+ 621 028c 514A0D00 		.word	870993
+ 622 0290 45A50D00 		.word	894277
+ 623 0294 BAAA5500 		.word	5614266
+ 624 0298 4E6A0500 		.word	354894
+ 625 029c 436D0A00 		.word	683331
+ 626 02a0 B72E4500 		.word	4533943
+ 627 02a4 4B2D0500 		.word	339275
+ 628 02a8 BF958A00 		.word	9082303
+ 629 02ac 53950A00 		.word	693587
+ 630 02b0 474A0B00 		.word	739911
+ 631 02b4 3B556B00 		.word	7034171
+ 632 02b8 4FD50A00 		.word	709967
+ 633 02bc 455A0500 		.word	350789
+ 634 02c0 385D4A00 		.word	4873528
+ 635 02c4 4C5B0A00 		.word	678732
+ 636 02c8 422B0500 		.word	338754
+ 637 02cc B6933A00 		.word	3838902
+ 638 02d0 49930600 		.word	430921
+ 639 02d4 BD297700 		.word	7809469
+ 640 02d8 51AA0600 		.word	436817
+ 641 02dc 46D50A00 		.word	709958
+ 642 02e0 BADA5400 		.word	5561018
+ 643 02e4 4EB60400 		.word	308814
+ 644 02e8 43570A00 		.word	677699
+ 645 02ec 38274500 		.word	4532024
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 17
+
+
+ 646 02f0 4A260D00 		.word	861770
+ 647 02f4 3E938E00 		.word	9343806
+ 648 02f8 52520D00 		.word	873042
+ 649 02fc 47AA0D00 		.word	895559
+ 650 0300 3BB56600 		.word	6731067
+ 651 0304 4F6D0500 		.word	355663
+ 652 0308 45AE0400 		.word	306757
+ 653 030c B94E4A00 		.word	4869817
+ 654 0310 4C4D0A00 		.word	675148
+ 655 0314 41150D00 		.word	857409
+ 656 0318 B5922D00 		.word	2986677
+ 657              		.section	.rodata.g_monthAdd,"a"
+ 658              		.align	2
+ 659              		.set	.LANCHOR1,. + 0
+ 662              	g_monthAdd:
+ 663 0000 0000     		.short	0
+ 664 0002 1F00     		.short	31
+ 665 0004 3B00     		.short	59
+ 666 0006 5A00     		.short	90
+ 667 0008 7800     		.short	120
+ 668 000a 9700     		.short	151
+ 669 000c B500     		.short	181
+ 670 000e D400     		.short	212
+ 671 0010 F300     		.short	243
+ 672 0012 1101     		.short	273
+ 673 0014 3001     		.short	304
+ 674 0016 4E01     		.short	334
+ 675              		.text
+ 676              	.Letext0:
+ 677              		.file 2 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 678              		.file 3 "d:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 679              		.file 4 "user/time/time.h"
+ 680              		.file 5 "user/lunar_calendar/lunar_calendar.h"
+ARM GAS  C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s 			page 18
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 lunar_calendar.c
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:18     .text.CalculationLunarCalendar:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:25     .text.CalculationLunarCalendar:00000000 CalculationLunarCalendar
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:410    .text.CalculationLunarCalendar:00000158 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:419    .text.GetLunarCalendar:00000000 $t
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:426    .text.GetLunarCalendar:00000000 GetLunarCalendar
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:440    .text.GetLunarCalendar:00000004 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:450    .bss.g_lunarCalendarData:00000000 g_lunarCalendarData
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:446    .bss.g_lunarCalendarData:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:453    .rodata.g_lunarCalendarTable:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:457    .rodata.g_lunarCalendarTable:00000000 g_lunarCalendarTable
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:658    .rodata.g_monthAdd:00000000 $d
+C:\Users\WENHUA~1\AppData\Local\Temp\cc74pPu3.s:662    .rodata.g_monthAdd:00000000 g_monthAdd
+
+NO UNDEFINED SYMBOLS

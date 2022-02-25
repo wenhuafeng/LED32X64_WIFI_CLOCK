@@ -4,14 +4,14 @@
 #include <stdbool.h>
 #include "stm32f1xx_hal.h"
 #include "main.h"
+#include "trace_printf.h"
 
 #define HTU21D_I2C_DELAY 2
 
-#define Write 0
-#define Read 1
+#define WRITE 0
+#define READ 1
 
-#define SlaveAddr 0x80
-#define resolution 0
+#define DEVICE_ADDR 0x80
 
 #define TEM_HOLD 0xe3
 #define TEM_NO 0xf3
@@ -21,7 +21,7 @@
 
 #define WRSR 0xe6
 #define RDSR 0xe7
-#define HT_RST 0xfe
+#define HTU21D_RESET 0xfe
 
 enum SdaIoType {
     HTU21D_SDA_OUTPUT,
@@ -221,22 +221,22 @@ static uint8_t HTU21D_GetData(void)
     float htu;
     uint16_t temp_data;
     float temp;
-    uint8_t err;
+    uint8_t status;
 
     StartBus();
-    err = WriteByte(SlaveAddr | Write);
-    if (err == 0) {
+    status = WriteByte(DEVICE_ADDR | WRITE);
+    if (status == 0) {
         goto i2c_fail;
     }
 
-    err = WriteByte(HUM_HOLD);
-    if (err == 0) {
+    status = WriteByte(HUM_HOLD);
+    if (status == 0) {
         goto i2c_fail;
     }
 
     StartBus();
-    err = WriteByte(SlaveAddr | Read);
-    if (err == 0) {
+    status = WriteByte(DEVICE_ADDR | READ);
+    if (status == 0) {
         goto i2c_fail;
     }
 
@@ -253,19 +253,19 @@ static uint8_t HTU21D_GetData(void)
     HAL_Delay(10);
 
     StartBus();
-    err = WriteByte(SlaveAddr | Write);
-    if (err == 0) {
+    status = WriteByte(DEVICE_ADDR | WRITE);
+    if (status == 0) {
         goto i2c_fail;
     }
 
-    err = WriteByte(TEM_HOLD);
-    if (err == 0) {
+    status = WriteByte(TEM_HOLD);
+    if (status == 0) {
         goto i2c_fail;
     }
 
     StartBus();
-    err = WriteByte(SlaveAddr | Read);
-    if (err == 0) {
+    status = WriteByte(DEVICE_ADDR | READ);
+    if (status == 0) {
         goto i2c_fail;
     }
 
@@ -279,16 +279,15 @@ static uint8_t HTU21D_GetData(void)
     temp = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
     g_thData.temperature = (int16_t)temp;
 
-    printf("\r\nHumi: %d \r\n", g_thData.humidity);
-    printf("Temp: %d \r\n", g_thData.temperature);
+    TRACE_PRINTF("\r\nHumi: %d \r\n", g_thData.humidity);
+    TRACE_PRINTF("Temp: %d \r\n", g_thData.temperature);
     g_i2cFial = 0;
-
     return true;
 
 i2c_fail:
     g_thData.temperature = 0x00;
     g_thData.humidity = 0x00;
-    printf("\r\nTemp test fail. \r\n");
+    TRACE_PRINTF("\r\ntemperature read fail. \r\n");
     g_i2cFial = 1;
     return false;
 }
@@ -296,22 +295,22 @@ i2c_fail:
 static uint8_t HTU21D_FuncInit(void)
 {
     uint8_t usr_reg;
-    uint8_t err;
+    uint8_t status;
 
     StartBus();
-    err = WriteByte(SlaveAddr | Write);
-    if (err == 0) {
+    status = WriteByte(DEVICE_ADDR | WRITE);
+    if (status == 0) {
         goto i2c_fail;
     }
 
-    err = WriteByte(RDSR);
-    if (err == 0) {
+    status = WriteByte(RDSR);
+    if (status == 0) {
         goto i2c_fail;
     }
 
     StartBus();
-    err = WriteByte(SlaveAddr | Read);
-    if (err == 0) {
+    status = WriteByte(DEVICE_ADDR | READ);
+    if (status == 0) {
         goto i2c_fail;
     }
 
@@ -319,18 +318,18 @@ static uint8_t HTU21D_FuncInit(void)
     NoAckBus();
 
     StartBus();
-    err = WriteByte(SlaveAddr | Write);
-    if (err == 0) {
+    status = WriteByte(DEVICE_ADDR | WRITE);
+    if (status == 0) {
         goto i2c_fail;
     }
 
-    err = WriteByte(WRSR);
-    if (err == 0) {
+    status = WriteByte(WRSR);
+    if (status == 0) {
         goto i2c_fail;
     }
 
-    err = WriteByte((usr_reg & 0x38) | 0x02 | resolution);
-    if (err == 0) {
+    status = WriteByte((usr_reg & 0x38) | 0x02);
+    if (status == 0) {
         goto i2c_fail;
     }
 
@@ -349,21 +348,23 @@ static uint8_t HTU21D_Reset(void)
     uint8_t status;
 
     StartBus();
-    status = WriteByte(SlaveAddr | Write);
-    if (status == 0)
+    status = WriteByte(DEVICE_ADDR | WRITE);
+    if (status == 0) {
         goto error;
-    status = WriteByte(HT_RST);
-    if (status == 0)
+    }
+    status = WriteByte(HTU21D_RESET);
+    if (status == 0) {
         goto error;
+    }
     StopBus();
     HAL_Delay(15);
 
     g_i2cFial = 0;
-    printf("\r\nHTU21D Reset OK\r\n");
+    TRACE_PRINTF("\r\nHTU21D Reset OK\r\n");
     return true;
 
 error:
-    printf("\r\nHTU21D Reset NG\r\n");
+    TRACE_PRINTF("\r\nHTU21D Reset NG\r\n");
     g_i2cFial = 1;
     return false;
 }
@@ -398,7 +399,7 @@ void HTU21D_Init(void)
 {
     HTU21D_I2cInit();
     if (HTU21D_FuncInit() == false) {
-        printf("\r\nHTU21D Init NG\r\n");
+        TRACE_PRINTF("\r\nHTU21D Init NG\r\n");
         return;
     }
     HAL_Delay(10);

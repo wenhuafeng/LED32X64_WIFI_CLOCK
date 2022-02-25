@@ -75,8 +75,7 @@ enum TraceStatus COM_ReceiveInit(void (*RxCb)(uint8_t *rx, uint16_t len, uint8_t
     RxCpltCallback = RxCb;
 
     /* Make sure that no UART transfer is on-going */
-    while (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_TC) == RESET)
-        ;
+    while (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_TC) == RESET);
 
     HAL_UARTEx_ReceiveToIdle_DMA(&huart2, g_rxType.rxBuffer, sizeof(g_rxType.rxBuffer));
     __HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
