@@ -42,6 +42,7 @@
 #include "hub75d.h"
 #include "wifi_uart_if.h"
 #include "trace_uart_if.h"
+#include "common.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -233,8 +234,8 @@ void RTC_IRQHandler(void)
   /* USER CODE END RTC_IRQn 0 */
   HAL_RTCEx_RTCIRQHandler(&hrtc);
   /* USER CODE BEGIN RTC_IRQn 1 */
-  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_12);
-  Set1sFlag(true);
+  WORK_LED_BLINK();
+  SetOneSecondFlag(true);
   /* USER CODE END RTC_IRQn 1 */
 }
 
@@ -332,7 +333,7 @@ void USART1_IRQHandler(void)
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
-  WIFI_ReceiveIDLE(&huart1);
+  WIFI_UART_ReceiveIDLE(&huart1);
   /* USER CODE END USART1_IRQn 1 */
 }
 

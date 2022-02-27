@@ -22,42 +22,37 @@
 
 bool g_pirInt = false;
 
+static void ClearGpioExtiIT(uint16_t GPIO_Pin)
+{
+    if (__HAL_GPIO_EXTI_GET_IT(GPIO_Pin) != 0x00u) {
+        __HAL_GPIO_EXTI_CLEAR_IT(GPIO_Pin);
+    }
+}
+
 static void COMMON_EnterStandbyMode(void)
 {
     TRACE_PRINTF("enter standby mode\n\r");
 
-    /* wifi off */
     WIFI_PowerOnOff(POWER_OFF);
-    /* display off */
     HUB75D_DispOnOff(DISP_TIME_OFF);
-    /* LED off */
-    HAL_GPIO_WritePin(WORK_LED_GPIO_Port, WORK_LED_Pin, GPIO_PIN_SET);
+    WORK_LED_OFF();
+    ClearGpioExtiIT(GPIO_PIN_0);
 
+    HAL_Delay(200);
     HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
 
     HAL_Init();
-    /* Configure the system clock */
     SystemClock_Config();
-    /* Initialize all configured peripherals */
     MX_GPIO_Init();
+    //MX_RTC_Init();
+    MX_TIM4_Init();
     MX_DMA_Init();
     MX_USART1_UART_Init();
-    /* Initialize interrupts */
-    //MX_NVIC_Init();
-    HAL_RTCEx_SetSecond_IT(&hrtc);
-    GetClock();
-    HAL_Delay(200);
-    HTU21D_Init();
-    /* wifi init */
-    WIFI_PowerOnOff(POWER_ON);
-    HAL_Delay(100);
-    WIFI_Init();
-    WIFI_ReceiveDmaInit();
-    //DISP power on
-    HUB75D_DispOnOff(DISP_TIME_5MIN);
-    HAL_Delay(100);
-    MX_TIM4_Init();
-    HAL_TIM_Base_Start_IT(&htim4);
+    MX_USART2_UART_Init();
+
+    HAL_RTC_MspInit(&hrtc);
+    HAL_TIM_Base_MspInit(&htim4);
+    COMMON_Init();
 
     TRACE_PRINTF("exit standby mode\n\r");
 }
@@ -69,7 +64,7 @@ static void IsPirIntFlagSet(void)
     }
     g_pirInt = false;
 
-    HUB75D_SetDispOffCtr(DISP_TIME_5MIN);
+    HUB75D_SetDispOffCtr(DISP_TIME);
     TRACE_PRINTF("pir interrupt, renew set display 5 minute\r\n");
 }
 
@@ -89,7 +84,7 @@ void COMMON_Init(void)
     HAL_Delay(100);
     GetClock();
     CalculationLunarCalendar(GetTimeData());
-    HUB75D_DispOnOff(DISP_TIME_5MIN);
+    HUB75D_DispOnOff(DISP_TIME);
     HAL_TIM_Base_Start_IT(&htim4);
     WIFI_Init();
 
@@ -101,7 +96,7 @@ void COMMON_Process(void)
     IsPirIntFlagSet();
     WIFI_HandlerUartData();
     if (Get1sFlag() == true) {
-        Set1sFlag(false);
+        SetOneSecondFlag(false);
         WIFI_CtrDec();
         HTU21D_Sampling();
         if (ClockRun() == true) {

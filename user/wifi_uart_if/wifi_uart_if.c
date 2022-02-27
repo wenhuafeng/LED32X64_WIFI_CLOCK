@@ -52,7 +52,7 @@ void WIFI_SendDataDMA(uint8_t *pdata, uint16_t Length)
     HAL_UART_Transmit_DMA(&huart1, pdata, Length);
 }
 
-void WIFI_ReceiveIDLE(UART_HandleTypeDef *huart)
+void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
 {
     uint32_t temp;
 

@@ -1,6 +1,7 @@
 #include "time.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include "common.h"
 #include "rtc.h"
 #include "hub75d.h"
 #include "lunar_calendar.h"
@@ -32,7 +33,7 @@ bool Get1sFlag(void)
     return g_1sFlag;
 }
 
-void Set1sFlag(bool flag)
+void SetOneSecondFlag(bool flag)
 {
     g_1sFlag = flag;
 }
