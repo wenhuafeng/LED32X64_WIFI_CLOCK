@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "gpio_bit_ctrl.h"
-#include "htu21d.h"
+#include "htu21d_sw.h"
 #include "lunar_calendar.h"
 #include "main.h"
 #include "time.h"

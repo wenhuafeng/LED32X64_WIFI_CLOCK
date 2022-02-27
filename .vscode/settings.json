@@ -6,6 +6,7 @@
         "htu21d.h": "c",
         "esp8266_at.h": "c",
         "string.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "htu21d_sw.h": "c"
     }
 }
