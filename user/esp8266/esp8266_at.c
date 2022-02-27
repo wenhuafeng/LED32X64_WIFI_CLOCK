@@ -161,7 +161,7 @@ static uint8_t ProcessClock(char *cRxBuf)
         SetTimeData(&time);
         SetClock(&time);
         CalculationLunarCalendar(&time);
-        TRACE_PRINTF("\r\nupdate time: %d-%d-%d %02d:%02d:%02d \r\n", time.year, time.month, time.day, time.hour,
+        TRACE_PRINTF("update time: %d-%d-%d %02d:%02d:%02d \r\n", time.year, time.month, time.day, time.hour,
                      time.min, time.sec);
     } else {
         g_getTime.getTimeCtr = GET_TIME_10S;

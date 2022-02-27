@@ -6,7 +6,7 @@
 
 enum DispTime {
     DISP_TIME_OFF = 0,
-    DISP_TIME = (1 * 60)
+    DISP_TIME = (5 * 60)
 };
 
 enum DispTorH {

@@ -506,7 +506,7 @@ bool HUB75D_CtrDec(void)
         g_displayOffCtr--;
         if (g_displayOffCtr == 0x00) {
             standby = true;
-            TRACE_PRINTF("display off, enter standby\r\n");
+            TRACE_PRINTF("display off\r\n");
         }
     }
 

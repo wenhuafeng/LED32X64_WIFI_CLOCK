@@ -279,7 +279,7 @@ static uint8_t HTU21D_GetData(void)
     temp = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
     g_thData.temperature = (int16_t)temp;
 
-    TRACE_PRINTF("\r\nHumi: %d \r\n", g_thData.humidity);
+    TRACE_PRINTF("Humi: %d \r\n", g_thData.humidity);
     TRACE_PRINTF("Temp: %d \r\n", g_thData.temperature);
     g_i2cFial = 0;
     return true;
@@ -287,7 +287,7 @@ static uint8_t HTU21D_GetData(void)
 i2c_fail:
     g_thData.temperature = 0x00;
     g_thData.humidity = 0x00;
-    TRACE_PRINTF("\r\ntemperature read fail. \r\n");
+    TRACE_PRINTF("temperature read fail. \r\n");
     g_i2cFial = 1;
     return false;
 }
@@ -360,11 +360,11 @@ static uint8_t HTU21D_Reset(void)
     HAL_Delay(15);
 
     g_i2cFial = 0;
-    TRACE_PRINTF("\r\nHTU21D Reset OK\r\n");
+    TRACE_PRINTF("HTU21D Reset OK\r\n");
     return true;
 
 error:
-    TRACE_PRINTF("\r\nHTU21D Reset NG\r\n");
+    TRACE_PRINTF("HTU21D Reset NG\r\n");
     g_i2cFial = 1;
     return false;
 }
@@ -399,7 +399,7 @@ void HTU21D_Init(void)
 {
     HTU21D_I2cInit();
     if (HTU21D_FuncInit() == false) {
-        TRACE_PRINTF("\r\nHTU21D Init NG\r\n");
+        TRACE_PRINTF("HTU21D Init NG\r\n");
         return;
     }
     HAL_Delay(10);

@@ -31,14 +31,14 @@ static void ClearGpioExtiIT(uint16_t GPIO_Pin)
 
 static void COMMON_EnterStandbyMode(void)
 {
-    TRACE_PRINTF("enter standby mode\n\r");
+    TRACE_PRINTF("enter stop mode\n\r");
 
     WIFI_PowerOnOff(POWER_OFF);
     HUB75D_DispOnOff(DISP_TIME_OFF);
     WORK_LED_OFF();
-    ClearGpioExtiIT(GPIO_PIN_0);
 
-    HAL_Delay(200);
+    HAL_Delay(100);
+    ClearGpioExtiIT(PIR_INT_Pin);
     HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
 
     HAL_Init();
@@ -54,7 +54,7 @@ static void COMMON_EnterStandbyMode(void)
     HAL_TIM_Base_MspInit(&htim4);
     COMMON_Init();
 
-    TRACE_PRINTF("exit standby mode\n\r");
+    TRACE_PRINTF("exit stop mode\n\r");
 }
 
 static void IsPirIntFlagSet(void)
@@ -75,20 +75,18 @@ void COMMON_Init(void)
     } else {
         TRACE_PRINTF("trace init ok\r\n");
     }
+    TRACE_PRINTF("%s, %s, %s\n", SOFTWARE_VERSION, __TIME__, __DATE__);
 
     WIFI_ReceiveDmaInit();
     WIFI_PowerOnOff(POWER_ON);
     HAL_RTCEx_SetSecond_IT(&hrtc);
-    HAL_Delay(200);
+    HAL_Delay(100);
     HTU21D_Init();
     HAL_Delay(100);
     GetClock();
-    CalculationLunarCalendar(GetTimeData());
+    WIFI_Init();
     HUB75D_DispOnOff(DISP_TIME);
     HAL_TIM_Base_Start_IT(&htim4);
-    WIFI_Init();
-
-    TRACE_PRINTF("%s, %s, %s\n", SOFTWARE_VERSION, __TIME__, __DATE__);
 }
 
 void COMMON_Process(void)

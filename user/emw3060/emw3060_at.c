@@ -92,7 +92,7 @@ static bool ProcessClock(char *cRxBuf)
         g_getTime.powerOffCtr = 0x00;
         EMW3060_AT_POWER_PIN_LOW();
         SetClock(&time);
-        TRACE_PRINTF("\r\nupdate time: %d-%d-%d %02d:%02d:%02d \r\n", time.year, time.month, time.day, time.hour,
+        TRACE_PRINTF("update time: %d-%d-%d %02d:%02d:%02d \r\n", time.year, time.month, time.day, time.hour,
                      time.min, time.sec);
     } else {
         g_getTime.getTimeCtr = GET_TIME_10S;
