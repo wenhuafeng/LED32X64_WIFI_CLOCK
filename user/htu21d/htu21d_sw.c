@@ -1,7 +1,8 @@
-#include "htu21d_sw.h"
+#include "main.h"
+#if defined(HTU21D_I2C_SOFTWARE) && HTU21D_I2C_SOFTWARE
+#include "htu21d.h"
 #include <stdint.h>
 #include <stdbool.h>
-#include "main.h"
 #include "htu21d_iic_sw.h"
 #include "trace_printf.h"
 
@@ -191,6 +192,19 @@ uint16_t HTU21D_GetHumidity(void)
     return g_thData.humidity;
 }
 
+void HTU21D_Init(void)
+{
+    I2C_Init();
+    if (HTU21D_FuncInit() == false) {
+        TRACE_PRINTF("HTU21D Init NG\r\n");
+        return;
+    }
+    HAL_Delay(10);
+    HTU21D_Reset();
+    HAL_Delay(100);
+    HTU21D_GetData();
+}
+
 void HTU21D_Sampling(void)
 {
     static uint8_t count;
@@ -207,15 +221,4 @@ void HTU21D_Sampling(void)
     }
 }
 
-void HTU21D_Init(void)
-{
-    I2C_Init();
-    if (HTU21D_FuncInit() == false) {
-        TRACE_PRINTF("HTU21D Init NG\r\n");
-        return;
-    }
-    HAL_Delay(10);
-    HTU21D_Reset();
-    HAL_Delay(100);
-    HTU21D_GetData();
-}
+#endif

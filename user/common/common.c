@@ -7,7 +7,7 @@
 #include "tim.h"
 #include "rtc.h"
 #include "hub75d.h"
-#include "htu21d_sw.h"
+#include "htu21d.h"
 #include "lunar_calendar.h"
 #if (WIFI_MODULE == WIFI_ESP8266)
 #include "esp8266_at.h"

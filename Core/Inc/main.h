@@ -57,9 +57,11 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-#define WIFI_ESP8266    1
-#define WIFI_EMW3060    2
-#define WIFI_MODULE     WIFI_ESP8266
+#define WIFI_ESP8266  1
+#define WIFI_EMW3060  2
+#define WIFI_MODULE   WIFI_ESP8266
+#define HTU21D_I2C_SOFTWARE 0
+#define HTU21D_I2C_HARDWARE 1
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -115,10 +117,6 @@ void Error_Handler(void);
 #define HUB_OE_GPIO_Port GPIOB
 #define WIFI_POWER_Pin GPIO_PIN_5
 #define WIFI_POWER_GPIO_Port GPIOB
-#define HTU21D_SCL_Pin GPIO_PIN_6
-#define HTU21D_SCL_GPIO_Port GPIOB
-#define HTU21D_SDA_Pin GPIO_PIN_7
-#define HTU21D_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 void SystemClock_Config(void);
 /* USER CODE END Private defines */

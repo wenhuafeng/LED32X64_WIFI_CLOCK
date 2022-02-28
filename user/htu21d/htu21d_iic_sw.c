@@ -1,8 +1,14 @@
+#include "main.h"
+#if defined(HTU21D_I2C_SOFTWARE) && HTU21D_I2C_SOFTWARE
 #include "htu21d_iic_sw.h"
 #include <stdint.h>
-#include "main.h"
 
 #define HTU21D_I2C_DELAY 2
+
+#define HTU21D_SCL_Pin GPIO_PIN_6
+#define HTU21D_SCL_GPIO_Port GPIOB
+#define HTU21D_SDA_Pin GPIO_PIN_7
+#define HTU21D_SDA_GPIO_Port GPIOB
 
 enum SdaIoType {
     HTU21D_SDA_OUTPUT,
@@ -188,3 +194,5 @@ uint8_t I2C_ReadByte(void)
 
     return value;
 }
+
+#endif
