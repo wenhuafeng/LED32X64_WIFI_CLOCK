@@ -9,22 +9,21 @@
 #define DEVICE_WRITE_ADDR 0x80
 #define DEVICE_READ_ADDR 0x81
 
-#define TEM_HOLD 0xe3
-#define TEM_NO 0xf3
+#define TEMP_HOLD 0xe3
+#define TEMP_NO_HOLD 0xf3
 
-#define HUM_HOLD 0xe5
-#define HUM_NO 0xf5
+#define HUMI_HOLD 0xe5
+#define HUMI_NO_HOLD 0xf5
 
-#define WRSR 0xe6
-#define RDSR 0xe7
-#define HTU21D_RESET 0xfe
+#define WRITE_USER_REGISTER 0xe6
+#define READ_USER_REGISTER 0xe7
+#define SOFT_RESET 0xfe
 
 struct Htu21dDataType {
     int16_t temperature;
     uint16_t humidity;
 };
 struct Htu21dDataType g_thData;
-static uint8_t g_i2cFial;
 
 static bool HTU21D_GetData(void)
 {
@@ -36,7 +35,7 @@ static bool HTU21D_GetData(void)
     uint8_t read[2];
     HAL_StatusTypeDef status;
 
-    write[0] = HUM_HOLD;
+    write[0] = HUMI_HOLD;
     status = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
     if (status != HAL_OK) {
         goto error;
@@ -49,11 +48,11 @@ static bool HTU21D_GetData(void)
     humiData = read[0];
     humiData <<= 8;
     humiData |= read[1];
-    humi = ((humiData & 0xfffc) / 65536.0 * 125.0 - 6.0);
-    g_thData.humidity = (uint16_t)humi * 10;
+    humi = ((humiData & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
+    g_thData.humidity = (uint16_t)humi;
     HAL_Delay(10);
 
-    write[0] = TEM_HOLD;
+    write[0] = TEMP_HOLD;
     status = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
     if (status != HAL_OK) {
         goto error;
@@ -84,7 +83,7 @@ static bool HTU21D_FuncInit(void)
     uint8_t write[2];
     HAL_StatusTypeDef status;
 
-    write[0] = RDSR;
+    write[0] = READ_USER_REGISTER;
     status = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
     if (status != HAL_OK) {
         goto error;
@@ -95,7 +94,7 @@ static bool HTU21D_FuncInit(void)
     }
     HAL_Delay(1);
 
-    write[0] = WRSR;
+    write[0] = WRITE_USER_REGISTER;
     write[1] = (read[0] & 0x38) | 0x02;
     status = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 2, 100);
     if (status != HAL_OK) {
@@ -104,26 +103,24 @@ static bool HTU21D_FuncInit(void)
     return true;
 
 error:
-    TRACE_PRINTF("HTU21D function init OK\r\n");
+    TRACE_PRINTF("error, HTU21D function init\r\n");
     return false;
 }
 
-static bool HTU21D_Reset(void)
+static bool HTU21D_SoftReset(void)
 {
     HAL_StatusTypeDef status;
-    uint8_t data = HTU21D_RESET;
+    uint8_t data = SOFT_RESET;
 
     status = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, &data, 1, 100);
     if (status != HAL_OK) {
         goto error;
     }
 
-    g_i2cFial = 0;
     TRACE_PRINTF("HTU21D Reset OK\r\n");
     return true;
 
 error:
-    g_i2cFial = 1;
     TRACE_PRINTF("HTU21D Reset NG\r\n");
     return false;
 }
@@ -147,20 +144,16 @@ void HTU21D_Init(void)
         return;
     }
     HAL_Delay(10);
-    HTU21D_Reset();
+    HTU21D_SoftReset();
     HAL_Delay(100);
     HTU21D_GetData();
+    TRACE_PRINTF("HTU21D Init OK\r\n");
 }
 
 void HTU21D_Sampling(void)
 {
-    static uint8_t count;
+    static uint8_t count = 0x00;
 
-    if (g_i2cFial) {
-        g_i2cFial = 0;
-        count = 0x00;
-        HTU21D_Init();
-    }
     count++;
     if (count > 9) {
         count = 0;
