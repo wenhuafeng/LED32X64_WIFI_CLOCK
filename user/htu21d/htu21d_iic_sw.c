@@ -2,6 +2,7 @@
 #if defined(HTU21D_I2C_SOFTWARE) && HTU21D_I2C_SOFTWARE
 #include "htu21d_iic_sw.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 #define HTU21D_I2C_DELAY 2
 
@@ -127,11 +128,11 @@ void I2C_Init(void)
     HAL_GPIO_WritePin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin, GPIO_PIN_SET);
 }
 
-uint8_t I2C_WriteByte(uint8_t send)
+bool I2C_WriteByte(uint8_t send)
 {
     uint8_t temp;
-    uint8_t ack = 0;
     uint8_t i;
+    bool ret = false;
 
     for (i = 0; i < 8; i++) {
         I2C_SCL_LOW();
@@ -154,25 +155,24 @@ uint8_t I2C_WriteByte(uint8_t send)
     I2C_SCL_HIGH();
     I2C_DelayUs(HTU21D_I2C_DELAY);
 
+    // read ack
     I2C_SDA_IN();
-    temp = 200;
+    temp = 10;
     while (--temp) {
         I2C_DelayUs(HTU21D_I2C_DELAY);
         if (HAL_GPIO_ReadPin(HTU21D_SDA_GPIO_Port, HTU21D_SDA_Pin) == GPIO_PIN_RESET) {
-            ack = 1;
+            ret = true;
             break;
         }
     }
     I2C_SDA_OUT();
-
-    if (temp == 0) {
-        ack = 0;
-    }
-
     I2C_SCL_LOW();
     I2C_DelayUs(HTU21D_I2C_DELAY);
+    if (temp == 0) {
+        ret = false;
+    }
 
-    return ack;
+    return ret;
 }
 
 uint8_t I2C_ReadByte(void)

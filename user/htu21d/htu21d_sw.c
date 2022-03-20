@@ -17,9 +17,20 @@
 #define HUMI_HOLD 0xe5
 #define HUMI_NO_HOLD 0xf5
 
-#define WRITE_USER_REGISTER 0xe6
-#define READ_USER_REGISTER 0xe7
 #define SOFT_RESET 0xfe
+
+// data byte define
+#define DATA_HIGH 0
+#define DATA_LOW  1
+#define DATA_CRC8 2
+
+// user register
+#define WRITE_USER_REGISTER 0xe6
+#define READ_USER_REGISTER  0xe7
+#define DISABLE_OTP_RELOAD  0x02
+
+// crc8
+#define POLYNOMIAL 0x31 // P(x) = x^8 + x^5 + x^4 + 1 = 00110001
 
 struct Htu21dDataType {
     int16_t temperature;
@@ -27,38 +38,68 @@ struct Htu21dDataType {
 };
 struct Htu21dDataType g_thData;
 
+static uint8_t CalcCrc(uint8_t *crcData, uint8_t len)
+{
+    uint8_t i, bit;
+    uint8_t crc = 0x00;
+
+    // calculates 8-Bit checksum with given polynomial
+    for (i = 0; i < len; i++) {
+        crc ^= (crcData[i]);
+        for (bit = 8; bit > 0; --bit) {
+            if (crc & 0x80) {
+                crc = (crc << 1) ^ POLYNOMIAL;
+            } else {
+                crc = (crc << 1);
+            }
+        }
+    }
+
+    return crc;
+}
+
 static bool HTU21D_GetData(void)
 {
     uint16_t htu_data;
     float htu;
     uint16_t temp_data;
     float temp;
-    uint8_t status;
+    uint8_t read[3];
+    bool status;
 
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | WRITE);
-    if (status == 0) {
+    if (status == false) {
+        goto i2c_fail;
+    }
+    status = I2C_WriteByte(HUMI_NO_HOLD);
+    if (status == false) {
         goto i2c_fail;
     }
 
-    status = I2C_WriteByte(HUMI_HOLD);
-    if (status == 0) {
-        goto i2c_fail;
-    }
+    HAL_Delay(60); /* must 58ms the above */
 
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | READ);
-    if (status == 0) {
+    if (status == false) {
         goto i2c_fail;
     }
-
-    HAL_Delay(20);
-    htu_data = I2C_ReadByte();
-    htu_data = htu_data << 8;
+    read[DATA_HIGH] = I2C_ReadByte();
     I2C_Ack();
-    htu_data += I2C_ReadByte();
+    read[DATA_LOW] = I2C_ReadByte();
+    I2C_Ack();
+    read[DATA_CRC8] = I2C_ReadByte();
     I2C_Nack();
     I2C_Stop();
+
+    if (CalcCrc(read, 2) != read[DATA_CRC8]) {
+        TRACE_PRINTF("humi crc8 error\r\n");
+        return false;
+    }
+
+    htu_data = read[DATA_HIGH];
+    htu_data = htu_data << 8;
+    htu_data += read[DATA_LOW];
     htu = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
     g_thData.humidity = (uint16_t)htu;
 
@@ -66,28 +107,36 @@ static bool HTU21D_GetData(void)
 
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | WRITE);
-    if (status == 0) {
+    if (status == false) {
         goto i2c_fail;
     }
-
-    status = I2C_WriteByte(TEMP_HOLD);
-    if (status == 0) {
-        goto i2c_fail;
-    }
-
-    I2C_Start();
-    status = I2C_WriteByte(DEVICE_ADDR | READ);
-    if (status == 0) {
+    status = I2C_WriteByte(TEMP_NO_HOLD);
+    if (status == false) {
         goto i2c_fail;
     }
 
     HAL_Delay(60); /* must 58ms the above */
-    temp_data = I2C_ReadByte();
-    temp_data = temp_data << 8;
+
+    I2C_Start();
+    status = I2C_WriteByte(DEVICE_ADDR | READ);
+    if (status == false) {
+        goto i2c_fail;
+    }
+    read[DATA_HIGH] = I2C_ReadByte();
     I2C_Ack();
-    temp_data += I2C_ReadByte();
+    read[DATA_LOW] = I2C_ReadByte();
+    I2C_Ack();
+    read[DATA_CRC8] = I2C_ReadByte();
     I2C_Nack();
     I2C_Stop();
+
+    if (CalcCrc(read, 2) != read[DATA_CRC8]) {
+        TRACE_PRINTF("temp crc8 error\r\n");
+        return false;
+    }
+    temp_data = read[DATA_HIGH];
+    temp_data = temp_data << 8;
+    temp_data += read[DATA_LOW];
     temp = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
     g_thData.temperature = (int16_t)temp;
 
@@ -104,45 +153,45 @@ i2c_fail:
 
 static bool HTU21D_FuncInit(void)
 {
-    uint8_t usr_reg;
-    uint8_t status;
+    uint8_t userReg;
+    bool status;
 
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | WRITE);
-    if (status == 0) {
+    if (status == false) {
+        TRACE_PRINTF("err0\r\n");
         goto i2c_fail;
     }
-
     status = I2C_WriteByte(READ_USER_REGISTER);
-    if (status == 0) {
+    if (status == false) {
+        TRACE_PRINTF("err1\r\n");
         goto i2c_fail;
     }
 
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | READ);
-    if (status == 0) {
+    if (status == false) {
+        TRACE_PRINTF("err2\r\n");
         goto i2c_fail;
     }
-
-    usr_reg = I2C_ReadByte();
+    userReg = I2C_ReadByte();
     I2C_Nack();
-
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | WRITE);
-    if (status == 0) {
+    if (status == false) {
+        TRACE_PRINTF("err3\r\n");
         goto i2c_fail;
     }
-
     status = I2C_WriteByte(WRITE_USER_REGISTER);
-    if (status == 0) {
+    if (status == false) {
+        TRACE_PRINTF("err4\r\n");
         goto i2c_fail;
     }
-
-    status = I2C_WriteByte((usr_reg & 0x38) | 0x02);
-    if (status == 0) {
+    status = I2C_WriteByte(userReg | 0x02);
+    if (status == false) {
+        TRACE_PRINTF("err5\r\n");
         goto i2c_fail;
     }
-
     I2C_Stop();
     return true;
 
@@ -152,16 +201,18 @@ i2c_fail:
 
 static bool HTU21D_SoftReset(void)
 {
-    uint8_t status;
+    bool status;
 
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | WRITE);
-    if (status == 0) {
-        goto error;
+    if (status == false) {
+        TRACE_PRINTF("err6\r\n");
+        goto i2c_fail;
     }
     status = I2C_WriteByte(SOFT_RESET);
-    if (status == 0) {
-        goto error;
+    if (status == false) {
+        TRACE_PRINTF("err7\r\n");
+        goto i2c_fail;
     }
     I2C_Stop();
     HAL_Delay(15);
@@ -169,7 +220,7 @@ static bool HTU21D_SoftReset(void)
     TRACE_PRINTF("HTU21D Reset OK\r\n");
     return true;
 
-error:
+i2c_fail:
     TRACE_PRINTF("HTU21D Reset NG\r\n");
     return false;
 }
@@ -187,15 +238,21 @@ uint16_t HTU21D_GetHumidity(void)
 void HTU21D_Init(void)
 {
     I2C_Init();
+    HAL_Delay(10);
+    (void)I2C_WriteByte(DEVICE_ADDR | WRITE);
+    I2C_Stop();
+    HAL_Delay(10);
+    HTU21D_SoftReset();
+    HAL_Delay(10);
     if (HTU21D_FuncInit() == false) {
         TRACE_PRINTF("HTU21D Init NG\r\n");
         return;
+    } else {
+        TRACE_PRINTF("HTU21D Init OK\r\n");
     }
-    HAL_Delay(10);
-    HTU21D_SoftReset();
+
     HAL_Delay(100);
     HTU21D_GetData();
-    TRACE_PRINTF("HTU21D Init OK\r\n");
 }
 
 void HTU21D_Sampling(void)
