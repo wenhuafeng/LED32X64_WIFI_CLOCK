@@ -6,6 +6,9 @@
 #include "htu21d_iic_sw.h"
 #include "trace_printf.h"
 
+#define HUMI_MAX_VALUE 999 /* 99.9% */
+#define TEMP_MAX_VALUE 999 /* 99.9C */
+
 #define WRITE 0
 #define READ 1
 
@@ -102,6 +105,9 @@ static bool HTU21D_GetData(void)
     htu_data += read[DATA_LOW];
     htu = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
     g_thData.humidity = (uint16_t)htu;
+    if (g_thData.humidity > HUMI_MAX_VALUE) {
+        g_thData.humidity = HUMI_MAX_VALUE;
+    }
 
     HAL_Delay(10);
 
@@ -139,6 +145,9 @@ static bool HTU21D_GetData(void)
     temp_data += read[DATA_LOW];
     temp = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
     g_thData.temperature = (int16_t)temp;
+    if (g_thData.temperature > TEMP_MAX_VALUE) {
+        g_thData.temperature = TEMP_MAX_VALUE;
+    }
 
     TRACE_PRINTF("Humi: %d \r\n", g_thData.humidity);
     TRACE_PRINTF("Temp: %d \r\n", g_thData.temperature);

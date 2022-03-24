@@ -6,6 +6,9 @@
 #include "i2c.h"
 #include "trace_printf.h"
 
+#define HUMI_MAX_VALUE 999 /* 99.9% */
+#define TEMP_MAX_VALUE 999 /* 99.9C */
+
 #define DEVICE_WRITE_ADDR 0x80
 #define DEVICE_READ_ADDR 0x81
 
@@ -86,6 +89,9 @@ static bool HTU21D_GetData(void)
     humiData |= read[DATA_LOW];
     humi = ((humiData & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
     g_thData.humidity = (uint16_t)humi;
+    if (g_thData.humidity > HUMI_MAX_VALUE) {
+        g_thData.humidity = HUMI_MAX_VALUE;
+    }
     HAL_Delay(10);
 
     write[0] = TEMP_NO_HOLD;
@@ -108,6 +114,9 @@ static bool HTU21D_GetData(void)
     tempData |= read[DATA_LOW];
     temp                 = ((tempData & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
     g_thData.temperature = (int16_t)temp;
+    if (g_thData.temperature > TEMP_MAX_VALUE) {
+        g_thData.temperature = TEMP_MAX_VALUE;
+    }
 
     TRACE_PRINTF("Humi: %d \r\n", g_thData.humidity);
     TRACE_PRINTF("Temp: %d \r\n", g_thData.temperature);
