@@ -27,6 +27,18 @@
 #define HUB_B2 PBout(10)
 #define HUB75D_DISP_POWER_PIN PBout(11)
 
+#define CHINESE_YEAR_INDEX 10
+#define CHINESE_MONTH_INDEX 9
+#define CHINESE_DAY_INDEX 8
+#define CHINESE_LUNAR_CALENDAR_INDEX 7
+
+#define TEMP_NEGATIVE_SIGN_INDEX 12
+#define TEMP_HUMI_DOT_INDEX 13
+#define TEMP_CELSIUS_DEGREE_ICON_INDEX 14
+#define TEMP_PERCENT_SIGN_ICON_INDEX 15
+
+#define SCAN_ALL_LINE 16
+
 struct CalendarDecimal {
     uint8_t yearH;
     uint8_t yearL;
@@ -227,10 +239,6 @@ static inline void DispTime(struct CalendarDecimal *caleDeci, struct RgbType *rg
     rgb->blue[7] |= g_timeSecondDigitTable[s0][i];
 }
 
-#define CHINESE_YEAR_INDEX 10
-#define CHINESE_MONTH_INDEX 9
-#define CHINESE_DAY_INDEX 8
-
 static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rgb, uint8_t i)
 {
     uint8_t y1 = caleDeci->yearH;
@@ -251,8 +259,8 @@ static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rg
     }
     rgb->red[10] |= (g_dateTable[y0][i] << 5);
     rgb->green[10] |= (g_dateTable[y0][i] << 5);
-    rgb->green[10] |= (g_chineseWeekDateTable[10][i] >> 2);
-    rgb->green[11] |= (g_chineseWeekDateTable[10][i] << 6);
+    rgb->green[10] |= (g_chineseWeekDateTable[CHINESE_YEAR_INDEX][i] >> 2);
+    rgb->green[11] |= (g_chineseWeekDateTable[CHINESE_YEAR_INDEX][i] << 6);
 
     if (m1 == 0) {
         m1 = 11; /* NULL */
@@ -261,8 +269,8 @@ static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rg
     rgb->green[11] |= (g_dateTable[m1][i] << 1);
     rgb->red[12] |= (g_dateTable[m0][i] << 4);
     rgb->green[12] |= (g_dateTable[m0][i] << 4);
-    rgb->green[12] |= (g_chineseWeekDateTable[9][i] >> 1);
-    rgb->green[13] |= (g_chineseWeekDateTable[9][i] << 7);
+    rgb->green[12] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][i] >> 1);
+    rgb->green[13] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][i] << 7);
 
     if (d1 == 0) {
         d1 = 11;
@@ -273,14 +281,38 @@ static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rg
     rgb->green[13] |= (g_dateTable[d0][i] >> 3);
     rgb->red[14] |= (g_dateTable[d0][i] << 5);
     rgb->green[14] |= (g_dateTable[d0][i] << 5);
-    rgb->green[14] |= (g_chineseWeekDateTable[8][i]);
+    rgb->green[14] |= (g_chineseWeekDateTable[CHINESE_DAY_INDEX][i]);
     rgb->red[15] |= g_chineseWeekDateTable[wk][i];
+}
+
+static inline void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
+{
+    struct LunarCalendarType *lcData = GetLunarCalendar();
+    uint8_t m1 = lcData->month / 10;
+    uint8_t m0 = lcData->month % 10;
+    uint8_t d1 = lcData->day / 10;
+    uint8_t d0 = lcData->day % 10;
+
+    rgb->green[8] |= g_chineseWeekDateTable[CHINESE_LUNAR_CALENDAR_INDEX][i];
+    if (m1 == 0) {
+        m1 = 11;
+    }
+    rgb->red[9] |= (g_dateTable[m1][i] << 4);
+    rgb->red[9] |= (g_dateTable[m0][i] >> 1);
+    rgb->red[10] |= (g_dateTable[m0][i] << 7);
+    rgb->green[10] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][i] << 1);
+    if (d1 == 0) {
+        d1 = 11;
+    }
+    rgb->red[11] |= (g_dateTable[d1][i] << 4);
+    rgb->red[11] |= (g_dateTable[d0][i] >> 1);
+    rgb->red[12] |= (g_dateTable[d0][i] << 7);
+    rgb->green[12] |= (g_chineseWeekDateTable[CHINESE_DAY_INDEX][i] << 2);
 }
 
 static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
 {
     bool sign = false;
-    uint8_t j = i - 8;
     uint8_t t1, t0, td;
     uint16_t tmp;
     int16_t temperature = HTU21D_GetTemperature();
@@ -317,48 +349,22 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
 
     if (sign == true) {
         if (t1 != 0x00) {
-            rgb->red[12] |= (g_tempHumiDigitTable[12][j] >> 6);
-            rgb->red[13] |= (g_tempHumiDigitTable[12][j] << 2);
+            rgb->red[12] |= (g_tempHumiDigitTable[TEMP_NEGATIVE_SIGN_INDEX][i] >> 6);
+            rgb->red[13] |= (g_tempHumiDigitTable[TEMP_NEGATIVE_SIGN_INDEX][i] << 2);
         }
     }
-    rgb->red[13] |= (g_tempHumiDigitTable[t1][j] >> 1);
-    rgb->red[13] |= (g_tempHumiDigitTable[t0][j] >> 7);
-    rgb->red[14] |= (g_tempHumiDigitTable[t0][j] << 1);
-    rgb->red[14] |= (g_tempHumiDigitTable[13][j] >> 4);
-    rgb->green[14] |= (g_tempHumiDigitTable[13][j] >> 4);
-    rgb->red[14] |= (g_tempHumiDigitTable[td][j] >> 5);
-    rgb->red[15] |= (g_tempHumiDigitTable[td][j] << 3);
+    rgb->red[13] |= (g_tempHumiDigitTable[t1][i] >> 1);
+    rgb->red[13] |= (g_tempHumiDigitTable[t0][i] >> 7);
+    rgb->red[14] |= (g_tempHumiDigitTable[t0][i] << 1);
+    rgb->red[14] |= (g_tempHumiDigitTable[TEMP_HUMI_DOT_INDEX][i] >> 4);
+    rgb->green[14] |= (g_tempHumiDigitTable[TEMP_HUMI_DOT_INDEX][i] >> 4);
+    rgb->red[14] |= (g_tempHumiDigitTable[td][i] >> 5);
+    rgb->red[15] |= (g_tempHumiDigitTable[td][i] << 3);
     if (g_displayTorH == DISP_T) {
-        rgb->green[15] |= (g_tempHumiDigitTable[14][j] >> 3); /* C */
+        rgb->green[15] |= (g_tempHumiDigitTable[TEMP_CELSIUS_DEGREE_ICON_INDEX][i] >> 3); /* C */
     } else {
-        rgb->green[15] |= (g_tempHumiDigitTable[15][j] >> 3); /* % */
+        rgb->green[15] |= (g_tempHumiDigitTable[TEMP_PERCENT_SIGN_ICON_INDEX][i] >> 3); /* % */
     }
-}
-
-static inline void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
-{
-    struct LunarCalendarType *lcData = GetLunarCalendar();
-    uint8_t j = i - 8;
-    uint8_t m1 = lcData->month / 10;
-    uint8_t m0 = lcData->month % 10;
-    uint8_t d1 = lcData->day / 10;
-    uint8_t d0 = lcData->day % 10;
-
-    rgb->green[8] |= g_chineseWeekDateTable[7][j];
-    if (m1 == 0) {
-        m1 = 11;
-    }
-    rgb->red[9] |= (g_dateTable[m1][j] << 4);
-    rgb->red[9] |= (g_dateTable[m0][j] >> 1);
-    rgb->red[10] |= (g_dateTable[m0][j] << 7);
-    rgb->green[10] |= (g_chineseWeekDateTable[9][j] << 1);
-    if (d1 == 0) {
-        d1 = 11;
-    }
-    rgb->red[11] |= (g_dateTable[d1][j] << 4);
-    rgb->red[11] |= (g_dateTable[d0][j] >> 1);
-    rgb->red[12] |= (g_dateTable[d0][j] << 7);
-    rgb->green[12] |= (g_chineseWeekDateTable[8][j] << 2);
 }
 
 static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
@@ -436,16 +442,16 @@ void inline HUB75D_DispScan(void)
 
     memset(&rgb, 0, sizeof(struct RgbType));
     DispTime(&g_calendarDecimal, &rgb, count);
-    if (count < 8) {
+    if (count < (SCAN_ALL_LINE / 2)) {
         DispDate(&g_calendarDecimal, &rgb, count);
     } else {
-        DispLunarCalendar(&rgb, count);
-        DispTemperatureHumidity(&rgb, count);
+        DispLunarCalendar(&rgb, count - (SCAN_ALL_LINE / 2));
+        DispTemperatureHumidity(&rgb, count - (SCAN_ALL_LINE / 2));
     }
     SetScanPin(&rgb, count);
 
     count++;
-    if (count > 15) {
+    if (count >= SCAN_ALL_LINE) {
         count = 0x00;
     }
 }
