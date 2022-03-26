@@ -95,6 +95,7 @@ void COMMON_Process(void)
     WIFI_HandlerUartData();
     if (Get1sFlag() == true) {
         SetOneSecondFlag(false);
+        TRACE_PRINTF("1000ms\r\n");
         WIFI_CtrDec();
         HTU21D_Sampling();
         if (ClockRun() == true) {

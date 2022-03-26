@@ -118,8 +118,7 @@ static bool HTU21D_GetData(void)
         g_thData.temperature = TEMP_MAX_VALUE;
     }
 
-    TRACE_PRINTF("Humi: %d \r\n", g_thData.humidity);
-    TRACE_PRINTF("Temp: %d \r\n", g_thData.temperature);
+    TRACE_PRINTF("Humi: %d, Temp: %d\r\n", g_thData.humidity, g_thData.temperature);
     return true;
 
 error:
