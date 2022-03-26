@@ -71,40 +71,40 @@ struct CalendarDecimal g_calendarDecimal;
 enum DispTorH g_displayTorH;
 static uint16_t g_displayOffCtr;
 
-static uint8_t const g_dateTable[] = {
-    0x00, 0x06, 0x09, 0x09, 0x09, 0x09, 0x09, 0x06, /* 0         */
-    0x00, 0x02, 0x06, 0x02, 0x02, 0x02, 0x02, 0x07, /* 1         */
-    0x00, 0x06, 0x09, 0x01, 0x02, 0x04, 0x08, 0x0f, /* 2         */
-    0x00, 0x06, 0x09, 0x01, 0x06, 0x01, 0x09, 0x06, /* 3         */
-    0x00, 0x02, 0x06, 0x0a, 0x0a, 0x0f, 0x02, 0x02, /* 4         */
-    0x00, 0x0f, 0x08, 0x0e, 0x09, 0x01, 0x09, 0x06, /* 5         */
-    0x00, 0x06, 0x09, 0x08, 0x0e, 0x09, 0x09, 0x06, /* 6         */
-    0x00, 0x0f, 0x01, 0x01, 0x02, 0x04, 0x04, 0x04, /* 7         */
-    0x00, 0x06, 0x09, 0x09, 0x06, 0x09, 0x09, 0x06, /* 8         */
-    0x00, 0x06, 0x09, 0x09, 0x07, 0x01, 0x09, 0x06, /* 9         */
-    0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, /* 10 :      */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 11 NULL   */
-    0x00, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x03, /* 13 -      */
-    0x00, 0x00, 0x00, 0x02, 0x07, 0x02, 0x00, 0x00, /* 14 +      */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, /*  - 15     */
-    0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, /*  . 16     */
-    0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, /*  . 17     */
-    0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, /*  - 18     */
-    0x00, 0x00, 0x80, 0x00, 0x30, 0x40, 0x40, 0x30, /* 19 .c 4x7 */
+static uint8_t const g_dateTable[][8] = {
+    { 0x00, 0x06, 0x09, 0x09, 0x09, 0x09, 0x09, 0x06 }, /* 0         */
+    { 0x00, 0x02, 0x06, 0x02, 0x02, 0x02, 0x02, 0x07 }, /* 1         */
+    { 0x00, 0x06, 0x09, 0x01, 0x02, 0x04, 0x08, 0x0f }, /* 2         */
+    { 0x00, 0x06, 0x09, 0x01, 0x06, 0x01, 0x09, 0x06 }, /* 3         */
+    { 0x00, 0x02, 0x06, 0x0a, 0x0a, 0x0f, 0x02, 0x02 }, /* 4         */
+    { 0x00, 0x0f, 0x08, 0x0e, 0x09, 0x01, 0x09, 0x06 }, /* 5         */
+    { 0x00, 0x06, 0x09, 0x08, 0x0e, 0x09, 0x09, 0x06 }, /* 6         */
+    { 0x00, 0x0f, 0x01, 0x01, 0x02, 0x04, 0x04, 0x04 }, /* 7         */
+    { 0x00, 0x06, 0x09, 0x09, 0x06, 0x09, 0x09, 0x06 }, /* 8         */
+    { 0x00, 0x06, 0x09, 0x09, 0x07, 0x01, 0x09, 0x06 }, /* 9         */
+    { 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00 }, /* 10 :      */
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, /* 11 NULL   */
+    { 0x00, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x03 }, /* 13 -      */
+    { 0x00, 0x00, 0x00, 0x02, 0x07, 0x02, 0x00, 0x00 }, /* 14 +      */
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00 }, /*  - 15     */
+    { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 }, /*  . 16     */
+    { 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00 }, /*  . 17     */
+    { 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00 }, /*  - 18     */
+    { 0x00, 0x00, 0x80, 0x00, 0x30, 0x40, 0x40, 0x30 }, /* 19 .c 4x7 */
 };
 
-static uint8_t const g_chineseWeekDateTable[] = {
-    0x00, 0x3e, 0x22, 0x22, 0x3e, 0x22, 0x22, 0x3e, /* 0  日  */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x7e, 0x00, 0x00, /* 1  一  */
-    0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x7e, 0x00, /* 2  二  */
-    0x00, 0x00, 0x00, 0x3c, 0x00, 0x3c, 0x00, 0x7e, /* 3  三  */
-    0x00, 0x00, 0x7f, 0x55, 0x55, 0x77, 0x41, 0x7f, /* 4  四  */
-    0x00, 0x00, 0x3e, 0x08, 0x3e, 0x12, 0x22, 0x7f, /* 5  五  */
-    0x00, 0x08, 0x00, 0x7f, 0x00, 0x14, 0x22, 0x41, /* 6  六  */
-    0x10, 0x7c, 0xa4, 0xb4, 0x48, 0x64, 0xb2, 0x20, /* 7  农  */
-    0x00, 0x0f, 0x09, 0x09, 0x0f, 0x09, 0x09, 0x0f, /* 8  日  */
-    0x00, 0x0f, 0x09, 0x0f, 0x09, 0x0f, 0x09, 0x11, /* 9  月  */
-    0x08, 0x1f, 0x24, 0x1f, 0x14, 0x3f, 0x04, 0x04, /* 10  年 */
+static uint8_t const g_chineseWeekDateTable[][8] = {
+    { 0x00, 0x3e, 0x22, 0x22, 0x3e, 0x22, 0x22, 0x3e }, /* 0  日  */
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x7e, 0x00, 0x00 }, /* 1  一  */
+    { 0x00, 0x00, 0x00, 0x3c, 0x00, 0x00, 0x7e, 0x00 }, /* 2  二  */
+    { 0x00, 0x00, 0x00, 0x3c, 0x00, 0x3c, 0x00, 0x7e }, /* 3  三  */
+    { 0x00, 0x00, 0x7f, 0x55, 0x55, 0x77, 0x41, 0x7f }, /* 4  四  */
+    { 0x00, 0x00, 0x3e, 0x08, 0x3e, 0x12, 0x22, 0x7f }, /* 5  五  */
+    { 0x00, 0x08, 0x00, 0x7f, 0x00, 0x14, 0x22, 0x41 }, /* 6  六  */
+    { 0x10, 0x7c, 0xa4, 0xb4, 0x48, 0x64, 0xb2, 0x20 }, /* 7  农  */
+    { 0x00, 0x0f, 0x09, 0x09, 0x0f, 0x09, 0x09, 0x0f }, /* 8  日  */
+    { 0x00, 0x0f, 0x09, 0x0f, 0x09, 0x0f, 0x09, 0x11 }, /* 9  月  */
+    { 0x08, 0x1f, 0x24, 0x1f, 0x14, 0x3f, 0x04, 0x04 }, /* 10  年 */
 };
 
 static uint8_t const g_tempHumiDigitTable[][8] = {
@@ -187,14 +187,17 @@ static inline void DispTime(struct CalendarDecimal *caleDeci, struct RgbType *rg
         h1 = 10;
     }
 
+    /* 8*8=64 */
     rgb->red[0] |= g_timeDigitTable[h1][i];
     rgb->green[0] |= g_timeDigitTable[h1][i];
     rgb->blue[0] |= g_timeDigitTable[h1][i];
+
     rgb->red[1] |= (g_timeDigitTable[h0][i] >> 1);
-    rgb->red[2] |= (g_timeDigitTable[h0][i] << 7);
     rgb->green[1] |= (g_timeDigitTable[h0][i] >> 1);
-    rgb->green[2] |= (g_timeDigitTable[h0][i] << 7);
     rgb->blue[1] |= (g_timeDigitTable[h0][i] >> 1);
+
+    rgb->red[2] |= (g_timeDigitTable[h0][i] << 7);
+    rgb->green[2] |= (g_timeDigitTable[h0][i] << 7);
     rgb->blue[2] |= (g_timeDigitTable[h0][i] << 7);
 
     rgb->red[2] |= g_timeDigitTable[sd][i];
@@ -203,11 +206,13 @@ static inline void DispTime(struct CalendarDecimal *caleDeci, struct RgbType *rg
     rgb->red[3] |= g_timeDigitTable[m1][i];
     rgb->green[3] |= g_timeDigitTable[m1][i];
     rgb->blue[3] |= g_timeDigitTable[m1][i];
+
     rgb->red[4] |= (g_timeDigitTable[m0][i] >> 1);
-    rgb->red[5] |= (g_timeDigitTable[m0][i] << 7);
     rgb->green[4] |= (g_timeDigitTable[m0][i] >> 1);
-    rgb->green[5] |= (g_timeDigitTable[m0][i] << 7);
     rgb->blue[4] |= (g_timeDigitTable[m0][i] >> 1);
+
+    rgb->red[5] |= (g_timeDigitTable[m0][i] << 7);
+    rgb->green[5] |= (g_timeDigitTable[m0][i] << 7);
     rgb->blue[5] |= (g_timeDigitTable[m0][i] << 7);
 
     rgb->red[5] |= g_timeDigitTable[sd][i];
@@ -216,10 +221,15 @@ static inline void DispTime(struct CalendarDecimal *caleDeci, struct RgbType *rg
     rgb->red[6] |= g_timeSecondDigitTable[s1][i];
     rgb->green[6] |= g_timeSecondDigitTable[s1][i];
     rgb->blue[6] |= g_timeSecondDigitTable[s1][i];
+
     rgb->red[7] |= g_timeSecondDigitTable[s0][i];
     rgb->green[7] |= g_timeSecondDigitTable[s0][i];
     rgb->blue[7] |= g_timeSecondDigitTable[s0][i];
 }
+
+#define CHINESE_YEAR_INDEX 10
+#define CHINESE_MONTH_INDEX 9
+#define CHINESE_DAY_INDEX 8
 
 static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rgb, uint8_t i)
 {
@@ -231,40 +241,40 @@ static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rg
     uint8_t d0 = caleDeci->dayL;
     uint8_t wk = caleDeci->week;
 
-    rgb->green[8] |= (g_dateTable[2 * 8 + i] << 4);
-    rgb->green[8] |= (g_dateTable[0 * 8 + i] >> 1);
-    rgb->green[9] |= (g_dateTable[0 * 8 + i] << 7);
-    rgb->green[9] |= (g_dateTable[y1 * 8 + i] << 2);
-    rgb->green[9] |= (g_dateTable[y0 * 8 + i] >> 3);
+    rgb->green[8] |= (g_dateTable[2][i] << 4);
+    rgb->green[8] |= (g_dateTable[0][i] >> 1);
+    rgb->green[9] |= (g_dateTable[0][i] << 7);
+    rgb->green[9] |= (g_dateTable[y1][i] << 2);
+    rgb->green[9] |= (g_dateTable[y0][i] >> 3);
     for (uint8_t j = 8; j < 10; j++) {
         rgb->red[j] = rgb->green[j];
     }
-    rgb->green[10] |= (g_dateTable[y0 * 8 + i] << 5);
-    rgb->red[10] |= (g_dateTable[y0 * 8 + i] << 5);
-    rgb->green[10] |= (g_chineseWeekDateTable[10 * 8 + i] >> 2);
-    rgb->green[11] |= (g_chineseWeekDateTable[10 * 8 + i] << 6);
+    rgb->red[10] |= (g_dateTable[y0][i] << 5);
+    rgb->green[10] |= (g_dateTable[y0][i] << 5);
+    rgb->green[10] |= (g_chineseWeekDateTable[10][i] >> 2);
+    rgb->green[11] |= (g_chineseWeekDateTable[10][i] << 6);
 
     if (m1 == 0) {
-        m1 = 11;
+        m1 = 11; /* NULL */
     }
-    rgb->green[11] |= (g_dateTable[m1 * 8 + i] << 1);
-    rgb->red[11] |= (g_dateTable[m1 * 8 + i] << 1);
-    rgb->green[12] |= (g_dateTable[m0 * 8 + i] << 4);
-    rgb->red[12] |= (g_dateTable[m0 * 8 + i] << 4);
-    rgb->green[12] |= (g_chineseWeekDateTable[9 * 8 + i] >> 1);
-    rgb->green[13] |= (g_chineseWeekDateTable[9 * 8 + i] << 7);
+    rgb->red[11] |= (g_dateTable[m1][i] << 1);
+    rgb->green[11] |= (g_dateTable[m1][i] << 1);
+    rgb->red[12] |= (g_dateTable[m0][i] << 4);
+    rgb->green[12] |= (g_dateTable[m0][i] << 4);
+    rgb->green[12] |= (g_chineseWeekDateTable[9][i] >> 1);
+    rgb->green[13] |= (g_chineseWeekDateTable[9][i] << 7);
 
     if (d1 == 0) {
         d1 = 11;
     }
-    rgb->green[13] |= (g_dateTable[d1 * 8 + i] << 2);
-    rgb->red[13] |= (g_dateTable[d1 * 8 + i] << 2);
-    rgb->green[13] |= (g_dateTable[d0 * 8 + i] >> 3);
-    rgb->red[13] |= (g_dateTable[d0 * 8 + i] >> 3);
-    rgb->green[14] |= (g_dateTable[d0 * 8 + i] << 5);
-    rgb->red[14] |= (g_dateTable[d0 * 8 + i] << 5);
-    rgb->green[14] |= (g_chineseWeekDateTable[8 * 8 + i]);
-    rgb->red[15] |= g_chineseWeekDateTable[(wk - 0) * 8 + i];
+    rgb->red[13] |= (g_dateTable[d1][i] << 2);
+    rgb->green[13] |= (g_dateTable[d1][i] << 2);
+    rgb->red[13] |= (g_dateTable[d0][i] >> 3);
+    rgb->green[13] |= (g_dateTable[d0][i] >> 3);
+    rgb->red[14] |= (g_dateTable[d0][i] << 5);
+    rgb->green[14] |= (g_dateTable[d0][i] << 5);
+    rgb->green[14] |= (g_chineseWeekDateTable[8][i]);
+    rgb->red[15] |= g_chineseWeekDateTable[wk][i];
 }
 
 static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
@@ -327,28 +337,28 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
 
 static inline void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
 {
-    uint8_t j = i - 8;
     struct LunarCalendarType *lcData = GetLunarCalendar();
+    uint8_t j = i - 8;
     uint8_t m1 = lcData->month / 10;
     uint8_t m0 = lcData->month % 10;
     uint8_t d1 = lcData->day / 10;
     uint8_t d0 = lcData->day % 10;
 
-    rgb->green[8] |= g_chineseWeekDateTable[7 * 8 + j];
+    rgb->green[8] |= g_chineseWeekDateTable[7][j];
     if (m1 == 0) {
         m1 = 11;
     }
-    rgb->red[9] |= (g_dateTable[m1 * 8 + j] << 4);
-    rgb->red[9] |= (g_dateTable[m0 * 8 + j] >> 1);
-    rgb->red[10] |= (g_dateTable[m0 * 8 + j] << 7);
-    rgb->green[10] |= (g_chineseWeekDateTable[9 * 8 + j] << 1);
+    rgb->red[9] |= (g_dateTable[m1][j] << 4);
+    rgb->red[9] |= (g_dateTable[m0][j] >> 1);
+    rgb->red[10] |= (g_dateTable[m0][j] << 7);
+    rgb->green[10] |= (g_chineseWeekDateTable[9][j] << 1);
     if (d1 == 0) {
         d1 = 11;
     }
-    rgb->red[11] |= (g_dateTable[d1 * 8 + j] << 4);
-    rgb->red[11] |= (g_dateTable[d0 * 8 + j] >> 1);
-    rgb->red[12] |= (g_dateTable[d0 * 8 + j] << 7);
-    rgb->green[12] |= (g_chineseWeekDateTable[8 * 8 + j] << 2);
+    rgb->red[11] |= (g_dateTable[d1][j] << 4);
+    rgb->red[11] |= (g_dateTable[d0][j] >> 1);
+    rgb->red[12] |= (g_dateTable[d0][j] << 7);
+    rgb->green[12] |= (g_chineseWeekDateTable[8][j] << 2);
 }
 
 static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
