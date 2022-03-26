@@ -32,12 +32,14 @@
 #define CHINESE_DAY_INDEX 8
 #define CHINESE_LUNAR_CALENDAR_INDEX 7
 
+#define TEMP_DISP_NULL_INDEX 11
 #define TEMP_NEGATIVE_SIGN_INDEX 12
 #define TEMP_HUMI_DOT_INDEX 13
 #define TEMP_CELSIUS_DEGREE_ICON_INDEX 14
 #define TEMP_PERCENT_SIGN_ICON_INDEX 15
 
 #define SCAN_ALL_LINE 16
+#define DATE_TABLE_DISP_NULL_INDEX 11
 
 struct CalendarDecimal {
     uint8_t yearH;
@@ -257,13 +259,14 @@ static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rg
     for (uint8_t j = 8; j < 10; j++) {
         rgb->red[j] = rgb->green[j];
     }
+
     rgb->red[10] |= (g_dateTable[y0][i] << 5);
     rgb->green[10] |= (g_dateTable[y0][i] << 5);
     rgb->green[10] |= (g_chineseWeekDateTable[CHINESE_YEAR_INDEX][i] >> 2);
     rgb->green[11] |= (g_chineseWeekDateTable[CHINESE_YEAR_INDEX][i] << 6);
 
     if (m1 == 0) {
-        m1 = 11; /* NULL */
+        m1 = DATE_TABLE_DISP_NULL_INDEX;
     }
     rgb->red[11] |= (g_dateTable[m1][i] << 1);
     rgb->green[11] |= (g_dateTable[m1][i] << 1);
@@ -273,12 +276,13 @@ static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rg
     rgb->green[13] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][i] << 7);
 
     if (d1 == 0) {
-        d1 = 11;
+        d1 = DATE_TABLE_DISP_NULL_INDEX;
     }
     rgb->red[13] |= (g_dateTable[d1][i] << 2);
     rgb->green[13] |= (g_dateTable[d1][i] << 2);
     rgb->red[13] |= (g_dateTable[d0][i] >> 3);
     rgb->green[13] |= (g_dateTable[d0][i] >> 3);
+
     rgb->red[14] |= (g_dateTable[d0][i] << 5);
     rgb->green[14] |= (g_dateTable[d0][i] << 5);
     rgb->green[14] |= (g_chineseWeekDateTable[CHINESE_DAY_INDEX][i]);
@@ -294,15 +298,17 @@ static inline void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
     uint8_t d0 = lcData->day % 10;
 
     rgb->green[8] |= g_chineseWeekDateTable[CHINESE_LUNAR_CALENDAR_INDEX][i];
+
     if (m1 == 0) {
-        m1 = 11;
+        m1 = DATE_TABLE_DISP_NULL_INDEX;
     }
     rgb->red[9] |= (g_dateTable[m1][i] << 4);
     rgb->red[9] |= (g_dateTable[m0][i] >> 1);
     rgb->red[10] |= (g_dateTable[m0][i] << 7);
     rgb->green[10] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][i] << 1);
+
     if (d1 == 0) {
-        d1 = 11;
+        d1 = DATE_TABLE_DISP_NULL_INDEX;
     }
     rgb->red[11] |= (g_dateTable[d1][i] << 4);
     rgb->red[11] |= (g_dateTable[d0][i] >> 1);
@@ -330,11 +336,11 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
         td = tmp % 10;
         if (sign == false) {
             if (t1 == 0x00) {
-                t1 = 11; /* ' ' */
+                t1 = TEMP_DISP_NULL_INDEX;
             }
         } else {
             if (t1 == 0x00) {
-                t1 = 12; /* '-' */
+                t1 = TEMP_NEGATIVE_SIGN_INDEX;
             }
         }
     } else {
@@ -343,7 +349,7 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
         t0 = tmp % 100 / 10;
         td = tmp % 10;
         if (t1 == 0x00) {
-            t1 = 11;
+            t1 = TEMP_DISP_NULL_INDEX;
         }
     }
 
@@ -361,9 +367,9 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
     rgb->red[14] |= (g_tempHumiDigitTable[td][i] >> 5);
     rgb->red[15] |= (g_tempHumiDigitTable[td][i] << 3);
     if (g_displayTorH == DISP_T) {
-        rgb->green[15] |= (g_tempHumiDigitTable[TEMP_CELSIUS_DEGREE_ICON_INDEX][i] >> 3); /* C */
+        rgb->green[15] |= (g_tempHumiDigitTable[TEMP_CELSIUS_DEGREE_ICON_INDEX][i] >> 3);
     } else {
-        rgb->green[15] |= (g_tempHumiDigitTable[TEMP_PERCENT_SIGN_ICON_INDEX][i] >> 3); /* % */
+        rgb->green[15] |= (g_tempHumiDigitTable[TEMP_PERCENT_SIGN_ICON_INDEX][i] >> 3);
     }
 }
 
