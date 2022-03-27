@@ -2,23 +2,44 @@
     // 使用 IntelliSense 了解相关属性。
     // 悬停以查看现有属性的描述。
     // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    //"version": "0.2.0",
+    //"configurations": [
+    //    {
+    //        "name": "debug stlink",
+    //        "type": "cortex-debug",
+    //        "request": "launch",
+    //        "servertype": "openocd",
+    //        "interface": "swd",
+    //        "cwd": "${workspaceRoot}",
+    //        "configFiles": [
+    //            // (1),D:\Program Files\OpenOCD-20211118-0.11.0\share\openocd\scripts\interface\stlink.cfg
+    //            // (2),D:\Program Files\OpenOCD-20211118-0.11.0\share\openocd\scripts\target\stm32f1x.cfg
+    //            "user/openocd/stlink.cfg",
+    //            "user/openocd/stm32f1x.cfg"
+    //        ],
+    //        "executable": "./build/CLOCK_STM32F103C8T6_WIFI.elf",
+    //        "device": "STM32F103C8",
+    //        "runToEntryPoint": "main",
+    //        "preLaunchTask": "build",
+    //    }
+    //]
+
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "openocd-launch",
+            "name": "Debug J-Link",
             "type": "cortex-debug",
             "request": "launch",
-            "servertype": "openocd",
             "cwd": "${workspaceRoot}",
-            "configFiles": [
-                // (1)	D:\Program Files\OpenOCD-20211118-0.11.0\share\openocd\scripts\interface\stlink.cfg
-                // (2)	D:\Program Files\OpenOCD-20211118-0.11.0\share\openocd\scripts\target\stm32f1x.cfg
-                "user/openocd/stlink.cfg",
-                "user/openocd/stm32f1x.cfg"
-            ],
-            "executable": "./build/CLOCK_STM32F103C8T6_WIFI.elf",
+            "executable": "${workspaceRoot}/build/CLOCK_STM32F103C8T6_WIFI.elf",
+            "serverpath": "C:/Program Files (x86)/SEGGER/JLink/JLinkGDBServerCL.exe",
+            "servertype": "jlink",
             "device": "STM32F103C8",
-            "runToMain": true,
+            "interface": "swd",
+            "serialNumber": "", //If you have more than one J-Link probe, add the serial number here.
+            "runToEntryPoint": "main",
+            "svdFile": "${workspaceRoot}/user/svd/STM32F103xx.svd",
+            "preLaunchTask": "build",
         }
     ]
 }

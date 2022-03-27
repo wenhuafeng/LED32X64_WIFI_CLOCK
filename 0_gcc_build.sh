@@ -28,7 +28,6 @@ function timediff() {
 start=$(date +"%s.%N")
 
 #run function
-cd ..
 make clean
 make -j
 

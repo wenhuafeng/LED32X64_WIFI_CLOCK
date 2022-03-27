@@ -28,7 +28,7 @@ function timediff() {
 start=$(date +"%s.%N")
 
 #run function
-"C:/Program Files (x86)/SEGGER/JLink/JLink.exe" -SelectEmuBySN 59800898 -Device STM32F103C8 -If SWD -Speed 1000 -CommanderScript "programming.jlink"
+openocd -f user/openocd/stlink.cfg -f user/openocd/stm32f1x.cfg -c init -c halt -c "program build/CLOCK_STM32F103C8T6_WIFI.bin 0x8000000" -c reset -c shutdown
 
 end=$(date +"%s.%N")
 
