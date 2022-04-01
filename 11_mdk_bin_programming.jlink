@@ -1,0 +1,8 @@
+r
+erase
+h
+
+loadfile "MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.bin"
+
+r
+exit
