@@ -36,10 +36,3 @@ cat ./MDK-ARM/build_log.txt
 end=$(date +"%s.%N")
 
 timediff $start $end
-
-#echo Init building ...
-#set UV=D:/Keil_v5/UV4/UV4.exe
-#set UV_PRO_PATH=./MDK-ARM/CLOCK_STM32F103C8T6_WIFI.uvprojx
-#%UV% -j0 -r %UV_PRO_PATH% -o %cd%./MDK-ARM/build_log.txt
-#
-#type MDK-ARM\build_log.txt
