@@ -32,17 +32,41 @@
 #define NOV 0x004e6f76
 #define DEC 0x00446563
 
+#define GET_TIME_2S (2)
 #define GET_TIME_6S (6)
 #define GET_TIME_8S (8)
 #define GET_TIME_10S (10)
 #define GET_TIME_14S (14)
+
+enum WifiReinit {
+    WIFI_NOT_REINIT,
+    WIFI_REINIT,
+};
+
+enum WifiInitStatus {
+    WIFI_INIT_REST,
+    WIFI_INIT_CWMODE,
+    WIFI_INIT_NAME_PASSWD,
+    WIFI_INIT_COMPLETE,
+};
+
+#define WIFI_INIT_TOTAL_STEP 4
+const char *g_wifiInit[WIFI_INIT_TOTAL_STEP] = {
+    "AT+RST\r\n",
+    "AT+CWMODE=1\r\n",
+    "AT+CWJAP_DEF=\"HSG2\",\"13537011631\"\r\n",
+    "AT+GMR\r\n",
+};
 
 enum ConnectFlag {
     DISCONNECT,
     CONNECT,
 };
 
+#define WIFI_GET_SNTP_TIME "AT+CIPSNTPTIME?\r\n"
+#define WIFI_SNTP_CONFIG "AT+CIPSNTPCFG=1,8\r\n"
 #define WIFI_OFF_TIME (2 * 60) /* 2min */
+
 #define ESP8266_AT_POWER_PIN_HIGH()                                            \
     do {                                                                       \
         HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, GPIO_PIN_SET); \
@@ -52,13 +76,10 @@ enum ConnectFlag {
         HAL_GPIO_WritePin(WIFI_POWER_GPIO_Port, WIFI_POWER_Pin, GPIO_PIN_RESET); \
     } while (0)
 
-#define WIFI_NAME_PASSWD "AT+CWJAP_DEF=\"HSG2\",\"13537011631\"\r\n"
-
 struct Esp8266GetTimeType {
     uint8_t powerOffCtr;
     uint8_t getTimeCtr;
-    uint8_t renewInitCtr1;
-    uint8_t renewInitCtr2;
+    uint8_t renewInitCtr;
     enum ConnectFlag connect;
     bool okFlag;
 };
@@ -170,40 +191,26 @@ static uint8_t ProcessClock(char *cRxBuf)
     return status;
 }
 
-static void ESP8266_AT_GetTime(void)
+static bool WIFI_Init(enum WifiReinit reInit)
 {
-    printf("AT+CIPSNTPTIME?\r\n");
+    static enum WifiInitStatus status = WIFI_INIT_REST;
+
+    if (reInit == WIFI_REINIT) {
+        TRACE_PRINTF("wifi reinit\r\n");
+        status = WIFI_INIT_REST;
+    }
+    if (status == WIFI_INIT_COMPLETE) {
+        return true;
+    }
+
+    printf(g_wifiInit[status]);
+    TRACE_PRINTF("wifi init:%s\r\n", g_wifiInit[status]);
+    status++;
+
+    return false;
 }
 
-static void ESP8266_AT_SNTP_CFG(void)
-{
-    printf("AT+CIPSNTPCFG=1,8\r\n");
-}
-
-void WIFI_Init(void)
-{
-    //printf("AT+RESTORE\r\n");
-    //HAL_Delay(1000);
-
-    printf("AT+RST\r\n");
-    HAL_Delay(100);
-
-    //printf("AT+GMR\r\n");
-    //HAL_Delay(100);
-
-    //printf("AT+CWQAP\r\n");
-    //HAL_Delay(100);
-
-    printf("AT+CWMODE=1\r\n");
-    HAL_Delay(100);
-
-    //printf("AT+CWAUTOCONN=1\r\n");
-    //HAL_Delay(1000);
-
-    printf(WIFI_NAME_PASSWD);
-}
-
-void WIFI_PowerOnOff(enum PowerFlag flag)
+void WIFI_Power(enum PowerFlag flag)
 {
     if (flag == POWER_ON) {
         ESP8266_AT_POWER_PIN_HIGH();
@@ -213,45 +220,41 @@ void WIFI_PowerOnOff(enum PowerFlag flag)
         g_getTime.connect = DISCONNECT;
         g_getTime.getTimeCtr = 0x00;
         g_getTime.powerOffCtr = 0x00;
-        g_getTime.renewInitCtr1 = 0x00;
-        g_getTime.renewInitCtr2 = 0x00;
+        g_getTime.renewInitCtr = 0x00;
     }
 }
 
-void WIFI_CtrDec(void)
+void WIFI_GetTime(void)
 {
+    if (WIFI_Init(WIFI_NOT_REINIT) == false) {
+        return;
+    }
+
     if (g_getTime.powerOffCtr) {
         g_getTime.powerOffCtr--;
         if (g_getTime.powerOffCtr == 0x00) {
-            WIFI_PowerOnOff(POWER_OFF);
+            WIFI_Power(POWER_OFF);
         }
     }
 
     if (g_getTime.getTimeCtr) {
         g_getTime.getTimeCtr--;
         if (g_getTime.getTimeCtr == GET_TIME_10S) {
-            ESP8266_AT_SNTP_CFG();
-        } else if (g_getTime.getTimeCtr == GET_TIME_8S) {
-            ESP8266_AT_GetTime();
-        } else if (g_getTime.getTimeCtr == GET_TIME_6S) {
-            ESP8266_AT_GetTime();
-        } else if (g_getTime.getTimeCtr == 0x00) {
-            ESP8266_AT_GetTime();
+            printf(WIFI_SNTP_CONFIG);
+        } else if ((g_getTime.getTimeCtr == GET_TIME_8S) ||
+            (g_getTime.getTimeCtr == GET_TIME_6S) ||
+            (g_getTime.getTimeCtr == 0x00)) {
+            printf(WIFI_GET_SNTP_TIME);
+        } else {
+            ;
         }
     }
 
-    if (g_getTime.renewInitCtr1) {
-        g_getTime.renewInitCtr1--;
-        if (g_getTime.renewInitCtr1 == 0x00) {
-            g_getTime.renewInitCtr2 = 2;
-            WIFI_PowerOnOff(POWER_ON);
-        }
-    }
-
-    if (g_getTime.renewInitCtr2) {
-        g_getTime.renewInitCtr2--;
-        if (g_getTime.renewInitCtr2 == 0x00) {
-            WIFI_Init();
+    if (g_getTime.renewInitCtr) {
+        g_getTime.renewInitCtr--;
+        if (g_getTime.renewInitCtr == 0x00) {
+            WIFI_Power(POWER_ON);
+            WIFI_Init(WIFI_REINIT);
         }
     }
 }
@@ -263,18 +266,21 @@ void WIFI_ReceiveProcess(uint8_t *buf)
 
     str = "WIFI CON"; /* WIFI CONNECTED */
     if (strstr((char *)buf, str) != NULL) {
+        TRACE_PRINTF("wifi connected\r\n");
         g_getTime.connect = CONNECT;
         g_getTime.getTimeCtr = GET_TIME_14S;
     }
     str = "WIFI DIS"; /* WIFI DISCONNECT */
     if (strstr((char *)buf, str) != NULL) {
-        WIFI_PowerOnOff(POWER_OFF);
-        g_getTime.renewInitCtr1 = 2;
+        TRACE_PRINTF("wifi disconnect\r\n");
+        WIFI_Power(POWER_OFF);
+        g_getTime.renewInitCtr = GET_TIME_2S;
     }
     str = "+CWJAP:2"; /* WIFI CONNECT FAIL */
     if (strstr((char *)buf, str) != NULL) {
-        WIFI_PowerOnOff(POWER_OFF);
-        g_getTime.renewInitCtr1 = 2;
+        TRACE_PRINTF("wifi connect fail\r\n");
+        WIFI_Power(POWER_OFF);
+        g_getTime.renewInitCtr = GET_TIME_2S;
     }
     if (g_getTime.connect == CONNECT) {
         str = "+CIPSNTPTIME:";

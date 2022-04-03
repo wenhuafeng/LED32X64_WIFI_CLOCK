@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../user/common;../user/emw3060;../user/esp8266;../user/htu21d;../user/hub75d;../user/lunar_calendar;../user/time;../user/trace;../user/wifi_uart_if</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../user/common;../user/esp8266;../user/htu21d;../user/hub75d;../user/lunar_calendar;../user/time;../user/trace;../user/wifi_uart_if</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -544,11 +544,6 @@
               <FileName>common.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\common\common.c</FilePath>
-            </File>
-            <File>
-              <FileName>emw3060_at.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\user\emw3060\emw3060_at.c</FilePath>
             </File>
             <File>
               <FileName>esp8266_at.c</FileName>

@@ -23,6 +23,6 @@ void HUB75D_DispScan(void);
 void HUB75D_CalculateCalendar(struct TimeType *time);
 bool HUB75D_CtrDec(void);
 void HUB75D_SetDispOffCtr(enum DispTime time);
-void HUB75D_DispOnOff(enum DispTime time);
+void HUB75D_Disp(enum DispTime time);
 
 #endif

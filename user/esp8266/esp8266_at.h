@@ -10,9 +10,8 @@ enum PowerFlag {
 };
 
 void WIFI_ReceiveProcess(uint8_t *buf);
-void WIFI_Init(void);
-void WIFI_CtrDec(void);
-void WIFI_PowerOnOff(enum PowerFlag flag);
+void WIFI_GetTime(void);
+void WIFI_Power(enum PowerFlag flag);
 bool WIFI_GetTimeDataFlag(void);
 void WIFI_SetTimeDataFlag(bool value);
 

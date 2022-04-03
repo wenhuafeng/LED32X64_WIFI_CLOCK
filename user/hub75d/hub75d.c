@@ -486,7 +486,7 @@ void HUB75D_SetDispOffCtr(enum DispTime time)
     g_displayOffCtr = time;
 }
 
-void HUB75D_DispOnOff(enum DispTime time)
+void HUB75D_Disp(enum DispTime time)
 {
     HUB75D_SetDispOffCtr(time);
     if (time == DISP_TIME_OFF) {

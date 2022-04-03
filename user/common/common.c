@@ -33,8 +33,8 @@ static void COMMON_EnterStandbyMode(void)
 {
     TRACE_PRINTF("enter stop mode\n\r");
 
-    WIFI_PowerOnOff(POWER_OFF);
-    HUB75D_DispOnOff(DISP_TIME_OFF);
+    WIFI_Power(POWER_OFF);
+    HUB75D_Disp(DISP_TIME_OFF);
     WORK_LED_OFF();
 
     HAL_Delay(100);
@@ -78,14 +78,13 @@ void COMMON_Init(void)
     TRACE_PRINTF("%s, %s, %s\n", SOFTWARE_VERSION, __TIME__, __DATE__);
 
     WIFI_ReceiveDmaInit();
-    WIFI_PowerOnOff(POWER_ON);
+    WIFI_Power(POWER_ON);
     HAL_RTCEx_SetSecond_IT(&hrtc);
     HAL_Delay(100);
     HTU21D_Init();
     HAL_Delay(100);
     GetClock();
-    WIFI_Init();
-    HUB75D_DispOnOff(DISP_TIME);
+    HUB75D_Disp(DISP_TIME);
     HAL_TIM_Base_Start_IT(&htim4);
 }
 
@@ -96,7 +95,7 @@ void COMMON_Process(void)
     if (Get1sFlag() == true) {
         SetOneSecondFlag(false);
         TRACE_PRINTF("1000ms\r\n");
-        WIFI_CtrDec();
+        WIFI_GetTime();
         HTU21D_Sampling();
         if (ClockRun() == true) {
             CalculationLunarCalendar(GetTimeData());
