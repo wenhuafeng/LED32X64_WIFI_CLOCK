@@ -31,7 +31,7 @@ static void ClearGpioExtiIT(uint16_t GPIO_Pin)
 
 static void COMMON_EnterStandbyMode(void)
 {
-    TRACE_PRINTF("enter stop mode\n\r");
+    TRACE_PRINTF("enter stop mode\r\n");
 
     WIFI_Power(POWER_OFF);
     HUB75D_Disp(DISP_TIME_OFF);
@@ -54,7 +54,7 @@ static void COMMON_EnterStandbyMode(void)
     HAL_TIM_Base_MspInit(&htim4);
     COMMON_Init();
 
-    TRACE_PRINTF("exit stop mode\n\r");
+    TRACE_PRINTF("exit stop mode\r\n");
 }
 
 static void IsPirIntFlagSet(void)
@@ -75,7 +75,7 @@ void COMMON_Init(void)
     } else {
         TRACE_PRINTF("trace init ok\r\n");
     }
-    TRACE_PRINTF("%s, %s, %s\n", SOFTWARE_VERSION, __TIME__, __DATE__);
+    TRACE_PRINTF("%s, %s, %s\r\n", SOFTWARE_VERSION, __TIME__, __DATE__);
 
     WIFI_ReceiveDmaInit();
     WIFI_Power(POWER_ON);
@@ -84,8 +84,11 @@ void COMMON_Init(void)
     HTU21D_Init();
     HAL_Delay(100);
     GetClock();
+    HAL_Delay(100);
     HUB75D_Disp(DISP_TIME);
     HAL_TIM_Base_Start_IT(&htim4);
+    HAL_Delay(100);
+    WIFI_Init(WIFI_REINIT);
 }
 
 void COMMON_Process(void)

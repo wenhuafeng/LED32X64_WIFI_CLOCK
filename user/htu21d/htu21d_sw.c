@@ -168,19 +168,16 @@ static bool HTU21D_FuncInit(void)
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | WRITE);
     if (status == false) {
-        TRACE_PRINTF("err0\r\n");
         goto i2c_fail;
     }
     status = I2C_WriteByte(READ_USER_REGISTER);
     if (status == false) {
-        TRACE_PRINTF("err1\r\n");
         goto i2c_fail;
     }
 
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | READ);
     if (status == false) {
-        TRACE_PRINTF("err2\r\n");
         goto i2c_fail;
     }
     userReg = I2C_ReadByte();
@@ -188,17 +185,14 @@ static bool HTU21D_FuncInit(void)
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | WRITE);
     if (status == false) {
-        TRACE_PRINTF("err3\r\n");
         goto i2c_fail;
     }
     status = I2C_WriteByte(WRITE_USER_REGISTER);
     if (status == false) {
-        TRACE_PRINTF("err4\r\n");
         goto i2c_fail;
     }
     status = I2C_WriteByte(userReg | 0x02);
     if (status == false) {
-        TRACE_PRINTF("err5\r\n");
         goto i2c_fail;
     }
     I2C_Stop();
@@ -215,12 +209,10 @@ static bool HTU21D_SoftReset(void)
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | WRITE);
     if (status == false) {
-        TRACE_PRINTF("err6\r\n");
         goto i2c_fail;
     }
     status = I2C_WriteByte(SOFT_RESET);
     if (status == false) {
-        TRACE_PRINTF("err7\r\n");
         goto i2c_fail;
     }
     I2C_Stop();

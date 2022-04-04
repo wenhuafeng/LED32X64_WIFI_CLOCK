@@ -7,7 +7,7 @@
 #endif
 #include "usart.h"
 
-#define RECEIVE_LENGTH 100
+#define RECEIVE_LENGTH 200
 #define USART_DMA_SENDING 1
 #define USART_DMA_SENDOVER 0
 

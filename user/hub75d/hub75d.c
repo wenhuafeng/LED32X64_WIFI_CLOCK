@@ -489,6 +489,7 @@ void HUB75D_SetDispOffCtr(enum DispTime time)
 void HUB75D_Disp(enum DispTime time)
 {
     HUB75D_SetDispOffCtr(time);
+
     if (time == DISP_TIME_OFF) {
         HUB75D_DISP_POWER_PIN = DISP_OFF;
         HUB_A = 0;
@@ -507,11 +508,13 @@ void HUB75D_Disp(enum DispTime time)
     } else {
         HUB75D_DISP_POWER_PIN = DISP_ON;
     }
+
+    TRACE_PRINTF("display time: %d\r\n\r\n", time);
 }
 
 bool HUB75D_CtrDec(void)
 {
-    bool standby = false;
+    bool ret = false;
     static uint8_t changeCtr;
 
     changeCtr++;
@@ -527,10 +530,9 @@ bool HUB75D_CtrDec(void)
     if (g_displayOffCtr) {
         g_displayOffCtr--;
         if (g_displayOffCtr == 0x00) {
-            standby = true;
-            TRACE_PRINTF("display off\r\n");
+            ret = true;
         }
     }
 
-    return standby;
+    return ret;
 }

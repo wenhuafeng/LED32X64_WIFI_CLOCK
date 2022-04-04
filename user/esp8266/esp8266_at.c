@@ -37,11 +37,7 @@
 #define GET_TIME_8S (8)
 #define GET_TIME_10S (10)
 #define GET_TIME_14S (14)
-
-enum WifiReinit {
-    WIFI_NOT_REINIT,
-    WIFI_REINIT,
-};
+#define GET_TIME_16S (16)
 
 enum WifiInitStatus {
     WIFI_INIT_REST,
@@ -178,26 +174,22 @@ static uint8_t ProcessClock(char *cRxBuf)
 
         HAL_UART_DeInit(&huart1);
         g_getTime.powerOffCtr = 0x00;
-        ESP8266_AT_POWER_PIN_LOW();
+        WIFI_Power(POWER_OFF);
         SetTimeData(&time);
         SetClock(&time);
         CalculationLunarCalendar(&time);
-        TRACE_PRINTF("update time: %d-%d-%d %02d:%02d:%02d \r\n", time.year, time.month, time.day, time.hour,
-                     time.min, time.sec);
-    } else {
-        g_getTime.getTimeCtr = GET_TIME_10S;
     }
 
     return status;
 }
 
-static bool WIFI_Init(enum WifiReinit reInit)
+bool WIFI_Init(enum WifiReinit reInit)
 {
     static enum WifiInitStatus status = WIFI_INIT_REST;
 
     if (reInit == WIFI_REINIT) {
-        TRACE_PRINTF("wifi reinit\r\n");
         status = WIFI_INIT_REST;
+        return false;
     }
     if (status == WIFI_INIT_COMPLETE) {
         return true;
@@ -215,12 +207,14 @@ void WIFI_Power(enum PowerFlag flag)
     if (flag == POWER_ON) {
         ESP8266_AT_POWER_PIN_HIGH();
         g_getTime.powerOffCtr = WIFI_OFF_TIME;
+        TRACE_PRINTF("wifi power on\r\n");
     } else {
         ESP8266_AT_POWER_PIN_LOW();
         g_getTime.connect = DISCONNECT;
         g_getTime.getTimeCtr = 0x00;
         g_getTime.powerOffCtr = 0x00;
         g_getTime.renewInitCtr = 0x00;
+        TRACE_PRINTF("wifi power off\r\n");
     }
 }
 
@@ -241,10 +235,13 @@ void WIFI_GetTime(void)
         g_getTime.getTimeCtr--;
         if (g_getTime.getTimeCtr == GET_TIME_10S) {
             printf(WIFI_SNTP_CONFIG);
+            TRACE_PRINTF("wifi: %s\r\n", WIFI_SNTP_CONFIG);
         } else if ((g_getTime.getTimeCtr == GET_TIME_8S) ||
-            (g_getTime.getTimeCtr == GET_TIME_6S) ||
-            (g_getTime.getTimeCtr == 0x00)) {
+            (g_getTime.getTimeCtr == GET_TIME_6S)) {
             printf(WIFI_GET_SNTP_TIME);
+            TRACE_PRINTF("wifi: %s\r\n", WIFI_GET_SNTP_TIME);
+        } else if (g_getTime.getTimeCtr == 0x00) {
+            g_getTime.getTimeCtr = GET_TIME_16S;
         } else {
             ;
         }
@@ -268,7 +265,7 @@ void WIFI_ReceiveProcess(uint8_t *buf)
     if (strstr((char *)buf, str) != NULL) {
         TRACE_PRINTF("wifi connected\r\n");
         g_getTime.connect = CONNECT;
-        g_getTime.getTimeCtr = GET_TIME_14S;
+        g_getTime.getTimeCtr = GET_TIME_16S;
     }
     str = "WIFI DIS"; /* WIFI DISCONNECT */
     if (strstr((char *)buf, str) != NULL) {
@@ -276,7 +273,7 @@ void WIFI_ReceiveProcess(uint8_t *buf)
         WIFI_Power(POWER_OFF);
         g_getTime.renewInitCtr = GET_TIME_2S;
     }
-    str = "+CWJAP:2"; /* WIFI CONNECT FAIL */
+    str = "+CWJAP:3"; /* WIFI CONNECT FAIL */
     if (strstr((char *)buf, str) != NULL) {
         TRACE_PRINTF("wifi connect fail\r\n");
         WIFI_Power(POWER_OFF);
