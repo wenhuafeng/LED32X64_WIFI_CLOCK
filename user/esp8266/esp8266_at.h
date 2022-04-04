@@ -6,7 +6,7 @@
 
 enum PowerFlag {
     POWER_OFF,
-    POWER_ON
+    POWER_ON,
 };
 
 enum WifiReinit {
@@ -18,7 +18,5 @@ bool WIFI_Init(enum WifiReinit reInit);
 void WIFI_ReceiveProcess(uint8_t *buf);
 void WIFI_GetTime(void);
 void WIFI_Power(enum PowerFlag flag);
-bool WIFI_GetTimeDataFlag(void);
-void WIFI_SetTimeDataFlag(bool value);
 
 #endif

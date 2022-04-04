@@ -6,17 +6,17 @@
 
 enum DispTime {
     DISP_TIME_OFF = 0,
-    DISP_TIME = (5 * 60)
+    DISP_TIME     = (5 * 60),
 };
 
 enum DispTorH {
     DISP_T,
-    DISP_H
+    DISP_H,
 };
 
 enum {
     DISP_OFF = 0,
-    DISP_ON = 1
+    DISP_ON  = 1,
 };
 
 void HUB75D_DispScan(void);

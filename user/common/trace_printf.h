@@ -3,7 +3,7 @@
 
 #include "trace.h"
 
-#define TRACE_PRINTF(...)                                                   \
+#define TRACE_PRINTF(...)                                             \
     do {                                                              \
         TRACE_COND_FSend(VLEVEL_OFF, T_REG_OFF, TS_OFF, __VA_ARGS__); \
     } while (0)

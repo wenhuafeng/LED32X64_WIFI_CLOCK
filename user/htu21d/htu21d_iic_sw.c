@@ -6,9 +6,9 @@
 
 #define HTU21D_I2C_DELAY 2
 
-#define HTU21D_SCL_Pin GPIO_PIN_6
+#define HTU21D_SCL_Pin       GPIO_PIN_6
 #define HTU21D_SCL_GPIO_Port GPIOB
-#define HTU21D_SDA_Pin GPIO_PIN_7
+#define HTU21D_SDA_Pin       GPIO_PIN_7
 #define HTU21D_SDA_GPIO_Port GPIOB
 
 enum SdaIoType {
@@ -53,12 +53,12 @@ static void HTU21D_SDA_SET(enum SdaIoType io)
     GPIO_InitTypeDef GPIO_InitStructure;
 
     if (io == HTU21D_SDA_OUTPUT) {
-        GPIO_InitStructure.Pin = HTU21D_SDA_Pin;
-        GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;
+        GPIO_InitStructure.Pin   = HTU21D_SDA_Pin;
+        GPIO_InitStructure.Mode  = GPIO_MODE_OUTPUT_OD;
         GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_LOW;
         HAL_GPIO_Init(HTU21D_SDA_GPIO_Port, &GPIO_InitStructure);
     } else {
-        GPIO_InitStructure.Pin = HTU21D_SDA_Pin;
+        GPIO_InitStructure.Pin  = HTU21D_SDA_Pin;
         GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
         GPIO_InitStructure.Pull = GPIO_PULLUP;
         HAL_GPIO_Init(HTU21D_SDA_GPIO_Port, &GPIO_InitStructure);
@@ -114,13 +114,13 @@ void I2C_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    GPIO_InitStructure.Pin = HTU21D_SDA_Pin;
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStructure.Pin   = HTU21D_SDA_Pin;
+    GPIO_InitStructure.Mode  = GPIO_MODE_OUTPUT_OD;
     GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(HTU21D_SDA_GPIO_Port, &GPIO_InitStructure);
 
-    GPIO_InitStructure.Pin = HTU21D_SCL_Pin;
-    GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStructure.Pin   = HTU21D_SCL_Pin;
+    GPIO_InitStructure.Mode  = GPIO_MODE_OUTPUT_OD;
     GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(HTU21D_SCL_GPIO_Port, &GPIO_InitStructure);
 

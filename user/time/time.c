@@ -53,14 +53,14 @@ void CalculateWeek(uint16_t year, uint8_t month, uint8_t day, uint8_t *week)
 
     if (month < 3) {
         monthTemp = month + 12;
-        yearTemp = year - 1;
+        yearTemp  = year - 1;
     } else {
         monthTemp = month;
-        yearTemp = year;
+        yearTemp  = year;
     }
 
     yearHigh = yearTemp / 100;
-    yearLow = yearTemp % 100;
+    yearLow  = yearTemp % 100;
 
     wk = yearLow + (yearLow / 4) + (yearHigh / 4);
     wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
@@ -71,13 +71,13 @@ void CalculateWeek(uint16_t year, uint8_t month, uint8_t day, uint8_t *week)
 
 void SetTimeData(struct TimeType *time)
 {
-    g_time.sec = time->sec;
-    g_time.min = time->min;
-    g_time.hour = time->hour;
-    g_time.week = time->week;
-    g_time.day = time->day;
+    g_time.sec   = time->sec;
+    g_time.min   = time->min;
+    g_time.hour  = time->hour;
+    g_time.week  = time->week;
+    g_time.day   = time->day;
     g_time.month = time->month;
-    g_time.year = time->year;
+    g_time.year  = time->year;
 }
 
 bool ClockRun(void)
@@ -127,14 +127,14 @@ void GetClock(void)
     HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-    g_time.sec = sTime.Seconds;
-    g_time.min = sTime.Minutes;
+    g_time.sec  = sTime.Seconds;
+    g_time.min  = sTime.Minutes;
     g_time.hour = sTime.Hours;
 
-    g_time.day = sDate.Date;
+    g_time.day   = sDate.Date;
     g_time.month = sDate.Month;
-    g_time.week = sDate.WeekDay;
-    g_time.year = (sDate.Year + 2000);
+    g_time.week  = sDate.WeekDay;
+    g_time.year  = (sDate.Year + 2000);
 
     HUB75D_CalculateCalendar(&g_time);
     CalculationLunarCalendar(&g_time);
@@ -150,12 +150,12 @@ void SetClock(struct TimeType *time)
 
     sTime.Seconds = time->sec;
     sTime.Minutes = time->min;
-    sTime.Hours = time->hour;
+    sTime.Hours   = time->hour;
 
-    sDate.Date = time->day;
-    sDate.Month = time->month;
+    sDate.Date    = time->day;
+    sDate.Month   = time->month;
     sDate.WeekDay = time->week;
-    sDate.Year = (time->year % 100);
+    sDate.Year    = (time->year % 100);
 
     HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);

@@ -32,9 +32,9 @@
 #define NOV 0x004e6f76
 #define DEC 0x00446563
 
-#define GET_TIME_2S (2)
-#define GET_TIME_6S (6)
-#define GET_TIME_8S (8)
+#define GET_TIME_2S  (2)
+#define GET_TIME_6S  (6)
+#define GET_TIME_8S  (8)
 #define GET_TIME_10S (10)
 #define GET_TIME_14S (14)
 #define GET_TIME_16S (16)
@@ -60,8 +60,8 @@ enum ConnectFlag {
 };
 
 #define WIFI_GET_SNTP_TIME "AT+CIPSNTPTIME?\r\n"
-#define WIFI_SNTP_CONFIG "AT+CIPSNTPCFG=1,8\r\n"
-#define WIFI_OFF_TIME (2 * 60) /* 2min */
+#define WIFI_SNTP_CONFIG   "AT+CIPSNTPCFG=1,8\r\n"
+#define WIFI_OFF_TIME      (2 * 60) /* 2min */
 
 #define ESP8266_AT_POWER_PIN_HIGH()                                            \
     do {                                                                       \
@@ -148,8 +148,8 @@ static uint8_t ProcessClock(char *cRxBuf)
     i |= cRxBuf[18] << 8 | cRxBuf[19];
     month = GetMonth(i);
 
-    day = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
-    hour = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
+    day    = AscToHex(cRxBuf[21]) * 10 + AscToHex(cRxBuf[22]);
+    hour   = AscToHex(cRxBuf[24]) * 10 + AscToHex(cRxBuf[25]);
     minute = AscToHex(cRxBuf[27]) * 10 + AscToHex(cRxBuf[28]);
     second = AscToHex(cRxBuf[30]) * 10 + AscToHex(cRxBuf[31]);
     year = AscToHex(cRxBuf[33]) * 1000 + AscToHex(cRxBuf[34]) * 100 + AscToHex(cRxBuf[35]) * 10 + AscToHex(cRxBuf[36]);
@@ -164,13 +164,13 @@ static uint8_t ProcessClock(char *cRxBuf)
     }
 
     if (status == true) {
-        time.year = year;
+        time.year  = year;
         time.month = month;
-        time.day = day;
-        time.week = week;
-        time.hour = hour;
-        time.min = minute;
-        time.sec = second;
+        time.day   = day;
+        time.week  = week;
+        time.hour  = hour;
+        time.min   = minute;
+        time.sec   = second;
 
         HAL_UART_DeInit(&huart1);
         g_getTime.powerOffCtr = 0x00;
@@ -210,9 +210,9 @@ void WIFI_Power(enum PowerFlag flag)
         TRACE_PRINTF("wifi power on\r\n");
     } else {
         ESP8266_AT_POWER_PIN_LOW();
-        g_getTime.connect = DISCONNECT;
-        g_getTime.getTimeCtr = 0x00;
-        g_getTime.powerOffCtr = 0x00;
+        g_getTime.connect      = DISCONNECT;
+        g_getTime.getTimeCtr   = 0x00;
+        g_getTime.powerOffCtr  = 0x00;
         g_getTime.renewInitCtr = 0x00;
         TRACE_PRINTF("wifi power off\r\n");
     }
@@ -236,8 +236,7 @@ void WIFI_GetTime(void)
         if (g_getTime.getTimeCtr == GET_TIME_10S) {
             printf(WIFI_SNTP_CONFIG);
             TRACE_PRINTF("wifi: %s\r\n", WIFI_SNTP_CONFIG);
-        } else if ((g_getTime.getTimeCtr == GET_TIME_8S) ||
-            (g_getTime.getTimeCtr == GET_TIME_6S)) {
+        } else if ((g_getTime.getTimeCtr == GET_TIME_8S) || (g_getTime.getTimeCtr == GET_TIME_6S)) {
             printf(WIFI_GET_SNTP_TIME);
             TRACE_PRINTF("wifi: %s\r\n", WIFI_GET_SNTP_TIME);
         } else if (g_getTime.getTimeCtr == 0x00) {
@@ -264,39 +263,32 @@ void WIFI_ReceiveProcess(uint8_t *buf)
     str = "WIFI CON"; /* WIFI CONNECTED */
     if (strstr((char *)buf, str) != NULL) {
         TRACE_PRINTF("wifi connected\r\n");
-        g_getTime.connect = CONNECT;
+        g_getTime.connect    = CONNECT;
         g_getTime.getTimeCtr = GET_TIME_16S;
     }
+
     str = "WIFI DIS"; /* WIFI DISCONNECT */
     if (strstr((char *)buf, str) != NULL) {
         TRACE_PRINTF("wifi disconnect\r\n");
         WIFI_Power(POWER_OFF);
         g_getTime.renewInitCtr = GET_TIME_2S;
     }
+
     str = "+CWJAP:3"; /* WIFI CONNECT FAIL */
     if (strstr((char *)buf, str) != NULL) {
         TRACE_PRINTF("wifi connect fail\r\n");
         WIFI_Power(POWER_OFF);
         g_getTime.renewInitCtr = GET_TIME_2S;
     }
+
     if (g_getTime.connect == CONNECT) {
-        str = "+CIPSNTPTIME:";
+        str         = "+CIPSNTPTIME:";
         strPosition = strstr((char *)buf, str);
         if (strPosition != NULL) {
             ProcessClock(strPosition);
             g_getTime.okFlag = 1;
         }
     }
-}
-
-bool WIFI_GetTimeDataFlag(void)
-{
-    return g_getTime.okFlag;
-}
-
-void WIFI_SetTimeDataFlag(bool value)
-{
-    g_getTime.okFlag = value;
 }
 
 #endif

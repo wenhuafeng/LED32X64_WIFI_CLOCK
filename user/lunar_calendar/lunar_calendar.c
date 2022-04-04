@@ -39,7 +39,7 @@ static bool LunarCalendar(struct TimeType *time, struct LunarCalendarType *lcDat
     uint8_t flag;        /* 用来对闰月的特殊处理 */
     uint16_t year = time->year;
     uint8_t month = time->month;
-    uint8_t day = time->day;
+    uint8_t day   = time->day;
 
     if (((g_lunarCalendarTable[year - 1901] & 0x0060) >> 5) == 1) {
         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1;
@@ -55,7 +55,7 @@ static bool LunarCalendar(struct TimeType *time, struct LunarCalendarType *lcDat
         sunToNY -= springToNY;
         month = 1;
         index = 1;
-        flag = 0;
+        flag  = 0;
         if ((g_lunarCalendarTable[year - 1901] & (0x80000 >> (index - 1))) == 0) {
             dayCount = 29;
         } else {
@@ -111,9 +111,9 @@ static bool LunarCalendar(struct TimeType *time, struct LunarCalendarType *lcDat
         }
         day = dayCount - springToNY + 1;
     }
-    lcData->year = year;
+    lcData->year  = year;
     lcData->month = month;
-    lcData->day = day;
+    lcData->day   = day;
 
     return (month == ((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20)) ? 1 : 0;
 }

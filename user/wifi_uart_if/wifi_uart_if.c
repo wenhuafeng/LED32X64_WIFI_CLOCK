@@ -7,8 +7,8 @@
 #endif
 #include "usart.h"
 
-#define RECEIVE_LENGTH 200
-#define USART_DMA_SENDING 1
+#define RECEIVE_LENGTH     200
+#define USART_DMA_SENDING  1
 #define USART_DMA_SENDOVER 0
 
 struct UsartReceiveType {
@@ -47,7 +47,8 @@ void WIFI_ReceiveDmaInit(void)
 
 void WIFI_SendDataDMA(uint8_t *pdata, uint16_t Length)
 {
-    while (g_usartType.sendFlag == USART_DMA_SENDING);
+    while (g_usartType.sendFlag == USART_DMA_SENDING)
+        ;
     g_usartType.sendFlag = USART_DMA_SENDING;
     HAL_UART_Transmit_DMA(&huart1, pdata, Length);
 }
@@ -63,8 +64,8 @@ void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
     __HAL_UART_CLEAR_IDLEFLAG(huart);
     HAL_UART_DMAStop(huart);
     if (huart->Instance == huart1.Instance) {
-        temp = huart1.hdmarx->Instance->CNDTR;
-        g_usartType.rxLength = RECEIVE_LENGTH - temp;
+        temp                    = huart1.hdmarx->Instance->CNDTR;
+        g_usartType.rxLength    = RECEIVE_LENGTH - temp;
         g_usartType.receiveFlag = 1;
         HAL_UART_Receive_DMA(&huart1, g_usartType.buffer, RECEIVE_LENGTH);
     }
@@ -88,5 +89,4 @@ void WIFI_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
 void WIFI_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-
 }

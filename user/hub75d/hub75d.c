@@ -12,33 +12,34 @@
 
 #define TEMP_HUMI_DISP_TIME (2) /* seconds */
 
-#define HUB_A PBout(13)
-#define HUB_B PBout(14)
-#define HUB_C PBout(15)
-#define HUB_D PAout(8)
-#define HUB_OE PBout(4)
+#define HUB_A   PBout(13)
+#define HUB_B   PBout(14)
+#define HUB_C   PBout(15)
+#define HUB_D   PAout(8)
+#define HUB_OE  PBout(4)
 #define HUB_LAT PBout(3)
 #define HUB_CLK PAout(15)
-#define HUB_R1 PAout(6)
-#define HUB_G1 PAout(5)
-#define HUB_B1 PAout(7)
-#define HUB_R2 PBout(0)
-#define HUB_G2 PBout(1)
-#define HUB_B2 PBout(10)
+#define HUB_R1  PAout(6)
+#define HUB_G1  PAout(5)
+#define HUB_B1  PAout(7)
+#define HUB_R2  PBout(0)
+#define HUB_G2  PBout(1)
+#define HUB_B2  PBout(10)
+
 #define HUB75D_DISP_POWER_PIN PBout(11)
 
-#define CHINESE_YEAR_INDEX 10
-#define CHINESE_MONTH_INDEX 9
-#define CHINESE_DAY_INDEX 8
+#define CHINESE_YEAR_INDEX           10
+#define CHINESE_MONTH_INDEX          9
+#define CHINESE_DAY_INDEX            8
 #define CHINESE_LUNAR_CALENDAR_INDEX 7
 
-#define TEMP_DISP_NULL_INDEX 11
-#define TEMP_NEGATIVE_SIGN_INDEX 12
-#define TEMP_HUMI_DOT_INDEX 13
+#define TEMP_DISP_NULL_INDEX           11
+#define TEMP_NEGATIVE_SIGN_INDEX       12
+#define TEMP_HUMI_DOT_INDEX            13
 #define TEMP_CELSIUS_DEGREE_ICON_INDEX 14
-#define TEMP_PERCENT_SIGN_ICON_INDEX 15
+#define TEMP_PERCENT_SIGN_ICON_INDEX   15
 
-#define SCAN_ALL_LINE 16
+#define SCAN_ALL_LINE              16
 #define DATE_TABLE_DISP_NULL_INDEX 11
 
 struct CalendarDecimal {
@@ -292,10 +293,10 @@ static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rg
 static inline void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
 {
     struct LunarCalendarType *lcData = GetLunarCalendar();
-    uint8_t m1 = lcData->month / 10;
-    uint8_t m0 = lcData->month % 10;
-    uint8_t d1 = lcData->day / 10;
-    uint8_t d0 = lcData->day % 10;
+    uint8_t m1                       = lcData->month / 10;
+    uint8_t m0                       = lcData->month % 10;
+    uint8_t d1                       = lcData->day / 10;
+    uint8_t d0                       = lcData->day % 10;
 
     rgb->green[8] |= g_chineseWeekDateTable[CHINESE_LUNAR_CALENDAR_INDEX][i];
 
@@ -322,12 +323,12 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
     uint8_t t1, t0, td;
     uint16_t tmp;
     int16_t temperature = HTU21D_GetTemperature();
-    uint16_t humidity = HTU21D_GetHumidity();
+    uint16_t humidity   = HTU21D_GetHumidity();
 
     if (g_displayTorH == DISP_T) {
         if (temperature < 0) {
             sign = true;
-            tmp = ~temperature + 1;
+            tmp  = ~temperature + 1;
         } else {
             tmp = temperature;
         }
@@ -345,9 +346,9 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
         }
     } else {
         tmp = humidity;
-        t1 = tmp / 100;
-        t0 = tmp % 100 / 10;
-        td = tmp % 10;
+        t1  = tmp / 100;
+        t0  = tmp % 100 / 10;
+        td  = tmp % 10;
         if (t1 == 0x00) {
             t1 = TEMP_DISP_NULL_INDEX;
         }
@@ -378,7 +379,7 @@ static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
     PinFlags flags = { 0 };
 
     HUB_LAT = 0;
-    HUB_OE = 1;
+    HUB_OE  = 1;
     for (uint8_t i = 0; i < 8; i++) {
         for (uint8_t j = 0; j < 8; j++) {
             flags.flag = 0x00;
@@ -402,19 +403,19 @@ static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
                 flags.bit.hubB2 = 1;
             }
 
-            rgb->red[i + 8] = rgb->red[i + 8] << 1;
+            rgb->red[i + 8]   = rgb->red[i + 8] << 1;
             rgb->green[i + 8] = rgb->green[i + 8] << 1;
-            rgb->blue[i + 8] = rgb->blue[i + 8] << 1;
-            rgb->red[i] = rgb->red[i] << 1;
-            rgb->green[i] = rgb->green[i] << 1;
-            rgb->blue[i] = rgb->blue[i] << 1;
+            rgb->blue[i + 8]  = rgb->blue[i + 8] << 1;
+            rgb->red[i]       = rgb->red[i] << 1;
+            rgb->green[i]     = rgb->green[i] << 1;
+            rgb->blue[i]      = rgb->blue[i] << 1;
 
-            HUB_R1 = flags.bit.hubR1;
-            HUB_G1 = flags.bit.hubG1;
-            HUB_B1 = flags.bit.hubB1;
-            HUB_R2 = flags.bit.hubR2;
-            HUB_G2 = flags.bit.hubG2;
-            HUB_B2 = flags.bit.hubB2;
+            HUB_R1  = flags.bit.hubR1;
+            HUB_G1  = flags.bit.hubG1;
+            HUB_B1  = flags.bit.hubB1;
+            HUB_R2  = flags.bit.hubR2;
+            HUB_G2  = flags.bit.hubG2;
+            HUB_B2  = flags.bit.hubB2;
             HUB_CLK = 1;
             HUB_CLK = 0;
         }
@@ -433,12 +434,12 @@ static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
         flags.bit.hubD = 1;
     }
 
-    HUB_A = flags.bit.hubA;
-    HUB_B = flags.bit.hubB;
-    HUB_C = flags.bit.hubC;
-    HUB_D = flags.bit.hubD;
+    HUB_A   = flags.bit.hubA;
+    HUB_B   = flags.bit.hubB;
+    HUB_C   = flags.bit.hubC;
+    HUB_D   = flags.bit.hubD;
     HUB_LAT = 1;
-    HUB_OE = 0;
+    HUB_OE  = 0;
 }
 
 void inline HUB75D_DispScan(void)
@@ -466,19 +467,19 @@ void HUB75D_CalculateCalendar(struct TimeType *time)
 {
     g_calendarDecimal.hourL = time->hour % 10;
     g_calendarDecimal.hourH = time->hour / 10;
-    g_calendarDecimal.minL = time->min % 10;
-    g_calendarDecimal.minH = time->min / 10;
-    g_calendarDecimal.secL = time->sec % 10;
-    g_calendarDecimal.secH = time->sec / 10;
+    g_calendarDecimal.minL  = time->min % 10;
+    g_calendarDecimal.minH  = time->min / 10;
+    g_calendarDecimal.secL  = time->sec % 10;
+    g_calendarDecimal.secH  = time->sec / 10;
 
-    g_calendarDecimal.dayL = time->day % 10;
-    g_calendarDecimal.dayH = time->day / 10;
+    g_calendarDecimal.dayL   = time->day % 10;
+    g_calendarDecimal.dayH   = time->day / 10;
     g_calendarDecimal.monthL = time->month % 10;
     g_calendarDecimal.monthH = time->month / 10;
-    g_calendarDecimal.yearL = time->year % 100 % 10;
-    g_calendarDecimal.yearH = time->year % 100 / 10;
-    g_calendarDecimal.week = time->week;
-    g_calendarDecimal.colon = 11; /* ":" */
+    g_calendarDecimal.yearL  = time->year % 100 % 10;
+    g_calendarDecimal.yearH  = time->year % 100 / 10;
+    g_calendarDecimal.week   = time->week;
+    g_calendarDecimal.colon  = 11; /* ":" */
 }
 
 void HUB75D_SetDispOffCtr(enum DispTime time)
@@ -492,19 +493,20 @@ void HUB75D_Disp(enum DispTime time)
 
     if (time == DISP_TIME_OFF) {
         HUB75D_DISP_POWER_PIN = DISP_OFF;
-        HUB_A = 0;
-        HUB_B = 0;
-        HUB_C = 0;
-        HUB_D = 0;
-        HUB_OE = 0;
+
+        HUB_A   = 0;
+        HUB_B   = 0;
+        HUB_C   = 0;
+        HUB_D   = 0;
+        HUB_OE  = 0;
         HUB_LAT = 0;
         HUB_CLK = 0;
-        HUB_R1 = 0;
-        HUB_G1 = 0;
-        HUB_B1 = 0;
-        HUB_R2 = 0;
-        HUB_G2 = 0;
-        HUB_B2 = 0;
+        HUB_R1  = 0;
+        HUB_G1  = 0;
+        HUB_B1  = 0;
+        HUB_R2  = 0;
+        HUB_G2  = 0;
+        HUB_B2  = 0;
     } else {
         HUB75D_DISP_POWER_PIN = DISP_ON;
     }

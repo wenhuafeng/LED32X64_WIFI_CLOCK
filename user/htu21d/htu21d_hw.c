@@ -10,12 +10,12 @@
 #define TEMP_MAX_VALUE 999 /* 99.9C */
 
 #define DEVICE_WRITE_ADDR 0x80
-#define DEVICE_READ_ADDR 0x81
+#define DEVICE_READ_ADDR  0x81
 
-#define TEMP_HOLD 0xe3
+#define TEMP_HOLD    0xe3
 #define TEMP_NO_HOLD 0xf3
 
-#define HUMI_HOLD 0xe5
+#define HUMI_HOLD    0xe5
 #define HUMI_NO_HOLD 0xf5
 
 #define SOFT_RESET 0xfe
@@ -70,7 +70,7 @@ static bool HTU21D_GetData(void)
     HAL_StatusTypeDef status;
 
     write[0] = HUMI_NO_HOLD;
-    status = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
+    status   = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
     if (status != HAL_OK) {
         goto error;
     }
@@ -88,6 +88,7 @@ static bool HTU21D_GetData(void)
     humiData <<= 8;
     humiData |= read[DATA_LOW];
     humi = ((humiData & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
+
     g_thData.humidity = (uint16_t)humi;
     if (g_thData.humidity > HUMI_MAX_VALUE) {
         g_thData.humidity = HUMI_MAX_VALUE;
@@ -95,7 +96,7 @@ static bool HTU21D_GetData(void)
     HAL_Delay(10);
 
     write[0] = TEMP_NO_HOLD;
-    status = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
+    status   = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
     if (status != HAL_OK) {
         goto error;
     }
@@ -112,7 +113,8 @@ static bool HTU21D_GetData(void)
     tempData = read[DATA_HIGH];
     tempData <<= 8;
     tempData |= read[DATA_LOW];
-    temp                 = ((tempData & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
+    temp = ((tempData & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
+
     g_thData.temperature = (int16_t)temp;
     if (g_thData.temperature > TEMP_MAX_VALUE) {
         g_thData.temperature = TEMP_MAX_VALUE;
@@ -133,7 +135,7 @@ static bool HTU21D_FuncInit(void)
     HAL_StatusTypeDef status;
 
     write[0] = READ_USER_REGISTER;
-    status = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
+    status   = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
     if (status != HAL_OK) {
         goto error;
     }
@@ -145,7 +147,7 @@ static bool HTU21D_FuncInit(void)
 
     write[0] = WRITE_USER_REGISTER;
     write[1] = (read[0] | DISABLE_OTP_RELOAD);
-    status = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 2, 100);
+    status   = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 2, 100);
     if (status != HAL_OK) {
         goto error;
     }

@@ -10,10 +10,10 @@
 
 #if defined(UTIL_ADV_TRACE_OVERRUN)
 enum TraceOverrunStatus {
-    TRACE_OVERRUN_NONE = 0,     /* overrun status none. */
-    TRACE_OVERRUN_INDICATION,   /* overrun status an indication shall be sent. */
-    TRACE_OVERRUN_TRANSFERT,    /* overrun status data transfer ongoing. */
-    TRACE_OVERRUN_EXECUTED,     /* overrun status data transfer complete. */
+    TRACE_OVERRUN_NONE = 0,   /* overrun status none. */
+    TRACE_OVERRUN_INDICATION, /* overrun status an indication shall be sent. */
+    TRACE_OVERRUN_TRANSFERT,  /* overrun status data transfer ongoing. */
+    TRACE_OVERRUN_EXECUTED,   /* overrun status data transfer complete. */
 };
 #endif
 
@@ -32,22 +32,22 @@ enum TraceUnchunkStatus {
 
 struct TraceContext {
 #if defined(TRACE_UNCHUNK_MODE)
-    uint16_t unchunkEnabled;                /* unchunk enable. */
-    enum TraceUnchunkStatus unchunkStatus;  /* unchunk transfer status. */
+    uint16_t unchunkEnabled;               /* unchunk enable. */
+    enum TraceUnchunkStatus unchunkStatus; /* unchunk transfer status. */
 #endif
 #if defined(UTIL_ADV_TRACE_OVERRUN)
-    enum TraceOverrunStatus overRunStatus;  /* overrun status. */
-    cb_overrun *overrunFunc;                /* overrun function */
+    enum TraceOverrunStatus overRunStatus; /* overrun status. */
+    cb_overrun *overrunFunc;               /* overrun function */
 #endif
 #if defined(TRACE_CONDITIONNAL)
-    cb_timestamp *timestampFunc;    /* ptr of function used to insert time stamp. */
-    uint8_t currentVerboseLevel;    /* verbose level used. */
-    uint32_t regionMask;            /* mask of the enabled region. */
+    cb_timestamp *timestampFunc; /* ptr of function used to insert time stamp. */
+    uint8_t currentVerboseLevel; /* verbose level used. */
+    uint32_t regionMask;         /* mask of the enabled region. */
 #endif
-    uint16_t traceReadPointer;      /* read pointer the trace system. */
-    uint16_t traceWritePointer;     /* write pointer the trace system. */
-    uint16_t traceSentSize;         /* size of the latest transfer. */
-    uint16_t traceLock;             /* lock counter of the trace system. */
+    uint16_t traceReadPointer;  /* read pointer the trace system. */
+    uint16_t traceWritePointer; /* write pointer the trace system. */
+    uint16_t traceSentSize;     /* size of the latest transfer. */
+    uint16_t traceLock;         /* lock counter of the trace system. */
 };
 
 static struct TraceContext g_traceContext;
@@ -113,19 +113,21 @@ static void TRACE_TxCpltCallback(void *Ptr)
 
 #if defined(TRACE_UNCHUNK_MODE)
     if (TRACE_UNCHUNK_TRANSFER == g_traceContext.unchunkStatus) {
-        g_traceContext.unchunkStatus = TRACE_UNCHUNK_NONE;
+        g_traceContext.unchunkStatus    = TRACE_UNCHUNK_NONE;
         g_traceContext.traceReadPointer = 0;
         TRACE_DEBUG("\nTRACE_TxCpltCallback::unchunk complete\n");
     } else {
-        g_traceContext.traceReadPointer = (g_traceContext.traceReadPointer + g_traceContext.traceSentSize) % TRACE_FIFO_SIZE;
+        g_traceContext.traceReadPointer =
+                (g_traceContext.traceReadPointer + g_traceContext.traceSentSize) % TRACE_FIFO_SIZE;
     }
 #else
-    g_traceContext.traceReadPointer = (g_traceContext.traceReadPointer + g_traceContext.traceSentSize) % TRACE_FIFO_SIZE;
+    g_traceContext.traceReadPointer =
+            (g_traceContext.traceReadPointer + g_traceContext.traceSentSize) % TRACE_FIFO_SIZE;
 #endif
 
 #if defined(UTIL_ADV_TRACE_OVERRUN)
     if (g_traceContext.overRunStatus == TRACE_OVERRUN_INDICATION) {
-        uint8_t *ptr = NULL;
+        uint8_t *ptr                 = NULL;
         g_traceContext.overRunStatus = TRACE_OVERRUN_TRANSFERT;
         TRACE_EXIT_CRITICAL_SECTION();
         g_traceContext.overrunFunc(&ptr, &g_traceContext.traceSentSize);
@@ -138,8 +140,8 @@ static void TRACE_TxCpltCallback(void *Ptr)
     if ((g_traceContext.traceReadPointer != g_traceContext.traceWritePointer) && (1u == g_traceContext.traceLock)) {
 #ifdef TRACE_UNCHUNK_MODE
         if (TRACE_UNCHUNK_DETECTED == g_traceContext.unchunkStatus) {
-            g_traceContext.traceSentSize = g_traceContext.unchunkEnabled - g_traceContext.traceReadPointer;
-            g_traceContext.unchunkStatus = TRACE_UNCHUNK_TRANSFER;
+            g_traceContext.traceSentSize  = g_traceContext.unchunkEnabled - g_traceContext.traceReadPointer;
+            g_traceContext.unchunkStatus  = TRACE_UNCHUNK_TRANSFER;
             g_traceContext.unchunkEnabled = 0;
 
             TRACE_DEBUG("\nTRACE_TxCpltCallback::unchunk start(%d,%d)\n", g_traceContext.unchunkEnabled,
@@ -148,7 +150,7 @@ static void TRACE_TxCpltCallback(void *Ptr)
             if (0u == g_traceContext.traceSentSize) {
                 /* this case occurs when an ongoing write aligned the Rd position with chunk position */
                 /* in that case the unchunk is forgot */
-                g_traceContext.unchunkStatus = TRACE_UNCHUNK_NONE;
+                g_traceContext.unchunkStatus    = TRACE_UNCHUNK_NONE;
                 g_traceContext.traceReadPointer = 0;
             }
         }
@@ -192,9 +194,9 @@ static int16_t TRACE_AllocateBufer(uint16_t size, uint16_t *pos)
 #ifdef TRACE_UNCHUNK_MODE
         freesize = (uint16_t)(TRACE_FIFO_SIZE - g_traceContext.traceWritePointer);
         if ((size >= freesize) && (g_traceContext.traceReadPointer > size)) {
-            g_traceContext.unchunkStatus = TRACE_UNCHUNK_DETECTED;
-            g_traceContext.unchunkEnabled = g_traceContext.traceWritePointer;
-            freesize = g_traceContext.traceReadPointer;
+            g_traceContext.unchunkStatus     = TRACE_UNCHUNK_DETECTED;
+            g_traceContext.unchunkEnabled    = g_traceContext.traceWritePointer;
+            freesize                         = g_traceContext.traceReadPointer;
             g_traceContext.traceWritePointer = 0;
         }
 #else
@@ -206,9 +208,9 @@ static int16_t TRACE_AllocateBufer(uint16_t size, uint16_t *pos)
         if (g_traceContext.traceWritePointer > g_traceContext.traceReadPointer) {
             freesize = (uint16_t)(TRACE_FIFO_SIZE - g_traceContext.traceWritePointer);
             if ((size >= freesize) && (g_traceContext.traceReadPointer > size)) {
-                g_traceContext.unchunkStatus = TRACE_UNCHUNK_DETECTED;
-                g_traceContext.unchunkEnabled = g_traceContext.traceWritePointer;
-                freesize = g_traceContext.traceReadPointer;
+                g_traceContext.unchunkStatus     = TRACE_UNCHUNK_DETECTED;
+                g_traceContext.unchunkEnabled    = g_traceContext.traceWritePointer;
+                freesize                         = g_traceContext.traceReadPointer;
                 g_traceContext.traceWritePointer = 0;
             }
         } else {
@@ -224,9 +226,9 @@ static int16_t TRACE_AllocateBufer(uint16_t size, uint16_t *pos)
     }
 
     if (freesize > size) {
-        *pos = g_traceContext.traceWritePointer;
+        *pos                             = g_traceContext.traceWritePointer;
         g_traceContext.traceWritePointer = (g_traceContext.traceWritePointer + size) % TRACE_FIFO_SIZE;
-        ret = 0;
+        ret                              = 0;
 #if defined(UTIL_ADV_TRACE_OVERRUN)
         if (g_traceContext.overRunStatus == TRACE_OVERRUN_EXECUTED) {
             /* clear the over run */
@@ -238,8 +240,8 @@ static int16_t TRACE_AllocateBufer(uint16_t size, uint16_t *pos)
         TRACE_DEBUG("\n--TRACE_AllocateBufer(%d-%d-%d::%d-%d)--\n", freesize - size, size,
                     g_traceContext.unchunkEnabled, g_traceContext.traceReadPointer, g_traceContext.traceWritePointer);
 #else
-        TRACE_DEBUG("\n--TRACE_AllocateBufer(%d-%d::%d-%d)--\n", freesize - size, size,
-                    g_traceContext.traceReadPointer, g_traceContext.traceWritePointer);
+        TRACE_DEBUG("\n--TRACE_AllocateBufer(%d-%d::%d-%d)--\n", freesize - size, size, g_traceContext.traceReadPointer,
+                    g_traceContext.traceWritePointer);
 #endif
     }
 #if defined(UTIL_ADV_TRACE_OVERRUN)
@@ -301,7 +303,7 @@ enum TraceStatus TRACE_StartRxProcess(void (*UserCallback)(uint8_t *inData, uint
 static enum TraceStatus TRACE_SendData(void)
 {
     enum TraceStatus ret = UTIL_ADV_TRACE_OK;
-    uint8_t *ptr = NULL;
+    uint8_t *ptr         = NULL;
 
     TRACE_ENTER_CRITICAL_SECTION();
 
@@ -311,15 +313,16 @@ static enum TraceStatus TRACE_SendData(void)
         if (g_traceContext.traceReadPointer != g_traceContext.traceWritePointer) {
 #ifdef TRACE_UNCHUNK_MODE
             if (TRACE_UNCHUNK_DETECTED == g_traceContext.unchunkStatus) {
-                g_traceContext.traceSentSize = (uint16_t)(g_traceContext.unchunkEnabled - g_traceContext.traceReadPointer);
-                g_traceContext.unchunkStatus = TRACE_UNCHUNK_TRANSFER;
+                g_traceContext.traceSentSize =
+                        (uint16_t)(g_traceContext.unchunkEnabled - g_traceContext.traceReadPointer);
+                g_traceContext.unchunkStatus  = TRACE_UNCHUNK_TRANSFER;
                 g_traceContext.unchunkEnabled = 0;
 
                 TRACE_DEBUG("\nTRACE_TxCpltCallback::unchunk start(%d,%d)\n", g_traceContext.unchunkEnabled,
                             g_traceContext.traceReadPointer);
 
                 if (0u == g_traceContext.traceSentSize) {
-                    g_traceContext.unchunkStatus = TRACE_UNCHUNK_NONE;
+                    g_traceContext.unchunkStatus    = TRACE_UNCHUNK_NONE;
                     g_traceContext.traceReadPointer = 0;
                 }
             }
@@ -366,7 +369,7 @@ enum TraceStatus TRACE_Send(const uint8_t *inData, uint16_t length)
         /* initialize the Ptr for Read/Write */
         for (idx = 0u; idx < length; idx++) {
             g_traceBuffer[writepos] = inData[idx];
-            writepos = (uint16_t)((writepos + 1u) % TRACE_FIFO_SIZE);
+            writepos                = (uint16_t)((writepos + 1u) % TRACE_FIFO_SIZE);
         }
         TRACE_UnLock();
 
@@ -380,8 +383,8 @@ enum TraceStatus TRACE_Send(const uint8_t *inData, uint16_t length)
 }
 
 #if defined(TRACE_CONDITIONNAL)
-enum TraceStatus TRACE_COND_FSend(uint32_t verboseLevel, uint32_t region,
-                                  uint32_t timeStampState, const char *strFormat, ...)
+enum TraceStatus TRACE_COND_FSend(uint32_t verboseLevel, uint32_t region, uint32_t timeStampState,
+                                  const char *strFormat, ...)
 {
     va_list vaArgs;
 #if defined(TRACE_UNCHUNK_MODE)
@@ -427,12 +430,11 @@ enum TraceStatus TRACE_COND_FSend(uint32_t verboseLevel, uint32_t region,
         /* copy the timestamp */
         for (idx = 0u; idx < timestamp_size; idx++) {
             g_traceBuffer[writepos] = buf[idx];
-            writepos = writepos + 1u;
+            writepos                = writepos + 1u;
         }
 
         /* copy the data */
-        (void)TRACE_VSNPRINTF((char *)(&g_traceBuffer[writepos]), TRACE_TMP_BUF_SIZE, strFormat,
-                                       vaArgs);
+        (void)TRACE_VSNPRINTF((char *)(&g_traceBuffer[writepos]), TRACE_TMP_BUF_SIZE, strFormat, vaArgs);
         va_end(vaArgs);
 
         TRACE_UnLock();
@@ -459,8 +461,7 @@ enum TraceStatus TRACE_COND_FSend(uint32_t verboseLevel, uint32_t region,
     }
 
     va_start(vaArgs, strFormat);
-    buff_size += (uint16_t)TRACE_VSNPRINTF((char *)(buf + buff_size), TRACE_TMP_BUF_SIZE, strFormat,
-                                                    vaArgs);
+    buff_size += (uint16_t)TRACE_VSNPRINTF((char *)(buf + buff_size), TRACE_TMP_BUF_SIZE, strFormat, vaArgs);
     va_end(vaArgs);
 
     return TRACE_Send(buf, buff_size);
@@ -481,9 +482,8 @@ enum TraceStatus TRACE_FSend(const char *strFormat, ...)
 }
 
 #if defined(TRACE_CONDITIONNAL)
-enum TraceStatus TRACE_COND_ZCSend_Allocation(uint32_t verboseLevel, uint32_t region,
-                                                              uint32_t timeStampState, uint16_t length, uint8_t **inData,
-                                                              uint16_t *fifoSize, uint16_t *writePos)
+enum TraceStatus TRACE_COND_ZCSend_Allocation(uint32_t verboseLevel, uint32_t region, uint32_t timeStampState,
+                                              uint16_t length, uint8_t **inData, uint16_t *fifoSize, uint16_t *writePos)
 {
     enum TraceStatus ret = UTIL_ADV_TRACE_OK;
     uint16_t writepos;
@@ -510,11 +510,11 @@ enum TraceStatus TRACE_COND_ZCSend_Allocation(uint32_t verboseLevel, uint32_t re
         /* fill time stamp information */
         for (uint16_t index = 0u; index < timestamp_size; index++) {
             g_traceBuffer[writepos] = timestamp_ptr[index];
-            writepos = (uint16_t)((writepos + 1u) % TRACE_FIFO_SIZE);
+            writepos                = (uint16_t)((writepos + 1u) % TRACE_FIFO_SIZE);
         }
 
         /*user fill */
-        *inData = g_traceBuffer;
+        *inData   = g_traceBuffer;
         *fifoSize = (uint16_t)TRACE_FIFO_SIZE;
         *writePos = writepos;
     } else {
@@ -536,8 +536,7 @@ enum TraceStatus TRACE_COND_ZCSend_Finalize(void)
 }
 #endif
 
-enum TraceStatus TRACE_ZCSend_Allocation(uint16_t length, uint8_t **inData, uint16_t *fifoSize,
-                                                         uint16_t *writePos)
+enum TraceStatus TRACE_ZCSend_Allocation(uint16_t length, uint8_t **inData, uint16_t *fifoSize, uint16_t *writePos)
 {
     enum TraceStatus ret = UTIL_ADV_TRACE_OK;
     uint16_t writepos;
@@ -547,7 +546,7 @@ enum TraceStatus TRACE_ZCSend_Allocation(uint16_t length, uint8_t **inData, uint
     /* if allocation is ok, write data into the buffer */
     if (TRACE_AllocateBufer(length, &writepos) != -1) {
         /*user fill */
-        *inData = g_traceBuffer;
+        *inData   = g_traceBuffer;
         *fifoSize = TRACE_FIFO_SIZE;
         *writePos = (uint16_t)writepos;
     } else {
@@ -559,8 +558,8 @@ enum TraceStatus TRACE_ZCSend_Allocation(uint16_t length, uint8_t **inData, uint
 }
 
 #if defined(TRACE_CONDITIONNAL)
-enum TraceStatus TRACE_COND_Send(uint32_t verboseLevel, uint32_t region, uint32_t timeStampState,
-                                 const uint8_t *inData, uint16_t length)
+enum TraceStatus TRACE_COND_Send(uint32_t verboseLevel, uint32_t region, uint32_t timeStampState, const uint8_t *inData,
+                                 uint16_t length)
 {
     enum TraceStatus ret;
     uint16_t writepos;
@@ -588,12 +587,12 @@ enum TraceStatus TRACE_COND_Send(uint32_t verboseLevel, uint32_t region, uint32_
         /* fill time stamp information */
         for (idx = 0; idx < timestamp_size; idx++) {
             g_traceBuffer[writepos] = timestamp_ptr[idx];
-            writepos = (uint16_t)((writepos + 1u) % TRACE_FIFO_SIZE);
+            writepos                = (uint16_t)((writepos + 1u) % TRACE_FIFO_SIZE);
         }
 
         for (idx = 0u; idx < length; idx++) {
             g_traceBuffer[writepos] = inData[idx];
-            writepos = (uint16_t)((writepos + 1u) % TRACE_FIFO_SIZE);
+            writepos                = (uint16_t)((writepos + 1u) % TRACE_FIFO_SIZE);
         }
 
         TRACE_UnLock();

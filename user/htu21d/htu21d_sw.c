@@ -10,14 +10,14 @@
 #define TEMP_MAX_VALUE 999 /* 99.9C */
 
 #define WRITE 0
-#define READ 1
+#define READ  1
 
 #define DEVICE_ADDR 0x80
 
-#define TEMP_HOLD 0xe3
+#define TEMP_HOLD    0xe3
 #define TEMP_NO_HOLD 0xf3
 
-#define HUMI_HOLD 0xe5
+#define HUMI_HOLD    0xe5
 #define HUMI_NO_HOLD 0xf5
 
 #define SOFT_RESET 0xfe
@@ -103,7 +103,7 @@ static bool HTU21D_GetData(void)
     htu_data = read[DATA_HIGH];
     htu_data = htu_data << 8;
     htu_data += read[DATA_LOW];
-    htu = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
+    htu               = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
     g_thData.humidity = (uint16_t)htu;
     if (g_thData.humidity > HUMI_MAX_VALUE) {
         g_thData.humidity = HUMI_MAX_VALUE;
@@ -143,7 +143,7 @@ static bool HTU21D_GetData(void)
     temp_data = read[DATA_HIGH];
     temp_data = temp_data << 8;
     temp_data += read[DATA_LOW];
-    temp = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
+    temp                 = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
     g_thData.temperature = (int16_t)temp;
     if (g_thData.temperature > TEMP_MAX_VALUE) {
         g_thData.temperature = TEMP_MAX_VALUE;
@@ -155,7 +155,7 @@ static bool HTU21D_GetData(void)
 
 i2c_fail:
     g_thData.temperature = 0x00;
-    g_thData.humidity = 0x00;
+    g_thData.humidity    = 0x00;
     TRACE_PRINTF("temperature read fail. \r\n");
     return false;
 }
