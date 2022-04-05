@@ -7,7 +7,7 @@
 #include "htu21d.h"
 #include "lunar_calendar.h"
 #include "main.h"
-#include "time.h"
+#include "time_run.h"
 #include "trace_printf.h"
 
 #define TEMP_HUMI_DISP_TIME (2) /* seconds */

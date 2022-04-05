@@ -1,4 +1,4 @@
-#include "time.h"
+#include "time_run.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include "common.h"
@@ -6,6 +6,7 @@
 #include "hub75d.h"
 #include "lunar_calendar.h"
 #include "trace_printf.h"
+#include "time_stamp.h"
 
 struct TimeType g_time;
 static bool g_1sFlag;
@@ -138,6 +139,7 @@ void GetClock(void)
 
     HUB75D_CalculateCalendar(&g_time);
     CalculationLunarCalendar(&g_time);
+    TimeConvertTimestamp(&g_time);
 
     TRACE_PRINTF("get time: %d-%d-%d %02d:%02d:%02d \r\n", g_time.year, g_time.month, g_time.day, g_time.hour,
                  g_time.min, g_time.sec);

@@ -38,7 +38,7 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "time.h"
+#include "time_run.h"
 #include "hub75d.h"
 #include "wifi_uart_if.h"
 #include "trace_uart_if.h"

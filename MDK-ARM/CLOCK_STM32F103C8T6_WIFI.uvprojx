@@ -576,9 +576,14 @@
               <FilePath>..\user\lunar_calendar\lunar_calendar.c</FilePath>
             </File>
             <File>
-              <FileName>time.c</FileName>
+              <FileName>time_run.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\user\time\time.c</FilePath>
+              <FilePath>..\user\time\time_run.c</FilePath>
+            </File>
+            <File>
+              <FileName>time_stamp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\time\time_stamp.c</FilePath>
             </File>
             <File>
               <FileName>mem.c</FileName>

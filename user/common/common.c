@@ -17,6 +17,7 @@
 #include "wifi_uart_if.h"
 #include "trace_uart_if.h"
 #include "trace_printf.h"
+#include "time_stamp.h"
 
 #define SOFTWARE_VERSION "V101"
 
@@ -35,7 +36,6 @@ static void COMMON_EnterStandbyMode(void)
 
     HAL_TIM_Base_Stop_IT(&htim4);
     HAL_TIM_Base_MspDeInit(&htim4);
-    HAL_RTC_MspDeInit(&hrtc);
 
     WIFI_Power(POWER_OFF);
     HUB75D_Disp(DISP_TIME_OFF);
@@ -110,7 +110,7 @@ void COMMON_Process(void)
     }
     SetOneSecondFlag(false);
 
-    TRACE_PRINTF("1000ms\r\n");
+    TimestampAdd();
     WIFI_GetTime();
     HTU21D_Sampling();
     if (ClockRun() == true) {

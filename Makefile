@@ -51,7 +51,8 @@ user/htu21d/htu21d_iic_sw.c \
 user/htu21d/htu21d_sw.c \
 user/hub75d/hub75d.c \
 user/lunar_calendar/lunar_calendar.c \
-user/time/time.c \
+user/time/time_run.c \
+user/time/time_stamp.c \
 user/trace/mem.c \
 user/trace/tiny_vsnprintf.c \
 user/trace/trace_uart_if.c \

@@ -6,9 +6,10 @@
 #include "main.h"
 #include "gpio_bit_ctrl.h"
 #include "usart.h"
-#include "time.h"
+#include "time_run.h"
 #include "lunar_calendar.h"
 #include "trace_printf.h"
+#include "time_stamp.h"
 
 #if (WIFI_MODULE == WIFI_ESP8266)
 
@@ -35,7 +36,7 @@
 #define NOV 0x004e6f76
 #define DEC 0x00446563
 
-#define WIFI_ON_TIME       (3 * 60) /* 3 min */
+#define WIFI_ON_TIME        (3 * 60) /* 3 min */
 #define WIFI_GET_TIME_TIMES (5U)
 #define WIFI_SET_SNTP_TIMES (5U)
 
@@ -196,6 +197,7 @@ static bool ProcessClock(char *cRxBuf)
         SetTimeData(&time);
         SetClock(&time);
         CalculationLunarCalendar(&time);
+        TimeConvertTimestamp(&time);
     }
 
     return status;

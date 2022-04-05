@@ -2,7 +2,7 @@
 #define HUB75D_H
 
 #include <stdbool.h>
-#include "time.h"
+#include "time_run.h"
 
 enum DispTime {
     DISP_TIME_OFF = 0,
