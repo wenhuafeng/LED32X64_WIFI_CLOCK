@@ -59,7 +59,7 @@ static uint8_t CalcCrc(uint8_t *crcData, uint8_t len)
     return crc;
 }
 
-static bool HTU21D_GetData(void)
+bool HTU21D_GetData(void)
 {
     uint16_t humiData;
     float humi;
@@ -125,6 +125,7 @@ static bool HTU21D_GetData(void)
 
 error:
     TRACE_PRINTF("error! read temperature and humidity\r\n");
+    HTU21D_Init();
     return false;
 }
 
@@ -201,7 +202,6 @@ void HTU21D_Init(void)
     }
 
     HAL_Delay(100);
-    HTU21D_GetData();
 }
 
 void HTU21D_Sampling(void)

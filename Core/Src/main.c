@@ -116,8 +116,6 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_RTC_MspInit(&hrtc);
-  HAL_TIM_Base_MspInit(&htim4);
   COMMON_Init();
   /* USER CODE END 2 */
 

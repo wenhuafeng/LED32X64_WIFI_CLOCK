@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "main.h"
 #if (WIFI_MODULE == WIFI_ESP8266)
 #include "esp8266_at.h"
@@ -76,7 +77,13 @@ void WIFI_HandlerUartData(void)
     if (g_usartType.receiveFlag) {
         g_usartType.receiveFlag = 0;
         WIFI_ReceiveProcess(g_usartType.buffer);
+        memset(g_usartType.buffer, 0, sizeof(g_usartType.buffer));
     }
+}
+
+void WIFI_ComDeInit(void)
+{
+    HAL_UART_MspDeInit(&huart1);
 }
 
 void WIFI_UART_TxCpltCallback(UART_HandleTypeDef *huart)

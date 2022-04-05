@@ -36,25 +36,13 @@ struct TraceDriverType TraceDriver = {
 enum TraceStatus COM_Init(void (*cb)(void *))
 {
     TxCpltCallback = cb;
-    //MX_DMA_Init();
-    //MX_USART2_UART_Init();
 
     return UTIL_ADV_TRACE_OK;
 }
 
 enum TraceStatus COM_DeInit(void)
 {
-    /* -1- Reset peripherals */
-    __HAL_RCC_USART2_FORCE_RESET();
-    __HAL_RCC_USART2_RELEASE_RESET();
-
-    /* -2- MspDeInit */
     HAL_UART_MspDeInit(&huart2);
-
-    /* -3- Disable the NVIC for DMA */
-    /* USER CODE BEGIN 1 */
-    HAL_NVIC_DisableIRQ(DMA1_Channel6_IRQn);
-    HAL_NVIC_DisableIRQ(DMA1_Channel7_IRQn);
 
     return UTIL_ADV_TRACE_OK;
 }

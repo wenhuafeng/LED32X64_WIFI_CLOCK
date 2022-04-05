@@ -61,7 +61,7 @@ static uint8_t CalcCrc(uint8_t *crcData, uint8_t len)
     return crc;
 }
 
-static bool HTU21D_GetData(void)
+bool HTU21D_GetData(void)
 {
     uint16_t htu_data;
     float htu;
@@ -253,7 +253,6 @@ void HTU21D_Init(void)
     }
 
     HAL_Delay(100);
-    HTU21D_GetData();
 }
 
 void HTU21D_Sampling(void)

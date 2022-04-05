@@ -33,12 +33,17 @@ static void COMMON_EnterStandbyMode(void)
 {
     TRACE_PRINTF("enter stop mode\r\n");
 
+    HAL_TIM_Base_Stop_IT(&htim4);
+    HAL_TIM_Base_MspDeInit(&htim4);
+    HAL_RTC_MspDeInit(&hrtc);
+
     WIFI_Power(POWER_OFF);
     HUB75D_Disp(DISP_TIME_OFF);
     WORK_LED_OFF();
 
     HAL_Delay(100);
     ClearGpioExtiIT(PIR_INT_Pin);
+
     HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
 
     HAL_Init();
@@ -50,9 +55,8 @@ static void COMMON_EnterStandbyMode(void)
     MX_USART1_UART_Init();
     MX_USART2_UART_Init();
 
-    HAL_RTC_MspInit(&hrtc);
-    HAL_TIM_Base_MspInit(&htim4);
     COMMON_Init();
+    WIFI_ReInit();
 
     TRACE_PRINTF("exit stop mode\r\n");
 }
@@ -79,34 +83,42 @@ void COMMON_Init(void)
 
     WIFI_ReceiveDmaInit();
     WIFI_Power(POWER_ON);
+
+    HAL_RTC_MspInit(&hrtc);
     HAL_RTCEx_SetSecond_IT(&hrtc);
+
     HAL_Delay(100);
     HTU21D_Init();
+    HTU21D_GetData();
+
     HAL_Delay(100);
     GetClock();
+
     HAL_Delay(100);
     HUB75D_Disp(DISP_TIME);
+    HAL_TIM_Base_MspInit(&htim4);
     HAL_TIM_Base_Start_IT(&htim4);
-    HAL_Delay(100);
-    WIFI_Init(WIFI_REINIT);
 }
 
 void COMMON_Process(void)
 {
     IsPirIntFlagSet();
     WIFI_HandlerUartData();
-    if (Get1sFlag() == true) {
-        SetOneSecondFlag(false);
-        TRACE_PRINTF("1000ms\r\n");
-        WIFI_GetTime();
-        HTU21D_Sampling();
-        if (ClockRun() == true) {
-            CalculationLunarCalendar(GetTimeData());
-        }
-        HUB75D_CalculateCalendar(GetTimeData());
-        if (HUB75D_CtrDec() == true) {
-            COMMON_EnterStandbyMode();
-        }
+
+    if (Get1sFlag() == false) {
+        return;
+    }
+    SetOneSecondFlag(false);
+
+    TRACE_PRINTF("1000ms\r\n");
+    WIFI_GetTime();
+    HTU21D_Sampling();
+    if (ClockRun() == true) {
+        CalculationLunarCalendar(GetTimeData());
+    }
+    HUB75D_CalculateCalendar(GetTimeData());
+    if (HUB75D_CtrDec() == true) {
+        COMMON_EnterStandbyMode();
     }
 }
 
