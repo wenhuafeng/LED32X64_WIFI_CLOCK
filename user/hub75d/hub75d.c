@@ -188,8 +188,9 @@ static uint8_t const g_timeSecondDigitTable[][16] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, /* 11   */
 };
 
-static inline void DispTime(struct CalendarDecimal *caleDeci, struct RgbType *rgb, uint8_t i)
+static inline void DispTime(struct RgbType *rgb, uint8_t i)
 {
+    struct CalendarDecimal *caleDeci = &g_calendarDecimal;
     uint8_t h1 = caleDeci->hourH;
     uint8_t h0 = caleDeci->hourL;
     uint8_t m1 = caleDeci->minH;
@@ -242,8 +243,9 @@ static inline void DispTime(struct CalendarDecimal *caleDeci, struct RgbType *rg
     rgb->blue[7] |= g_timeSecondDigitTable[s0][i];
 }
 
-static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rgb, uint8_t i)
+static inline void DispDate(struct RgbType *rgb, uint8_t i)
 {
+    struct CalendarDecimal *caleDeci = &g_calendarDecimal;
     uint8_t y1 = caleDeci->yearH;
     uint8_t y0 = caleDeci->yearL;
     uint8_t m1 = caleDeci->monthH;
@@ -293,10 +295,10 @@ static inline void DispDate(struct CalendarDecimal *caleDeci, struct RgbType *rg
 static inline void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
 {
     struct LunarCalendarType *lcData = GetLunarCalendar();
-    uint8_t m1                       = lcData->month / 10;
-    uint8_t m0                       = lcData->month % 10;
-    uint8_t d1                       = lcData->day / 10;
-    uint8_t d0                       = lcData->day % 10;
+    uint8_t m1 = lcData->month / 10;
+    uint8_t m0 = lcData->month % 10;
+    uint8_t d1 = lcData->day / 10;
+    uint8_t d0 = lcData->day % 10;
 
     rgb->green[8] |= g_chineseWeekDateTable[CHINESE_LUNAR_CALENDAR_INDEX][i];
 
@@ -448,9 +450,9 @@ void inline HUB75D_DispScan(void)
     struct RgbType rgb;
 
     memset(&rgb, 0, sizeof(struct RgbType));
-    DispTime(&g_calendarDecimal, &rgb, count);
+    DispTime(&rgb, count);
     if (count < (SCAN_ALL_LINE / 2)) {
-        DispDate(&g_calendarDecimal, &rgb, count);
+        DispDate(&rgb, count);
     } else {
         DispLunarCalendar(&rgb, count - (SCAN_ALL_LINE / 2));
         DispTemperatureHumidity(&rgb, count - (SCAN_ALL_LINE / 2));
