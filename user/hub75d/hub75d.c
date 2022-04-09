@@ -61,10 +61,12 @@ struct CalendarDecimal {
 
 #define WORD_COUNT 16
 struct RgbType {
-    uint8_t red[WORD_COUNT];
-    uint8_t green[WORD_COUNT];
-    uint8_t blue[WORD_COUNT];
+    uint8_t red[WORD_COUNT][SCAN_ALL_LINE];
+    uint8_t green[WORD_COUNT][SCAN_ALL_LINE];
+    uint8_t blue[WORD_COUNT][SCAN_ALL_LINE];
 };
+struct RgbType g_rgb;
+struct RgbType g_rgbScan;
 
 typedef union {
     uint16_t flag;
@@ -188,7 +190,7 @@ static uint8_t const g_timeSecondDigitTable[][16] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, /* 11   */
 };
 
-static inline void DispTime(struct RgbType *rgb, uint8_t i)
+static void DispTime(struct RgbType *rgb, uint8_t index)
 {
     struct CalendarDecimal *caleDeci = &g_calendarDecimal;
     uint8_t h1 = caleDeci->hourH;
@@ -203,47 +205,47 @@ static inline void DispTime(struct RgbType *rgb, uint8_t i)
         h1 = 10;
     }
 
-    /* 8*8=64 */
-    rgb->red[0] |= g_timeDigitTable[h1][i];
-    rgb->green[0] |= g_timeDigitTable[h1][i];
-    rgb->blue[0] |= g_timeDigitTable[h1][i];
+    /* 8 * 8 = 64 */
+    rgb->red[0][index] |= g_timeDigitTable[h1][index];
+    rgb->green[0][index] |= g_timeDigitTable[h1][index];
+    rgb->blue[0][index] |= g_timeDigitTable[h1][index];
 
-    rgb->red[1] |= (g_timeDigitTable[h0][i] >> 1);
-    rgb->green[1] |= (g_timeDigitTable[h0][i] >> 1);
-    rgb->blue[1] |= (g_timeDigitTable[h0][i] >> 1);
+    rgb->red[1][index] |= (g_timeDigitTable[h0][index] >> 1);
+    rgb->green[1][index] |= (g_timeDigitTable[h0][index] >> 1);
+    rgb->blue[1][index] |= (g_timeDigitTable[h0][index] >> 1);
 
-    rgb->red[2] |= (g_timeDigitTable[h0][i] << 7);
-    rgb->green[2] |= (g_timeDigitTable[h0][i] << 7);
-    rgb->blue[2] |= (g_timeDigitTable[h0][i] << 7);
+    rgb->red[2][index] |= (g_timeDigitTable[h0][index] << 7);
+    rgb->green[2][index] |= (g_timeDigitTable[h0][index] << 7);
+    rgb->blue[2][index] |= (g_timeDigitTable[h0][index] << 7);
 
-    rgb->red[2] |= g_timeDigitTable[sd][i];
-    rgb->blue[2] |= g_timeDigitTable[sd][i];
+    rgb->red[2][index] |= g_timeDigitTable[sd][index];
+    rgb->blue[2][index] |= g_timeDigitTable[sd][index];
 
-    rgb->red[3] |= g_timeDigitTable[m1][i];
-    rgb->green[3] |= g_timeDigitTable[m1][i];
-    rgb->blue[3] |= g_timeDigitTable[m1][i];
+    rgb->red[3][index] |= g_timeDigitTable[m1][index];
+    rgb->green[3][index] |= g_timeDigitTable[m1][index];
+    rgb->blue[3][index] |= g_timeDigitTable[m1][index];
 
-    rgb->red[4] |= (g_timeDigitTable[m0][i] >> 1);
-    rgb->green[4] |= (g_timeDigitTable[m0][i] >> 1);
-    rgb->blue[4] |= (g_timeDigitTable[m0][i] >> 1);
+    rgb->red[4][index] |= (g_timeDigitTable[m0][index] >> 1);
+    rgb->green[4][index] |= (g_timeDigitTable[m0][index] >> 1);
+    rgb->blue[4][index] |= (g_timeDigitTable[m0][index] >> 1);
 
-    rgb->red[5] |= (g_timeDigitTable[m0][i] << 7);
-    rgb->green[5] |= (g_timeDigitTable[m0][i] << 7);
-    rgb->blue[5] |= (g_timeDigitTable[m0][i] << 7);
+    rgb->red[5][index] |= (g_timeDigitTable[m0][index] << 7);
+    rgb->green[5][index] |= (g_timeDigitTable[m0][index] << 7);
+    rgb->blue[5][index] |= (g_timeDigitTable[m0][index] << 7);
 
-    rgb->red[5] |= g_timeDigitTable[sd][i];
-    rgb->blue[5] |= g_timeDigitTable[sd][i];
+    rgb->red[5][index] |= g_timeDigitTable[sd][index];
+    rgb->blue[5][index] |= g_timeDigitTable[sd][index];
 
-    rgb->red[6] |= g_timeSecondDigitTable[s1][i];
-    rgb->green[6] |= g_timeSecondDigitTable[s1][i];
-    rgb->blue[6] |= g_timeSecondDigitTable[s1][i];
+    rgb->red[6][index] |= g_timeSecondDigitTable[s1][index];
+    rgb->green[6][index] |= g_timeSecondDigitTable[s1][index];
+    rgb->blue[6][index] |= g_timeSecondDigitTable[s1][index];
 
-    rgb->red[7] |= g_timeSecondDigitTable[s0][i];
-    rgb->green[7] |= g_timeSecondDigitTable[s0][i];
-    rgb->blue[7] |= g_timeSecondDigitTable[s0][i];
+    rgb->red[7][index] |= g_timeSecondDigitTable[s0][index];
+    rgb->green[7][index] |= g_timeSecondDigitTable[s0][index];
+    rgb->blue[7][index] |= g_timeSecondDigitTable[s0][index];
 }
 
-static inline void DispDate(struct RgbType *rgb, uint8_t i)
+static void DispDate(struct RgbType *rgb, uint8_t index)
 {
     struct CalendarDecimal *caleDeci = &g_calendarDecimal;
     uint8_t y1 = caleDeci->yearH;
@@ -254,78 +256,80 @@ static inline void DispDate(struct RgbType *rgb, uint8_t i)
     uint8_t d0 = caleDeci->dayL;
     uint8_t wk = caleDeci->week;
 
-    rgb->green[8] |= (g_dateTable[2][i] << 4);
-    rgb->green[8] |= (g_dateTable[0][i] >> 1);
-    rgb->green[9] |= (g_dateTable[0][i] << 7);
-    rgb->green[9] |= (g_dateTable[y1][i] << 2);
-    rgb->green[9] |= (g_dateTable[y0][i] >> 3);
+    rgb->green[8][index] |= (g_dateTable[2][index] << 4);
+    rgb->green[8][index] |= (g_dateTable[0][index] >> 1);
+    rgb->green[9][index] |= (g_dateTable[0][index] << 7);
+    rgb->green[9][index] |= (g_dateTable[y1][index] << 2);
+    rgb->green[9][index] |= (g_dateTable[y0][index] >> 3);
     for (uint8_t j = 8; j < 10; j++) {
-        rgb->red[j] = rgb->green[j];
+        rgb->red[j][index] = rgb->green[j][index];
     }
 
-    rgb->red[10] |= (g_dateTable[y0][i] << 5);
-    rgb->green[10] |= (g_dateTable[y0][i] << 5);
-    rgb->green[10] |= (g_chineseWeekDateTable[CHINESE_YEAR_INDEX][i] >> 2);
-    rgb->green[11] |= (g_chineseWeekDateTable[CHINESE_YEAR_INDEX][i] << 6);
+    rgb->red[10][index] |= (g_dateTable[y0][index] << 5);
+    rgb->green[10][index] |= (g_dateTable[y0][index] << 5);
+    rgb->green[10][index] |= (g_chineseWeekDateTable[CHINESE_YEAR_INDEX][index] >> 2);
+    rgb->green[11][index] |= (g_chineseWeekDateTable[CHINESE_YEAR_INDEX][index] << 6);
 
     if (m1 == 0) {
         m1 = DATE_TABLE_DISP_NULL_INDEX;
     }
-    rgb->red[11] |= (g_dateTable[m1][i] << 1);
-    rgb->green[11] |= (g_dateTable[m1][i] << 1);
-    rgb->red[12] |= (g_dateTable[m0][i] << 4);
-    rgb->green[12] |= (g_dateTable[m0][i] << 4);
-    rgb->green[12] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][i] >> 1);
-    rgb->green[13] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][i] << 7);
+    rgb->red[11][index] |= (g_dateTable[m1][index] << 1);
+    rgb->green[11][index] |= (g_dateTable[m1][index] << 1);
+    rgb->red[12][index] |= (g_dateTable[m0][index] << 4);
+    rgb->green[12][index] |= (g_dateTable[m0][index] << 4);
+    rgb->green[12][index] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][index] >> 1);
+    rgb->green[13][index] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][index] << 7);
 
     if (d1 == 0) {
         d1 = DATE_TABLE_DISP_NULL_INDEX;
     }
-    rgb->red[13] |= (g_dateTable[d1][i] << 2);
-    rgb->green[13] |= (g_dateTable[d1][i] << 2);
-    rgb->red[13] |= (g_dateTable[d0][i] >> 3);
-    rgb->green[13] |= (g_dateTable[d0][i] >> 3);
+    rgb->red[13][index] |= (g_dateTable[d1][index] << 2);
+    rgb->green[13][index] |= (g_dateTable[d1][index] << 2);
+    rgb->red[13][index] |= (g_dateTable[d0][index] >> 3);
+    rgb->green[13][index] |= (g_dateTable[d0][index] >> 3);
 
-    rgb->red[14] |= (g_dateTable[d0][i] << 5);
-    rgb->green[14] |= (g_dateTable[d0][i] << 5);
-    rgb->green[14] |= (g_chineseWeekDateTable[CHINESE_DAY_INDEX][i]);
-    rgb->red[15] |= g_chineseWeekDateTable[wk][i];
+    rgb->red[14][index] |= (g_dateTable[d0][index] << 5);
+    rgb->green[14][index] |= (g_dateTable[d0][index] << 5);
+    rgb->green[14][index] |= (g_chineseWeekDateTable[CHINESE_DAY_INDEX][index]);
+    rgb->red[15][index] |= g_chineseWeekDateTable[wk][index];
 }
 
-static inline void DispLunarCalendar(struct RgbType *rgb, uint8_t i)
+static void DispLunarCalendar(struct RgbType *rgb, uint8_t index)
 {
     struct LunarCalendarType *lcData = GetLunarCalendar();
     uint8_t m1 = lcData->month / 10;
     uint8_t m0 = lcData->month % 10;
     uint8_t d1 = lcData->day / 10;
     uint8_t d0 = lcData->day % 10;
+    uint8_t tableIndex = index - (SCAN_ALL_LINE / 2);
 
-    rgb->green[8] |= g_chineseWeekDateTable[CHINESE_LUNAR_CALENDAR_INDEX][i];
+    rgb->green[8][index] |= g_chineseWeekDateTable[CHINESE_LUNAR_CALENDAR_INDEX][tableIndex];
 
     if (m1 == 0) {
         m1 = DATE_TABLE_DISP_NULL_INDEX;
     }
-    rgb->red[9] |= (g_dateTable[m1][i] << 4);
-    rgb->red[9] |= (g_dateTable[m0][i] >> 1);
-    rgb->red[10] |= (g_dateTable[m0][i] << 7);
-    rgb->green[10] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][i] << 1);
+    rgb->red[9][index] |= (g_dateTable[m1][tableIndex] << 4);
+    rgb->red[9][index] |= (g_dateTable[m0][tableIndex] >> 1);
+    rgb->red[10][index] |= (g_dateTable[m0][tableIndex] << 7);
+    rgb->green[10][index] |= (g_chineseWeekDateTable[CHINESE_MONTH_INDEX][tableIndex] << 1);
 
     if (d1 == 0) {
         d1 = DATE_TABLE_DISP_NULL_INDEX;
     }
-    rgb->red[11] |= (g_dateTable[d1][i] << 4);
-    rgb->red[11] |= (g_dateTable[d0][i] >> 1);
-    rgb->red[12] |= (g_dateTable[d0][i] << 7);
-    rgb->green[12] |= (g_chineseWeekDateTable[CHINESE_DAY_INDEX][i] << 2);
+    rgb->red[11][index] |= (g_dateTable[d1][tableIndex] << 4);
+    rgb->red[11][index] |= (g_dateTable[d0][tableIndex] >> 1);
+    rgb->red[12][index] |= (g_dateTable[d0][tableIndex] << 7);
+    rgb->green[12][index] |= (g_chineseWeekDateTable[CHINESE_DAY_INDEX][tableIndex] << 2);
 }
 
-static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
+static void DispTemperatureHumidity(struct RgbType *rgb, uint8_t index)
 {
     bool sign = false;
     uint8_t t1, t0, td;
     uint16_t tmp;
     int16_t temperature = HTU21D_GetTemperature();
     uint16_t humidity   = HTU21D_GetHumidity();
+    uint8_t tableIndex = index - (SCAN_ALL_LINE / 2);
 
     if (g_displayTorH == DISP_T) {
         if (temperature < 0) {
@@ -358,59 +362,56 @@ static inline void DispTemperatureHumidity(struct RgbType *rgb, uint8_t i)
 
     if (sign == true) {
         if (t1 != 0x00) {
-            rgb->red[12] |= (g_tempHumiDigitTable[TEMP_NEGATIVE_SIGN_INDEX][i] >> 6);
-            rgb->red[13] |= (g_tempHumiDigitTable[TEMP_NEGATIVE_SIGN_INDEX][i] << 2);
+            rgb->red[12][index] |= (g_tempHumiDigitTable[TEMP_NEGATIVE_SIGN_INDEX][tableIndex] >> 6);
+            rgb->red[13][index] |= (g_tempHumiDigitTable[TEMP_NEGATIVE_SIGN_INDEX][tableIndex] << 2);
         }
     }
-    rgb->red[13] |= (g_tempHumiDigitTable[t1][i] >> 1);
-    rgb->red[13] |= (g_tempHumiDigitTable[t0][i] >> 7);
-    rgb->red[14] |= (g_tempHumiDigitTable[t0][i] << 1);
-    rgb->red[14] |= (g_tempHumiDigitTable[TEMP_HUMI_DOT_INDEX][i] >> 4);
-    rgb->green[14] |= (g_tempHumiDigitTable[TEMP_HUMI_DOT_INDEX][i] >> 4);
-    rgb->red[14] |= (g_tempHumiDigitTable[td][i] >> 5);
-    rgb->red[15] |= (g_tempHumiDigitTable[td][i] << 3);
+    rgb->red[13][index] |= (g_tempHumiDigitTable[t1][tableIndex] >> 1);
+    rgb->red[13][index] |= (g_tempHumiDigitTable[t0][tableIndex] >> 7);
+    rgb->red[14][index] |= (g_tempHumiDigitTable[t0][tableIndex] << 1);
+    rgb->red[14][index] |= (g_tempHumiDigitTable[TEMP_HUMI_DOT_INDEX][tableIndex] >> 4);
+    rgb->green[14][index] |= (g_tempHumiDigitTable[TEMP_HUMI_DOT_INDEX][tableIndex] >> 4);
+    rgb->red[14][index] |= (g_tempHumiDigitTable[td][tableIndex] >> 5);
+    rgb->red[15][index] |= (g_tempHumiDigitTable[td][tableIndex] << 3);
     if (g_displayTorH == DISP_T) {
-        rgb->green[15] |= (g_tempHumiDigitTable[TEMP_CELSIUS_DEGREE_ICON_INDEX][i] >> 3);
+        rgb->green[15][index] |= (g_tempHumiDigitTable[TEMP_CELSIUS_DEGREE_ICON_INDEX][tableIndex] >> 3);
     } else {
-        rgb->green[15] |= (g_tempHumiDigitTable[TEMP_PERCENT_SIGN_ICON_INDEX][i] >> 3);
+        rgb->green[15][index] |= (g_tempHumiDigitTable[TEMP_PERCENT_SIGN_ICON_INDEX][tableIndex] >> 3);
     }
 }
 
-static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
+static void SetScanPin(uint8_t index)
 {
-    PinFlags flags = { 0 };
+    PinFlags flags = {0};
+    struct RgbType *rgb = &g_rgbScan;
+    uint8_t move;
 
     HUB_LAT = 0;
     HUB_OE  = 1;
     for (uint8_t i = 0; i < 8; i++) {
-        for (uint8_t j = 0; j < 8; j++) {
+        move = 0x80;
+        for (uint8_t loop = 0; loop < 8; loop++) {
             flags.flag = 0x00;
-            if (rgb->red[i + 8] & 0x80) {
+            if (rgb->red[i + 8][index] & move) {
                 flags.bit.hubR1 = 1;
             }
-            if (rgb->green[i + 8] & 0x80) {
+            if (rgb->green[i + 8][index] & move) {
                 flags.bit.hubG1 = 1;
             }
-            if (rgb->blue[i + 8] & 0x80) {
+            if (rgb->blue[i + 8][index] & move) {
                 flags.bit.hubB1 = 1;
             }
 
-            if (rgb->red[i] & 0x80) {
+            if (rgb->red[i][index] & move) {
                 flags.bit.hubR2 = 1;
             }
-            if (rgb->green[i] & 0x80) {
+            if (rgb->green[i][index] & move) {
                 flags.bit.hubG2 = 1;
             }
-            if (rgb->blue[i] & 0x80) {
+            if (rgb->blue[i][index] & move) {
                 flags.bit.hubB2 = 1;
             }
-
-            rgb->red[i + 8]   = rgb->red[i + 8] << 1;
-            rgb->green[i + 8] = rgb->green[i + 8] << 1;
-            rgb->blue[i + 8]  = rgb->blue[i + 8] << 1;
-            rgb->red[i]       = rgb->red[i] << 1;
-            rgb->green[i]     = rgb->green[i] << 1;
-            rgb->blue[i]      = rgb->blue[i] << 1;
+            move >>= 1;
 
             HUB_R1  = flags.bit.hubR1;
             HUB_G1  = flags.bit.hubG1;
@@ -423,16 +424,16 @@ static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
         }
     }
 
-    if (count & 0x01) {
+    if (index & 0x01) {
         flags.bit.hubA = 1;
     }
-    if (count & 0x02) {
+    if (index & 0x02) {
         flags.bit.hubB = 1;
     }
-    if (count & 0x04) {
+    if (index & 0x04) {
         flags.bit.hubC = 1;
     }
-    if (count & 0x08) {
+    if (index & 0x08) {
         flags.bit.hubD = 1;
     }
 
@@ -444,20 +445,30 @@ static inline void SetScanPin(struct RgbType *rgb, uint8_t count)
     HUB_OE  = 0;
 }
 
+void HUB75D_GetScanRgb(void)
+{
+    struct RgbType *rgb = &g_rgb;
+    struct RgbType *rgbScan = &g_rgbScan;
+    uint8_t count;
+
+    memset(rgb, 0, sizeof(struct RgbType));
+    for (count = 0; count < SCAN_ALL_LINE; count++) {
+        DispTime(rgb, count);
+        if (count < (SCAN_ALL_LINE / 2)) {
+            DispDate(rgb, count);
+        } else {
+            DispLunarCalendar(rgb, count);
+            DispTemperatureHumidity(rgb, count);
+        }
+    }
+    memcpy(rgbScan, rgb, sizeof(struct RgbType));
+}
+
 void inline HUB75D_DispScan(void)
 {
     static uint8_t count = 0;
-    struct RgbType rgb;
 
-    memset(&rgb, 0, sizeof(struct RgbType));
-    DispTime(&rgb, count);
-    if (count < (SCAN_ALL_LINE / 2)) {
-        DispDate(&rgb, count);
-    } else {
-        DispLunarCalendar(&rgb, count - (SCAN_ALL_LINE / 2));
-        DispTemperatureHumidity(&rgb, count - (SCAN_ALL_LINE / 2));
-    }
-    SetScanPin(&rgb, count);
+    SetScanPin(count);
 
     count++;
     if (count >= SCAN_ALL_LINE) {

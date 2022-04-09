@@ -120,6 +120,7 @@ void COMMON_Process(void)
     if (HUB75D_CtrDec() == true) {
         COMMON_EnterStandbyMode();
     }
+    HUB75D_GetScanRgb();
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
