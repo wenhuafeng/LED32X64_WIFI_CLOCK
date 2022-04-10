@@ -25,5 +25,6 @@ bool HUB75D_CtrDec(void);
 void HUB75D_SetDispOffCtr(enum DispTime time);
 void HUB75D_Disp(enum DispTime time);
 void HUB75D_GetScanRgb(void);
+void HUB75D_Init(void);
 
 #endif

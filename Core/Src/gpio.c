@@ -59,7 +59,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, HUB_R2_Pin|HUB_G2_Pin|HUB_B2_Pin|DISP_POWER_Pin
                           |WORK_LED_Pin|HUB_A_Pin|HUB_B_Pin|HUB_C_Pin
-                          |HUB_LAT_Pin|HUB_OE_Pin|WIFI_POWER_Pin, GPIO_PIN_RESET);
+                          |HUB_LAT_Pin|WIFI_POWER_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PC13 */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
@@ -88,10 +88,10 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PBPin PBPin PBPin PBPin
                            PBPin PBPin PBPin PBPin
-                           PBPin PBPin PBPin */
+                           PBPin PBPin */
   GPIO_InitStruct.Pin = HUB_R2_Pin|HUB_G2_Pin|HUB_B2_Pin|DISP_POWER_Pin
                           |WORK_LED_Pin|HUB_A_Pin|HUB_B_Pin|HUB_C_Pin
-                          |HUB_LAT_Pin|HUB_OE_Pin|WIFI_POWER_Pin;
+                          |HUB_LAT_Pin|WIFI_POWER_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

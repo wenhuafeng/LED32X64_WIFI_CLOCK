@@ -113,8 +113,6 @@ void Error_Handler(void);
 #define HUB_CA15_GPIO_Port GPIOA
 #define HUB_LAT_Pin GPIO_PIN_3
 #define HUB_LAT_GPIO_Port GPIOB
-#define HUB_OE_Pin GPIO_PIN_4
-#define HUB_OE_GPIO_Port GPIOB
 #define WIFI_POWER_Pin GPIO_PIN_5
 #define WIFI_POWER_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */

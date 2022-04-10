@@ -95,6 +95,7 @@ void COMMON_Init(void)
     GetClock();
 
     HAL_Delay(100);
+    HUB75D_Init();
     HUB75D_Disp(DISP_TIME);
     HAL_TIM_Base_MspInit(&htim4);
     HAL_TIM_Base_Start_IT(&htim4);
