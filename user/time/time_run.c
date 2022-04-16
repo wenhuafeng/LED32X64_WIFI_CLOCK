@@ -14,7 +14,7 @@ static bool g_1sFlag;
 static uint8_t GetMaxDay(uint16_t year, uint8_t month)
 {
     uint8_t day;
-    uint8_t constDays[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    uint8_t daysTable[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
     if (month == 2) {
         if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
@@ -23,7 +23,7 @@ static uint8_t GetMaxDay(uint16_t year, uint8_t month)
             day = 28;
         }
     } else {
-        day = constDays[month];
+        day = daysTable[month];
     }
 
     return day;
@@ -44,79 +44,85 @@ struct TimeType *GetTimeData(void)
     return &g_time;
 }
 
-void CalculateWeek(uint16_t year, uint8_t month, uint8_t day, uint8_t *week)
+void CalculateWeek(void)
 {
     int16_t yearTemp = 0;
     int16_t yearHigh;
     int16_t yearLow;
     int8_t monthTemp = 0;
     int8_t wk;
+    struct TimeType *time = &g_time;
 
-    if (month < 3) {
-        monthTemp = month + 12;
-        yearTemp  = year - 1;
+    if (time->month < 3) {
+        monthTemp = time->month + 12;
+        yearTemp  = time->year - 1;
     } else {
-        monthTemp = month;
-        yearTemp  = year;
+        monthTemp = time->month;
+        yearTemp  = time->year;
     }
 
     yearHigh = yearTemp / 100;
     yearLow  = yearTemp % 100;
 
     wk = yearLow + (yearLow / 4) + (yearHigh / 4);
-    wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + day - 1;
+    wk = wk - (2 * yearHigh) + (26 * (monthTemp + 1) / 10) + time->day - 1;
     wk = (wk + 140) % 7;
 
-    *week = wk;
+    time->week = wk;
 }
 
-void SetTimeData(struct TimeType *time)
+void SetTimeData(struct TimeType *inTime)
 {
-    g_time.sec   = time->sec;
-    g_time.min   = time->min;
-    g_time.hour  = time->hour;
-    g_time.week  = time->week;
-    g_time.day   = time->day;
-    g_time.month = time->month;
-    g_time.year  = time->year;
+    struct TimeType *time = &g_time;
+
+    time->sec   = inTime->sec;
+    time->min   = inTime->min;
+    time->hour  = inTime->hour;
+    time->week  = inTime->week;
+    time->day   = inTime->day;
+    time->month = inTime->month;
+    time->year  = inTime->year;
 }
 
 bool ClockRun(void)
 {
-    g_time.sec++;
-    if (g_time.sec < 60) {
+    struct TimeType *time = &g_time;
+
+    time->sec++;
+    if (time->sec < 60) {
         return false;
     }
 
-    g_time.sec = 0;
-    g_time.min++;
-    if (g_time.min < 60) {
+    time->sec = 0;
+    time->min++;
+    if (time->min < 60) {
         return false;
     }
 
-    g_time.min = 0;
-    g_time.hour++;
-    if (g_time.hour < 24) {
+    time->min = 0;
+    time->hour++;
+    if (time->hour < 24) {
         return false;
     }
 
-    g_time.hour = 0;
-    g_time.day++;
-    if (g_time.day <= GetMaxDay(g_time.year, g_time.month)) {
+    time->hour = 0;
+    time->day++;
+    if (time->day <= GetMaxDay(time->year, time->month)) {
         goto calc_week;
     }
 
-    g_time.day = 1;
-    g_time.month++;
-    if (g_time.month < 13) {
+    time->day = 1;
+    time->month++;
+    if (time->month < 13) {
         goto calc_week;
     }
 
-    g_time.month = 1;
-    g_time.year++;
+    time->month = 1;
+    time->year++;
 
 calc_week:
-    CalculateWeek(g_time.year, g_time.month, g_time.day, &g_time.week);
+    CalculateWeek();
+
     return true;
 }
 
