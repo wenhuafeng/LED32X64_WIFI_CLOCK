@@ -5,10 +5,7 @@
 #include "hub75d.h"
 #include "time_run.h"
 
-#define DISP_TASK_EVENT_SCAN_LED     (1 << 0)
-#define DISP_TASK_EVENT_GET_SCAN_RGB (1 << 1)
-#define DISP_TASK_EVENT_DISP_ON      (1 << 2)
-#define DISP_TASK_EVENT_ALL          (0xffffffff)
+#define DISP_TASK_EVENT_ALL (0xffffffff)
 
 #define DISP_TASK_NAME       "dispTask"
 #define DISP_TASK_STACK_SIZE (128 * 4)
@@ -53,6 +50,7 @@ static void DISP_Task(void *argument)
             HUB75D_Disp(&hub75d.displayCount, DISP_TIME);
             HAL_TIM_Base_MspInit(&htim4);
             HAL_TIM_Base_Start_IT(&htim4);
+            //TRACE_PRINTF("pir interrupt, renew set display 5 minute\r\n");
         }
     }
 }

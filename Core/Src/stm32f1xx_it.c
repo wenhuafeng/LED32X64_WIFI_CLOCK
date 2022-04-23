@@ -38,11 +38,12 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "time_run.h"
-#include "hub75d.h"
+//#include "time_run.h"
+//#include "hub75d.h"
 #include "wifi_uart_if.h"
-#include "trace_uart_if.h"
+//#include "trace_uart_if.h"
 #include "common.h"
+#include "display_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -197,7 +198,7 @@ void RTC_IRQHandler(void)
   HAL_RTCEx_RTCIRQHandler(&hrtc);
   /* USER CODE BEGIN RTC_IRQn 1 */
   WORK_LED_BLINK();
-  SetOneSecondFlag(true);
+  DISP_TaskSetEvent(DISP_TASK_EVENT_GET_SCAN_RGB);
   /* USER CODE END RTC_IRQn 1 */
 }
 
@@ -295,7 +296,7 @@ void TIM4_IRQHandler(void)
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
-  //HUB75D_DispScan();
+  DISP_TaskSetEvent(DISP_TASK_EVENT_SCAN_LED);
   /* USER CODE END TIM4_IRQn 1 */
 }
 
@@ -323,7 +324,7 @@ void USART2_IRQHandler(void)
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
-  TRACE_UART_ReceiveIDLE(&huart2);
+  //TRACE_UART_ReceiveIDLE(&huart2);
   /* USER CODE END USART2_IRQn 1 */
 }
 

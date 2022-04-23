@@ -18,10 +18,9 @@
 #include "trace_uart_if.h"
 #include "trace_printf.h"
 #include "time_stamp.h"
+#include "display_task.h"
 
 #define SOFTWARE_VERSION "V101"
-
-bool g_pirInt = false;
 
 static void ClearGpioExtiIT(uint16_t GPIO_Pin)
 {
@@ -61,17 +60,6 @@ static void COMMON_EnterStandbyMode(void)
     TRACE_PRINTF("exit stop mode\r\n");
 }
 
-static void IsPirIntFlagSet(void)
-{
-    if (g_pirInt == false) {
-        return;
-    }
-    g_pirInt = false;
-
-    //HUB75D_Disp(DISP_TIME);
-    TRACE_PRINTF("pir interrupt, renew set display 5 minute\r\n");
-}
-
 void COMMON_Init(void)
 {
     if (TRACE_Init() != UTIL_ADV_TRACE_OK) {
@@ -103,7 +91,7 @@ void COMMON_Init(void)
 
 void COMMON_Process(void)
 {
-    IsPirIntFlagSet();
+    //IsPirIntFlagSet();
     WIFI_HandlerUartData();
 
     if (Get1sFlag() == false) {
@@ -127,7 +115,7 @@ void COMMON_Process(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == GPIO_PIN_0) {
-        g_pirInt = true;
+        DISP_TaskSetEvent(DISP_TASK_EVENT_DISP_ON);
     }
 }
 
