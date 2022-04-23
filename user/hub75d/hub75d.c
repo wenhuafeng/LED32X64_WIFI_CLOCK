@@ -434,10 +434,10 @@ void HUB75D_GetCalendar(struct CalendarDecimal *calendar, struct TimeType *time)
 {
     calendar->hourL = time->hour % 10;
     calendar->hourH = time->hour / 10;
-    calendar->minL  = time->min % 10;
-    calendar->minH  = time->min / 10;
-    calendar->secL  = time->sec % 10;
-    calendar->secH  = time->sec / 10;
+    calendar->minL  = time->minute % 10;
+    calendar->minH  = time->minute / 10;
+    calendar->secL  = time->second % 10;
+    calendar->secH  = time->second / 10;
     calendar->dayL   = time->day % 10;
     calendar->dayH   = time->day / 10;
     calendar->monthL = time->month % 10;

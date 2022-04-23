@@ -28,9 +28,7 @@ static const uint32_t g_lunarCalendarTable[YEAR_TABLE_NUM] = {
 };
 static const uint16_t g_monthAdd[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
-struct LunarCalendarType g_lunarCalendarData;
-
-static bool LunarCalendar(struct TimeType *time, struct LunarCalendarType *lcData)
+bool GetLunarCalendar(struct LunarCalendarType *lcData, struct TimeType *time)
 {
     uint16_t springToNY; /* 记录春节离当年元旦的天数 */
     uint16_t sunToNY;    /* 记录阳历日离当年元旦的天数 */
@@ -116,14 +114,4 @@ static bool LunarCalendar(struct TimeType *time, struct LunarCalendarType *lcDat
     lcData->day   = day;
 
     return (month == ((g_lunarCalendarTable[year - 1901] & 0xF00000) >> 20)) ? 1 : 0;
-}
-
-void CalculationLunarCalendar(struct TimeType *time)
-{
-    (void)LunarCalendar(time, &g_lunarCalendarData);
-}
-
-struct LunarCalendarType *GetLunarCalendar(void)
-{
-    return &g_lunarCalendarData;
 }

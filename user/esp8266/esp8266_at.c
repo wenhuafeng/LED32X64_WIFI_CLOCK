@@ -161,13 +161,6 @@ static uint8_t GetMonth(char *monthString)
 
 static bool ProcessClock(char *cRxBuf)
 {
-    uint16_t year;
-    uint8_t month;
-    uint8_t day;
-    uint8_t week;
-    uint8_t hour;
-    uint8_t minute;
-    uint8_t second;
     char str[4] = {0};
     struct TimeType time;
     int ret;
@@ -177,55 +170,47 @@ static bool ProcessClock(char *cRxBuf)
         TRACE_PRINTF("%s snprintf error!\r\n", __LINE__);
         return false;
     }
-    week = GetWeek(str);
+    time.week = GetWeek(str);
 
     ret = snprintf(str, sizeof(str), "%s", &cRxBuf[MONTH_STR_INDEX]);
     if (ret <= 0) {
         TRACE_PRINTF("%s snprintf error!\r\n", __LINE__);
         return false;
     }
-    month = GetMonth(str);
+    time.month = GetMonth(str);
 
-    day    = AscToHex(cRxBuf[DAY_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[DAY_STR_INDEX_LOW]);
-    hour   = AscToHex(cRxBuf[HOUR_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[HOUR_STR_INDEX_LOW]);
-    minute = AscToHex(cRxBuf[MIN_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[MIN_STR_INDEX_LOW]);
-    second = AscToHex(cRxBuf[SEC_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[SEC_STR_INDEX_LOW]);
-    year   = AscToHex(cRxBuf[YEAR_STR_INDEX_THOUSAND]) * 1000 + AscToHex(cRxBuf[YEAR_STR_INDEX_HUNDRED]) * 100 +
+    time.day    = AscToHex(cRxBuf[DAY_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[DAY_STR_INDEX_LOW]);
+    time.hour   = AscToHex(cRxBuf[HOUR_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[HOUR_STR_INDEX_LOW]);
+    time.minute = AscToHex(cRxBuf[MIN_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[MIN_STR_INDEX_LOW]);
+    time.second = AscToHex(cRxBuf[SEC_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[SEC_STR_INDEX_LOW]);
+    time.year   = AscToHex(cRxBuf[YEAR_STR_INDEX_THOUSAND]) * 1000 + AscToHex(cRxBuf[YEAR_STR_INDEX_HUNDRED]) * 100 +
              AscToHex(cRxBuf[YEAR_STR_INDEX_TEN]) * 10 + AscToHex(cRxBuf[YEAR_STR_INDEX]);
 
-    if (year < YEAR_MIN || year > YEAR_MAX) {
+    if (time.year < YEAR_MIN || time.year > YEAR_MAX) {
         return false;
     }
-    if (month < MONTH_MIN || month > MONTH_MAX) {
+    if (time.month < MONTH_MIN || time.month > MONTH_MAX) {
         return false;
     }
-    if (day < DAY_MIN || day > DAY_MAX) {
+    if (time.day < DAY_MIN || time.day > DAY_MAX) {
         return false;
     }
-    if (week > WEEK_MAX) {
+    if (time.week > WEEK_MAX) {
         return false;
     }
-    if (hour > HOUR_MAX) {
+    if (time.hour > HOUR_MAX) {
         return false;
     }
-    if (minute > MIN_MAX) {
+    if (time.minute > MIN_MAX) {
         return false;
     }
-    if (second > SEC_MAX) {
+    if (time.second > SEC_MAX) {
         return false;
     }
 
-    time.year  = year;
-    time.month = month;
-    time.day   = day;
-    time.week  = week;
-    time.hour  = hour;
-    time.min   = minute;
-    time.sec   = second;
-
-    SetTimeData(&time);
+    //SetTimeData(&time);
     SetClock(&time);
-    CalculationLunarCalendar(&time);
+    //CalculationLunarCalendar(&time);
     TimeConvertTimestamp(&time);
 
     return true;

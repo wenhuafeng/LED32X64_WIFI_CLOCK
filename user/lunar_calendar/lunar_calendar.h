@@ -10,7 +10,6 @@ struct LunarCalendarType {
     uint8_t day;
 };
 
-void CalculationLunarCalendar(struct TimeType *time);
-struct LunarCalendarType *GetLunarCalendar(void);
+bool GetLunarCalendar(struct LunarCalendarType *lcData, struct TimeType *time);
 
 #endif

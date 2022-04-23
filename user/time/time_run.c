@@ -8,9 +8,6 @@
 #include "trace_printf.h"
 #include "time_stamp.h"
 
-struct TimeType g_time;
-static bool g_1sFlag;
-
 static uint8_t GetMaxDay(uint16_t year, uint8_t month)
 {
     uint8_t day;
@@ -29,29 +26,13 @@ static uint8_t GetMaxDay(uint16_t year, uint8_t month)
     return day;
 }
 
-bool Get1sFlag(void)
-{
-    return g_1sFlag;
-}
-
-void SetOneSecondFlag(bool flag)
-{
-    g_1sFlag = flag;
-}
-
-struct TimeType *GetTimeData(void)
-{
-    return &g_time;
-}
-
-void CalculateWeek(void)
+static void CalculateWeek(struct TimeType *time)
 {
     int16_t yearTemp = 0;
     int16_t yearHigh;
     int16_t yearLow;
     int8_t monthTemp = 0;
     int8_t wk;
-    struct TimeType *time = &g_time;
 
     if (time->month < 3) {
         monthTemp = time->month + 12;
@@ -71,35 +52,31 @@ void CalculateWeek(void)
     time->week = wk;
 }
 
-void SetTimeData(struct TimeType *inTime)
+//void SetTimeData(struct TimeType *time, struct TimeType *inTime)
+//{
+//    time->sec   = inTime->sec;
+//    time->min   = inTime->min;
+//    time->hour  = inTime->hour;
+//    time->week  = inTime->week;
+//    time->day   = inTime->day;
+//    time->month = inTime->month;
+//    time->year  = inTime->year;
+//}
+
+bool ClockRun(struct TimeType *time)
 {
-    struct TimeType *time = &g_time;
-
-    time->sec   = inTime->sec;
-    time->min   = inTime->min;
-    time->hour  = inTime->hour;
-    time->week  = inTime->week;
-    time->day   = inTime->day;
-    time->month = inTime->month;
-    time->year  = inTime->year;
-}
-
-bool ClockRun(void)
-{
-    struct TimeType *time = &g_time;
-
-    time->sec++;
-    if (time->sec < 60) {
+    time->second++;
+    if (time->second < 60) {
         return false;
     }
 
-    time->sec = 0;
-    time->min++;
-    if (time->min < 60) {
+    time->second = 0;
+    time->minute++;
+    if (time->minute < 60) {
         return false;
     }
 
-    time->min = 0;
+    time->minute = 0;
     time->hour++;
     if (time->hour < 24) {
         return false;
@@ -121,12 +98,12 @@ bool ClockRun(void)
     time->year++;
 
 calc_week:
-    CalculateWeek();
+    CalculateWeek(time);
 
     return true;
 }
 
-void GetClock(void)
+void GetClock(struct TimeType *time)
 {
     RTC_TimeTypeDef sTime;
     RTC_DateTypeDef sDate;
@@ -134,21 +111,20 @@ void GetClock(void)
     HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-    g_time.sec  = sTime.Seconds;
-    g_time.min  = sTime.Minutes;
-    g_time.hour = sTime.Hours;
-
-    g_time.day   = sDate.Date;
-    g_time.month = sDate.Month;
-    g_time.week  = sDate.WeekDay;
-    g_time.year  = (sDate.Year + 2000);
+    time->second  = sTime.Seconds;
+    time->minute  = sTime.Minutes;
+    time->hour  = sTime.Hours;
+    time->day   = sDate.Date;
+    time->month = sDate.Month;
+    time->week  = sDate.WeekDay;
+    time->year  = (sDate.Year + 2000);
 
     //HUB75D_GetCalendar(&g_time);
-    CalculationLunarCalendar(&g_time);
-    TimeConvertTimestamp(&g_time);
+    //CalculationLunarCalendar(&g_time);
+    //TimeConvertTimestamp(&g_time);
 
-    TRACE_PRINTF("get time: %d-%d-%d %02d:%02d:%02d \r\n", g_time.year, g_time.month, g_time.day, g_time.hour,
-                 g_time.min, g_time.sec);
+    //TRACE_PRINTF("get time: %d-%d-%d %02d:%02d:%02d \r\n", g_time.year, g_time.month, g_time.day, g_time.hour,
+    //             g_time.min, g_time.sec);
 }
 
 void SetClock(struct TimeType *time)
@@ -156,8 +132,8 @@ void SetClock(struct TimeType *time)
     RTC_TimeTypeDef sTime;
     RTC_DateTypeDef sDate;
 
-    sTime.Seconds = time->sec;
-    sTime.Minutes = time->min;
+    sTime.Seconds = time->second;
+    sTime.Minutes = time->minute;
     sTime.Hours   = time->hour;
 
     sDate.Date    = time->day;
@@ -168,6 +144,6 @@ void SetClock(struct TimeType *time)
     HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-    TRACE_PRINTF("set time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
-                 time->sec);
+    //TRACE_PRINTF("set time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
+    //             time->sec);
 }

@@ -79,10 +79,10 @@ void COMMON_Init(void)
     HTU21D_Init();
     HTU21D_GetData();
 
-    HAL_Delay(100);
-    GetClock();
+    //HAL_Delay(100);
+    //GetClock();
 
-    HAL_Delay(100);
+    //HAL_Delay(100);
     //HUB75D_Init();
     //HUB75D_Disp(DISP_TIME);
     //HAL_TIM_Base_MspInit(&htim4);
@@ -94,17 +94,17 @@ void COMMON_Process(void)
     //IsPirIntFlagSet();
     WIFI_HandlerUartData();
 
-    if (Get1sFlag() == false) {
-        return;
-    }
-    SetOneSecondFlag(false);
+    //if (Get1sFlag() == false) {
+    //    return;
+    //}
+    //SetOneSecondFlag(false);
 
     TimestampAdd();
     WIFI_GetTime();
     HTU21D_Sampling();
-    if (ClockRun() == true) {
-        CalculationLunarCalendar(GetTimeData());
-    }
+    //if (ClockRun() == true) {
+    //    CalculationLunarCalendar(GetTimeData());
+    //}
     //HUB75D_GetCalendar(GetTimeData());
     //if (HUB75D_CtrDec() == true) {
         COMMON_EnterStandbyMode();

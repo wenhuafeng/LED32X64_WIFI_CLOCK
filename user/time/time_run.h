@@ -5,8 +5,8 @@
 #include <stdbool.h>
 
 struct TimeType {
-    uint8_t sec;
-    uint8_t min;
+    uint8_t second;
+    uint8_t minute;
     uint8_t hour;
     uint8_t day;
     uint8_t week;
@@ -14,13 +14,13 @@ struct TimeType {
     uint16_t year;
 };
 
-bool Get1sFlag(void);
-void SetOneSecondFlag(bool flag);
-struct TimeType *GetTimeData(void);
-void SetTimeData(struct TimeType *time);
-void CalculateWeek(void);
-bool ClockRun(void);
-void GetClock(void);
+//bool Get1sFlag(void);
+//void SetOneSecondFlag(bool flag);
+//struct TimeType *GetTimeData(void);
+//void SetTimeData(struct TimeType *time, struct TimeType *inTime);
+//void CalculateWeek(void);
+bool ClockRun(struct TimeType *time);
+void GetClock(struct TimeType *time);
 void SetClock(struct TimeType *time);
 
 #endif

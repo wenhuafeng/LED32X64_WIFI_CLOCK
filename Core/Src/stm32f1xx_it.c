@@ -44,6 +44,7 @@
 //#include "trace_uart_if.h"
 #include "common.h"
 #include "display_task.h"
+#include "display_scan_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -296,7 +297,7 @@ void TIM4_IRQHandler(void)
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
-  DISP_TaskSetEvent(DISP_TASK_EVENT_SCAN_LED);
+  DISP_ScanTaskSetEvent(DISP_SCAN_TASK_EVENT_SCAN_LED);
   /* USER CODE END TIM4_IRQn 1 */
 }
 
