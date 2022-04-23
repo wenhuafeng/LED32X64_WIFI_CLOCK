@@ -143,7 +143,7 @@ void GetClock(void)
     g_time.week  = sDate.WeekDay;
     g_time.year  = (sDate.Year + 2000);
 
-    HUB75D_CalculateCalendar(&g_time);
+    //HUB75D_GetCalendar(&g_time);
     CalculationLunarCalendar(&g_time);
     TimeConvertTimestamp(&g_time);
 

@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "display_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,20 +54,6 @@ const osThreadAttr_t mainTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for wifiTask */
-osThreadId_t wifiTaskHandle;
-const osThreadAttr_t wifiTask_attributes = {
-  .name = "wifiTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal7,
-};
-/* Definitions for thTask */
-osThreadId_t thTaskHandle;
-const osThreadAttr_t thTask_attributes = {
-  .name = "thTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal6,
-};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -75,8 +61,6 @@ const osThreadAttr_t thTask_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void MainTask(void *argument);
-void WifiTask(void *argument);
-void ThTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -110,14 +94,11 @@ void MX_FREERTOS_Init(void) {
   /* creation of mainTask */
   mainTaskHandle = osThreadNew(MainTask, NULL, &mainTask_attributes);
 
-  /* creation of wifiTask */
-  wifiTaskHandle = osThreadNew(WifiTask, NULL, &wifiTask_attributes);
-
-  /* creation of thTask */
-  thTaskHandle = osThreadNew(ThTask, NULL, &thTask_attributes);
-
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  if (DISP_TaskInit() != osOK) {
+    return;
+  }
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -142,42 +123,6 @@ void MainTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END MainTask */
-}
-
-/* USER CODE BEGIN Header_WifiTask */
-/**
-* @brief Function implementing the wifiTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_WifiTask */
-void WifiTask(void *argument)
-{
-  /* USER CODE BEGIN WifiTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END WifiTask */
-}
-
-/* USER CODE BEGIN Header_ThTask */
-/**
-* @brief Function implementing the thTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_ThTask */
-void ThTask(void *argument)
-{
-  /* USER CODE BEGIN ThTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END ThTask */
 }
 
 /* Private application code --------------------------------------------------*/

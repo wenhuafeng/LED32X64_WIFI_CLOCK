@@ -34,11 +34,11 @@ static void COMMON_EnterStandbyMode(void)
 {
     TRACE_PRINTF("enter stop mode\r\n");
 
-    HAL_TIM_Base_Stop_IT(&htim4);
-    HAL_TIM_Base_MspDeInit(&htim4);
+    //HAL_TIM_Base_Stop_IT(&htim4);
+    //HAL_TIM_Base_MspDeInit(&htim4);
 
     WIFI_Power(POWER_OFF);
-    HUB75D_Disp(DISP_TIME_OFF);
+    //HUB75D_Disp(DISP_TIME_OFF);
     WORK_LED_OFF();
 
     HAL_Delay(100);
@@ -68,7 +68,7 @@ static void IsPirIntFlagSet(void)
     }
     g_pirInt = false;
 
-    HUB75D_Disp(DISP_TIME);
+    //HUB75D_Disp(DISP_TIME);
     TRACE_PRINTF("pir interrupt, renew set display 5 minute\r\n");
 }
 
@@ -95,10 +95,10 @@ void COMMON_Init(void)
     GetClock();
 
     HAL_Delay(100);
-    HUB75D_Init();
-    HUB75D_Disp(DISP_TIME);
-    HAL_TIM_Base_MspInit(&htim4);
-    HAL_TIM_Base_Start_IT(&htim4);
+    //HUB75D_Init();
+    //HUB75D_Disp(DISP_TIME);
+    //HAL_TIM_Base_MspInit(&htim4);
+    //HAL_TIM_Base_Start_IT(&htim4);
 }
 
 void COMMON_Process(void)
@@ -117,11 +117,11 @@ void COMMON_Process(void)
     if (ClockRun() == true) {
         CalculationLunarCalendar(GetTimeData());
     }
-    HUB75D_CalculateCalendar(GetTimeData());
-    if (HUB75D_CtrDec() == true) {
+    //HUB75D_GetCalendar(GetTimeData());
+    //if (HUB75D_CtrDec() == true) {
         COMMON_EnterStandbyMode();
-    }
-    HUB75D_GetScanRgb();
+    //}
+    //HUB75D_GetScanRgb();
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
