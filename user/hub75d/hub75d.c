@@ -494,14 +494,9 @@ void HUB75D_CalculateCalendar(struct TimeType *time)
     g_calendarDecimal.colon  = 11; /* ":" */
 }
 
-void HUB75D_SetDispOffCtr(enum DispTime time)
-{
-    g_displayOffCtr = time;
-}
-
 void HUB75D_Disp(enum DispTime time)
 {
-    HUB75D_SetDispOffCtr(time);
+    g_displayOffCtr = time;
 
     if (time == DISP_TIME_OFF) {
         HUB75D_DISP_POWER_PIN = DISP_OFF;

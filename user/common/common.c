@@ -68,7 +68,7 @@ static void IsPirIntFlagSet(void)
     }
     g_pirInt = false;
 
-    HUB75D_SetDispOffCtr(DISP_TIME);
+    HUB75D_Disp(DISP_TIME);
     TRACE_PRINTF("pir interrupt, renew set display 5 minute\r\n");
 }
 
