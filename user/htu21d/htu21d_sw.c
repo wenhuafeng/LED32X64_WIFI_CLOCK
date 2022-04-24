@@ -3,6 +3,7 @@
 #include "htu21d.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "cmsis_os2.h"
 #include "htu21d_iic_sw.h"
 #include "trace_printf.h"
 
@@ -35,12 +36,6 @@
 // crc8
 #define POLYNOMIAL 0x31 // P(x) = x^8 + x^5 + x^4 + 1 = 00110001
 
-struct Htu21dDataType {
-    int16_t temperature;
-    uint16_t humidity;
-};
-struct Htu21dDataType g_thData;
-
 static uint8_t CalcCrc(uint8_t *crcData, uint8_t len)
 {
     uint8_t i, bit;
@@ -59,105 +54,6 @@ static uint8_t CalcCrc(uint8_t *crcData, uint8_t len)
     }
 
     return crc;
-}
-
-bool HTU21D_GetData(void)
-{
-    uint16_t htu_data;
-    float htu;
-    uint16_t temp_data;
-    float temp;
-    uint8_t read[3];
-    bool status;
-
-    I2C_Start();
-    status = I2C_WriteByte(DEVICE_ADDR | WRITE);
-    if (status == false) {
-        goto i2c_fail;
-    }
-    status = I2C_WriteByte(HUMI_NO_HOLD);
-    if (status == false) {
-        goto i2c_fail;
-    }
-
-    HAL_Delay(60); /* must 58ms the above */
-
-    I2C_Start();
-    status = I2C_WriteByte(DEVICE_ADDR | READ);
-    if (status == false) {
-        goto i2c_fail;
-    }
-    read[DATA_HIGH] = I2C_ReadByte();
-    I2C_Ack();
-    read[DATA_LOW] = I2C_ReadByte();
-    I2C_Ack();
-    read[DATA_CRC8] = I2C_ReadByte();
-    I2C_Nack();
-    I2C_Stop();
-
-    if (CalcCrc(read, 2) != read[DATA_CRC8]) {
-        TRACE_PRINTF("humi crc8 error\r\n");
-        return false;
-    }
-
-    htu_data = read[DATA_HIGH];
-    htu_data = htu_data << 8;
-    htu_data += read[DATA_LOW];
-    htu               = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
-    g_thData.humidity = (uint16_t)htu;
-    if (g_thData.humidity > HUMI_MAX_VALUE) {
-        g_thData.humidity = HUMI_MAX_VALUE;
-    }
-
-    HAL_Delay(10);
-
-    I2C_Start();
-    status = I2C_WriteByte(DEVICE_ADDR | WRITE);
-    if (status == false) {
-        goto i2c_fail;
-    }
-    status = I2C_WriteByte(TEMP_NO_HOLD);
-    if (status == false) {
-        goto i2c_fail;
-    }
-
-    HAL_Delay(60); /* must 58ms the above */
-
-    I2C_Start();
-    status = I2C_WriteByte(DEVICE_ADDR | READ);
-    if (status == false) {
-        goto i2c_fail;
-    }
-    read[DATA_HIGH] = I2C_ReadByte();
-    I2C_Ack();
-    read[DATA_LOW] = I2C_ReadByte();
-    I2C_Ack();
-    read[DATA_CRC8] = I2C_ReadByte();
-    I2C_Nack();
-    I2C_Stop();
-
-    if (CalcCrc(read, 2) != read[DATA_CRC8]) {
-        TRACE_PRINTF("temp crc8 error\r\n");
-        return false;
-    }
-    temp_data = read[DATA_HIGH];
-    temp_data = temp_data << 8;
-    temp_data += read[DATA_LOW];
-    temp                 = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
-    g_thData.temperature = (int16_t)temp;
-    if (g_thData.temperature > TEMP_MAX_VALUE) {
-        g_thData.temperature = TEMP_MAX_VALUE;
-    }
-
-    TRACE_PRINTF("Humi: %d \r\n", g_thData.humidity);
-    TRACE_PRINTF("Temp: %d \r\n", g_thData.temperature);
-    return true;
-
-i2c_fail:
-    g_thData.temperature = 0x00;
-    g_thData.humidity    = 0x00;
-    TRACE_PRINTF("temperature read fail. \r\n");
-    return false;
 }
 
 static bool HTU21D_FuncInit(void)
@@ -216,7 +112,7 @@ static bool HTU21D_SoftReset(void)
         goto i2c_fail;
     }
     I2C_Stop();
-    HAL_Delay(15);
+    osDelay(15);
 
     TRACE_PRINTF("HTU21D Reset OK\r\n");
     return true;
@@ -226,25 +122,15 @@ i2c_fail:
     return false;
 }
 
-int16_t HTU21D_GetTemperature(void)
-{
-    return g_thData.temperature;
-}
-
-uint16_t HTU21D_GetHumidity(void)
-{
-    return g_thData.humidity;
-}
-
 void HTU21D_Init(void)
 {
     I2C_Init();
-    HAL_Delay(10);
+    osDelay(10);
     (void)I2C_WriteByte(DEVICE_ADDR | WRITE);
     I2C_Stop();
-    HAL_Delay(10);
+    osDelay(10);
     HTU21D_SoftReset();
-    HAL_Delay(10);
+    osDelay(10);
     if (HTU21D_FuncInit() == false) {
         TRACE_PRINTF("HTU21D Init NG\r\n");
         return;
@@ -252,18 +138,105 @@ void HTU21D_Init(void)
         TRACE_PRINTF("HTU21D Init OK\r\n");
     }
 
-    HAL_Delay(100);
+    osDelay(100);
 }
 
-void HTU21D_Sampling(void)
+bool HTU21D_GetData(struct Htu21dDataType *th)
 {
-    static uint8_t count = 0x00;
+    uint16_t htu_data;
+    float htu;
+    uint16_t temp_data;
+    float temp;
+    uint8_t read[3];
+    bool status;
 
-    count++;
-    if (count > 9) {
-        count = 0;
-        HTU21D_GetData();
+    I2C_Start();
+    status = I2C_WriteByte(DEVICE_ADDR | WRITE);
+    if (status == false) {
+        goto i2c_fail;
     }
+    status = I2C_WriteByte(HUMI_NO_HOLD);
+    if (status == false) {
+        goto i2c_fail;
+    }
+
+    osDelay(60); /* must 58ms the above */
+
+    I2C_Start();
+    status = I2C_WriteByte(DEVICE_ADDR | READ);
+    if (status == false) {
+        goto i2c_fail;
+    }
+    read[DATA_HIGH] = I2C_ReadByte();
+    I2C_Ack();
+    read[DATA_LOW] = I2C_ReadByte();
+    I2C_Ack();
+    read[DATA_CRC8] = I2C_ReadByte();
+    I2C_Nack();
+    I2C_Stop();
+
+    if (CalcCrc(read, 2) != read[DATA_CRC8]) {
+        TRACE_PRINTF("humi crc8 error\r\n");
+        return false;
+    }
+
+    htu_data = read[DATA_HIGH];
+    htu_data = htu_data << 8;
+    htu_data += read[DATA_LOW];
+    htu               = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
+    th->humidity = (uint16_t)htu;
+    if (th->humidity > HUMI_MAX_VALUE) {
+        th->humidity = HUMI_MAX_VALUE;
+    }
+
+    osDelay(10);
+
+    I2C_Start();
+    status = I2C_WriteByte(DEVICE_ADDR | WRITE);
+    if (status == false) {
+        goto i2c_fail;
+    }
+    status = I2C_WriteByte(TEMP_NO_HOLD);
+    if (status == false) {
+        goto i2c_fail;
+    }
+
+    osDelay(60); /* must 58ms the above */
+
+    I2C_Start();
+    status = I2C_WriteByte(DEVICE_ADDR | READ);
+    if (status == false) {
+        goto i2c_fail;
+    }
+    read[DATA_HIGH] = I2C_ReadByte();
+    I2C_Ack();
+    read[DATA_LOW] = I2C_ReadByte();
+    I2C_Ack();
+    read[DATA_CRC8] = I2C_ReadByte();
+    I2C_Nack();
+    I2C_Stop();
+
+    if (CalcCrc(read, 2) != read[DATA_CRC8]) {
+        TRACE_PRINTF("temp crc8 error\r\n");
+        return false;
+    }
+    temp_data = read[DATA_HIGH];
+    temp_data = temp_data << 8;
+    temp_data += read[DATA_LOW];
+    temp            = ((temp_data & 0xfffc) / 65536.0 * 175.72 - 46.85) * 10;
+    th->temperature = (int16_t)temp;
+    if (th->temperature > TEMP_MAX_VALUE) {
+        th->temperature = TEMP_MAX_VALUE;
+    }
+
+    TRACE_PRINTF("Humi: %d \r\n", th->humidity);
+    TRACE_PRINTF("Temp: %d \r\n", th->temperature);
+    return true;
+
+i2c_fail:
+    TRACE_PRINTF("temperature read fail. \r\n");
+    HTU21D_Init();
+    return false;
 }
 
 #endif

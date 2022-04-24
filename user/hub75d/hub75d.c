@@ -297,11 +297,11 @@ static void DispTemperatureHumidity(struct Hub75dType *hub75d, uint8_t index)
     uint8_t tableIndex = index - (SCAN_ALL_LINE / 2);
 
     if (hub75d->displayTh == DISP_T) {
-        if (hub75d->temperature < 0) {
+        if (hub75d->tempHumi.temperature < 0) {
             sign = true;
-            tmp  = ~hub75d->temperature + 1;
+            tmp  = ~hub75d->tempHumi.temperature + 1;
         } else {
-            tmp = hub75d->temperature;
+            tmp = hub75d->tempHumi.temperature;
         }
         t1 = tmp / 100;
         t0 = tmp % 100 / 10;
@@ -316,7 +316,7 @@ static void DispTemperatureHumidity(struct Hub75dType *hub75d, uint8_t index)
             }
         }
     } else {
-        tmp = hub75d->humidity;
+        tmp = hub75d->tempHumi.humidity;
         t1  = tmp / 100;
         t0  = tmp % 100 / 10;
         td  = tmp % 10;

@@ -3,6 +3,7 @@
 #include "htu21d_iic_sw.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "cmsis_os2.h"
 
 #define HTU21D_I2C_DELAY 2
 
@@ -43,9 +44,7 @@ enum SdaIoType {
 
 static void I2C_DelayUs(uint8_t c)
 {
-    uint16_t count = c;
-
-    while (count--);
+    osDelay(c);
 }
 
 static void HTU21D_SDA_SET(enum SdaIoType io)

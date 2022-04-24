@@ -52,17 +52,6 @@ static void CalculateWeek(struct TimeType *time)
     time->week = wk;
 }
 
-//void SetTimeData(struct TimeType *time, struct TimeType *inTime)
-//{
-//    time->sec   = inTime->sec;
-//    time->min   = inTime->min;
-//    time->hour  = inTime->hour;
-//    time->week  = inTime->week;
-//    time->day   = inTime->day;
-//    time->month = inTime->month;
-//    time->year  = inTime->year;
-//}
-
 bool ClockRun(struct TimeType *time)
 {
     time->second++;
@@ -111,20 +100,20 @@ void GetClock(struct TimeType *time)
     HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-    time->second  = sTime.Seconds;
-    time->minute  = sTime.Minutes;
-    time->hour  = sTime.Hours;
-    time->day   = sDate.Date;
-    time->month = sDate.Month;
-    time->week  = sDate.WeekDay;
-    time->year  = (sDate.Year + 2000);
+    time->second = sTime.Seconds;
+    time->minute = sTime.Minutes;
+    time->hour   = sTime.Hours;
+    time->day    = sDate.Date;
+    time->month  = sDate.Month;
+    time->week   = sDate.WeekDay;
+    time->year   = (sDate.Year + 2000);
 
     //HUB75D_GetCalendar(&g_time);
     //CalculationLunarCalendar(&g_time);
     //TimeConvertTimestamp(&g_time);
 
-    //TRACE_PRINTF("get time: %d-%d-%d %02d:%02d:%02d \r\n", g_time.year, g_time.month, g_time.day, g_time.hour,
-    //             g_time.min, g_time.sec);
+    TRACE_PRINTF("get time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
+                 time->sec);
 }
 
 void SetClock(struct TimeType *time)
@@ -144,6 +133,6 @@ void SetClock(struct TimeType *time)
     HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-    //TRACE_PRINTF("set time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
-    //             time->sec);
+    TRACE_PRINTF("set time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
+                 time->sec);
 }

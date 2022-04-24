@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include "lunar_calendar.h"
 #include "time_run.h"
+#include "hub75d.h"
+#include "htu21d.h"
 
 enum DispTime {
     DISP_TIME_OFF = 0,
@@ -51,8 +53,7 @@ struct Hub75dType {
     struct LunarCalendarType lunarCalendar;
     enum DispTH displayTh;
     uint16_t displayCount;
-    int16_t temperature;
-    uint16_t humidity;
+    struct Htu21dDataType tempHumi;
     struct RgbType rgb;
     struct RgbType rgbScan;
 };

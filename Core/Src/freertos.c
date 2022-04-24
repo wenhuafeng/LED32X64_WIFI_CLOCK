@@ -27,6 +27,7 @@
 /* USER CODE BEGIN Includes */
 #include "display_task.h"
 #include "display_scan_task.h"
+#include "temp_humi_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,6 +102,9 @@ void MX_FREERTOS_Init(void) {
     return;
   }
   if (DISP_ScanTaskInit() != osOK) {
+    return;
+  }
+  if (TH_TaskInit() != osOK) {
     return;
   }
   /* USER CODE END RTOS_THREADS */

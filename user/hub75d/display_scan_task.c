@@ -3,6 +3,7 @@
 #include "FreeRTOS.h"
 #include "hub75d.h"
 #include "display_task.h"
+#include "trace_printf.h"
 
 #define DISP_SCAN_TASK_EVENT_ALL (0xffffffff)
 
@@ -30,7 +31,9 @@ static void DISP_ScanTask(void *argument)
             HUB75D_DispScan(&rgbScan);
         }
         if ((event & DISP_SCAN_TASK_EVENT_RECEIVED_NEW_DATA) == DISP_SCAN_TASK_EVENT_RECEIVED_NEW_DATA) {
-            (void)GetDispScanData(&rgbScan);
+            if (DISP_TaskGetDispScanData(&rgbScan) != osOK) {
+                TRACE_PRINTF("Get rgb scan data error!\r\n");
+            }
         }
     }
 }

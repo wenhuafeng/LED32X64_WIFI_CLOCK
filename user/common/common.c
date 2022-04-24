@@ -31,7 +31,7 @@ static void ClearGpioExtiIT(uint16_t GPIO_Pin)
 
 static void COMMON_EnterStandbyMode(void)
 {
-    TRACE_PRINTF("enter stop mode\r\n");
+    //TRACE_PRINTF("enter stop mode\r\n");
 
     //HAL_TIM_Base_Stop_IT(&htim4);
     //HAL_TIM_Base_MspDeInit(&htim4);
@@ -40,7 +40,7 @@ static void COMMON_EnterStandbyMode(void)
     //HUB75D_Disp(DISP_TIME_OFF);
     WORK_LED_OFF();
 
-    HAL_Delay(100);
+    //HAL_Delay(100);
     ClearGpioExtiIT(PIR_INT_Pin);
 
     HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
@@ -75,9 +75,9 @@ void COMMON_Init(void)
     HAL_RTC_MspInit(&hrtc);
     HAL_RTCEx_SetSecond_IT(&hrtc);
 
-    HAL_Delay(100);
-    HTU21D_Init();
-    HTU21D_GetData();
+    //HAL_Delay(100);
+    //HTU21D_Init();
+    //HTU21D_GetData();
 
     //HAL_Delay(100);
     //GetClock();
@@ -101,7 +101,7 @@ void COMMON_Process(void)
 
     TimestampAdd();
     WIFI_GetTime();
-    HTU21D_Sampling();
+    //HTU21D_Sampling();
     //if (ClockRun() == true) {
     //    CalculationLunarCalendar(GetTimeData());
     //}

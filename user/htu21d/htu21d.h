@@ -4,10 +4,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-int16_t HTU21D_GetTemperature(void);
-uint16_t HTU21D_GetHumidity(void);
-void HTU21D_Sampling(void);
+struct Htu21dDataType {
+    int16_t temperature;
+    uint16_t humidity;
+};
+
 void HTU21D_Init(void);
-bool HTU21D_GetData(void);
+bool HTU21D_GetData(struct Htu21dDataType *th);
 
 #endif

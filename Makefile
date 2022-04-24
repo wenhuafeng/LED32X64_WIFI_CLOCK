@@ -53,6 +53,7 @@ user/esp8266/esp8266_at.c \
 user/htu21d/htu21d_hw.c \
 user/htu21d/htu21d_iic_sw.c \
 user/htu21d/htu21d_sw.c \
+user/htu21d/temp_humi_task.c \
 user/hub75d/display_scan_task.c \
 user/hub75d/display_task.c \
 user/hub75d/hub75d.c \

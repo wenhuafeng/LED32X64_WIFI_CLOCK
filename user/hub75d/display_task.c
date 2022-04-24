@@ -5,6 +5,9 @@
 #include "tim.h"
 #include "hub75d.h"
 #include "time_run.h"
+#include "display_scan_task.h"
+#include "temp_humi_task.h"
+#include "trace_printf.h"
 
 #define DISP_TASK_SCAN_MSG_MAX  1
 #define DISP_TASK_SCAN_MSG_SIZE (sizeof(struct RgbType))
@@ -46,7 +49,12 @@ static void DISP_Task(void *argument)
                 HUB75D_Disp(&hub75d.displayCount, DISP_TIME_OFF);
             }
             HUB75D_GetScanRgb(&hub75d);
-            osMessageQueuePut(g_dispScanMsgId, &hub75d.rgbScan, 0, 0);
+            if (osMessageQueuePut(g_dispScanMsgId, &hub75d.rgbScan, 0, 0) == osOK) {
+                DISP_ScanTaskSetEvent(DISP_SCAN_TASK_EVENT_RECEIVED_NEW_DATA);
+            }
+        }
+        if ((event & DISP_TASK_EVENT_GET_TH_DATA) == DISP_TASK_EVENT_GET_TH_DATA) {
+            TH_TaskGetThData(&hub75d.tempHumi);
         }
         if ((event & DISP_TASK_EVENT_DISP_ON) == DISP_TASK_EVENT_DISP_ON) {
             HUB75D_Init();
@@ -54,7 +62,7 @@ static void DISP_Task(void *argument)
             HAL_TIM_Base_MspInit(&htim4);
             HAL_TIM_Base_Start_IT(&htim4);
             GetClock(&time);
-            //TRACE_PRINTF("pir interrupt, renew set display 5 minute\r\n");
+            TRACE_PRINTF("pir interrupt, renew set display 5 minute\r\n");
         }
     }
 }
@@ -90,7 +98,7 @@ void DISP_TaskSetEvent(uint32_t event)
     osEventFlagsSet(g_dispEvent, event);
 }
 
-osStatus_t GetDispScanData(struct RgbType *scanRgb)
+osStatus_t DISP_TaskGetDispScanData(struct RgbType *scanRgb)
 {
     osStatus_t status;
 
