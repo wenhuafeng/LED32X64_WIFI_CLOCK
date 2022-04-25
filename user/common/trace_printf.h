@@ -1,7 +1,7 @@
 #ifndef TRACE_PRINTF_H
 #define TRACE_PRINTF_H
 
-#include "trace.h"
+//#include "trace.h"
 
 #define TRACE_PRINTF(...)
     //do {

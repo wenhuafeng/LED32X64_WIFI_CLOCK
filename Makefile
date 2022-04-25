@@ -50,6 +50,7 @@ Core/Src/freertos.c \
 Core/Src/stm32f1xx_hal_timebase_tim.c \
 user/common/common.c \
 user/esp8266/esp8266_at.c \
+user/esp8266/wifi_task.c \
 user/htu21d/htu21d_hw.c \
 user/htu21d/htu21d_iic_sw.c \
 user/htu21d/htu21d_sw.c \
@@ -60,10 +61,6 @@ user/hub75d/hub75d.c \
 user/lunar_calendar/lunar_calendar.c \
 user/time/time_run.c \
 user/time/time_stamp.c \
-user/trace/mem.c \
-user/trace/tiny_vsnprintf.c \
-user/trace/trace_uart_if.c \
-user/trace/trace.c \
 user/wifi_uart_if/wifi_uart_if.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c \
@@ -159,7 +156,6 @@ C_INCLUDES =  \
 -Iuser/hub75d \
 -Iuser/lunar_calendar \
 -Iuser/time \
--Iuser/trace \
 -Iuser/wifi_uart_if \
 -IMiddlewares/Third_Party/FreeRTOS/Source/include \
 -IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \

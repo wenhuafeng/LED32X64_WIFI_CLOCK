@@ -7,6 +7,7 @@
 #include "time_run.h"
 #include "display_scan_task.h"
 #include "temp_humi_task.h"
+#include "wifi_task.h"
 #include "trace_printf.h"
 
 #define DISP_TASK_SCAN_MSG_MAX  1
@@ -55,6 +56,9 @@ static void DISP_Task(void *argument)
         }
         if ((event & DISP_TASK_EVENT_GET_TH_DATA) == DISP_TASK_EVENT_GET_TH_DATA) {
             TH_TaskGetThData(&hub75d.tempHumi);
+        }
+        if ((event & DISP_TASK_EVENT_GET_TIME_DATA) == DISP_TASK_EVENT_GET_TIME_DATA) {
+            WIFI_TaskGetTimeData(&time);
         }
         if ((event & DISP_TASK_EVENT_DISP_ON) == DISP_TASK_EVENT_DISP_ON) {
             HUB75D_Init();

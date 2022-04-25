@@ -1,12 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "main.h"
-#if (WIFI_MODULE == WIFI_ESP8266)
 #include "esp8266_at.h"
-#elif (WIFI_MODULE == WIFI_EMW3060)
-#include "emw3060_at.h"
-#endif
 #include "usart.h"
+#include "wifi_task.h"
 
 #define RECEIVE_LENGTH     200
 #define USART_DMA_SENDING  1
@@ -46,12 +43,11 @@ void WIFI_ReceiveDmaInit(void)
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
 }
 
-void WIFI_SendDataDMA(uint8_t *pdata, uint16_t Length)
+void WIFI_SendDataDMA(uint8_t *data, uint16_t length)
 {
-    while (g_usartType.sendFlag == USART_DMA_SENDING)
-        ;
+    while (g_usartType.sendFlag == USART_DMA_SENDING);
     g_usartType.sendFlag = USART_DMA_SENDING;
-    HAL_UART_Transmit_DMA(&huart1, pdata, Length);
+    HAL_UART_Transmit_DMA(&huart1, data, length);
 }
 
 void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
@@ -76,8 +72,9 @@ void WIFI_HandlerUartData(void)
 {
     if (g_usartType.receiveFlag) {
         g_usartType.receiveFlag = 0;
-        WIFI_ReceiveProcess(g_usartType.buffer);
-        memset(g_usartType.buffer, 0, sizeof(g_usartType.buffer));
+        //WIFI_ReceiveProcess(g_usartType.buffer);
+        //memset(g_usartType.buffer, 0, sizeof(g_usartType.buffer));
+        (void)WIFI_TaskSendBuffer(g_usartType.buffer);
     }
 }
 

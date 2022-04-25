@@ -50,15 +50,6 @@
 /* wifi init hander */
 #define WIFI_INIT_TOTAL_STEP (6U)
 
-enum WifiCmdType {
-    WIFI_INIT_REST,
-    WIFI_INIT_CWMODE,
-    WIFI_INIT_NAME_PASSWD,
-    WIFI_SET_SNTP_CONFIG,
-    WIFI_GET_SNTP_TIME,
-    WIFI_GET_VERSION,
-};
-
 const char *g_wifiCmdTable[WIFI_INIT_TOTAL_STEP] = {
     "AT+RST\r\n",
     "AT+CWMODE=1\r\n",
@@ -71,37 +62,7 @@ const char *g_wifiCmdTable[WIFI_INIT_TOTAL_STEP] = {
 /* wifi receive data handler */
 #define WIFI_RECEIVE_INFO_SIZE 5
 
-enum WifiReceiveInfo {
-    WIFI_DISCONNECT,
-    WIFI_CONNECTED,
-    WIFI_GOT_IP,
-    WIFI_CONNECT_FAIL,
-    WIFI_RETURN_TIME,
-};
-
-enum WifiInitStatus {
-    WIFI_NOT_INIT,
-    WIFI_INIT_COMPLETE,
-};
-
-enum WifiConnectStatus {
-    WIFI_IS_DISCONNECT,
-    WIFI_IS_CONNECTED,
-};
-
-struct Esp8266GetTimeType {
-    enum WifiConnectStatus wifiConnectedStatus;
-    uint8_t wifiPowerOffTime;
-    uint8_t setSntpCtr;
-    uint8_t getTimeTimes;
-    uint8_t getTimeCtr;
-    enum WifiCmdType cmdType;
-    enum WifiReceiveInfo rxInfoCtr;
-};
-struct Esp8266GetTimeType g_getTime;
-static enum WifiInitStatus g_wifiInitComplete = WIFI_NOT_INIT;
-
-typedef void (*WifiReceiveInfoHandler)(char *buf);
+typedef void (*WifiReceiveInfoHandler)(struct Esp8266GetTimeType *wifi, char *buf);
 struct WifiRxType {
     enum WifiReceiveInfo info;
     char *str;
@@ -159,7 +120,7 @@ static uint8_t GetMonth(char *monthString)
     return i;
 }
 
-static bool ProcessClock(char *cRxBuf)
+static bool ProcessClock(struct Esp8266GetTimeType *wifi, char *cRxBuf)
 {
     char str[4] = {0};
     struct TimeType time;
@@ -208,67 +169,90 @@ static bool ProcessClock(char *cRxBuf)
         return false;
     }
 
-    //SetTimeData(&time);
-    SetClock(&time);
-    //CalculationLunarCalendar(&time);
-    TimeConvertTimestamp(&time);
+    memcpy(&wifi->time, &time, sizeof(struct TimeType));
+    wifi->rxInfoCtr = WIFI_GET_TIME_COMPLETE;
 
     return true;
 }
 
-static void WIFI_Disconnect(char *buf)
+static void WIFI_ReInit(struct Esp8266GetTimeType *wifi)
+{
+    wifi->wifiInitComplete = WIFI_NOT_INIT;
+}
+
+static bool WIFI_Init(struct Esp8266GetTimeType *wifi)
+{
+    if (wifi->wifiInitComplete == WIFI_INIT_COMPLETE) {
+        return true;
+    }
+    if (wifi->wifiConnectedStatus == WIFI_IS_CONNECTED) {
+        return true;
+    }
+    if (wifi->cmdType > WIFI_INIT_NAME_PASSWD) {
+        wifi->wifiInitComplete = WIFI_INIT_COMPLETE;
+        return true;
+    }
+
+    printf(g_wifiCmdTable[wifi->cmdType]);
+    TRACE_PRINTF("wifi init:%s\r\n", g_wifiCmdTable[wifi->cmdType]);
+    wifi->cmdType++;
+
+    return false;
+}
+
+static void WIFI_Disconnect(struct Esp8266GetTimeType *wifi, char *buf)
 {
     TRACE_PRINTF("wifi disconnect\r\n");
     printf(g_wifiCmdTable[WIFI_INIT_NAME_PASSWD]);
-    g_getTime.wifiConnectedStatus = WIFI_IS_DISCONNECT;
-    g_getTime.rxInfoCtr           = WIFI_DISCONNECT;
+    wifi->wifiConnectedStatus = WIFI_IS_DISCONNECT;
+    wifi->rxInfoCtr           = WIFI_DISCONNECT;
 }
 
-static void WIFI_Connected(char *buf)
+static void WIFI_Connected(struct Esp8266GetTimeType *wifi, char *buf)
 {
     TRACE_PRINTF("wifi connected\r\n");
-    g_getTime.wifiConnectedStatus = WIFI_IS_CONNECTED;
-    g_getTime.rxInfoCtr           = WIFI_CONNECTED;
+    wifi->wifiConnectedStatus = WIFI_IS_CONNECTED;
+    wifi->rxInfoCtr           = WIFI_CONNECTED;
 }
 
-static void WIFI_GotIp(char *buf)
+static void WIFI_GotIp(struct Esp8266GetTimeType *wifi, char *buf)
 {
     TRACE_PRINTF("wifi got ip\r\n");
-    if (g_getTime.wifiConnectedStatus == WIFI_IS_CONNECTED) {
-        g_getTime.setSntpCtr = SET_SNTP_DELAY_SEC;
+    if (wifi->wifiConnectedStatus == WIFI_IS_CONNECTED) {
+        wifi->setSntpCtr = SET_SNTP_DELAY_SEC;
     }
 
-    g_getTime.rxInfoCtr = WIFI_GOT_IP;
+    wifi->rxInfoCtr = WIFI_GOT_IP;
 }
 
-static void WIFI_ConnectedFail(char *buf)
+static void WIFI_ConnectedFail(struct Esp8266GetTimeType *wifi, char *buf)
 {
     TRACE_PRINTF("wifi connect fail\r\n");
     printf(g_wifiCmdTable[WIFI_INIT_NAME_PASSWD]);
-    g_getTime.rxInfoCtr = WIFI_CONNECT_FAIL;
+    wifi->rxInfoCtr = WIFI_CONNECT_FAIL;
 }
 
-static void WIFI_ReturnTime(char *buf)
+static void WIFI_ReturnTime(struct Esp8266GetTimeType *wifi, char *buf)
 {
     bool ret;
     TRACE_PRINTF("wifi return time\r\n");
 
-    ret = ProcessClock(buf);
+    ret = ProcessClock(wifi, buf);
     if (ret == false) {
         TRACE_PRINTF("process clock error!\r\n");
-        if (g_getTime.getTimeTimes < WIFI_GET_TIME_TIMES) {
-            g_getTime.getTimeTimes++;
-            g_getTime.getTimeCtr = GET_TIME_DELAY_SEC;
+        if (wifi->getTimeTimes < WIFI_GET_TIME_TIMES) {
+            wifi->getTimeTimes++;
+            wifi->getTimeCtr = GET_TIME_DELAY_SEC;
         } else {
-            g_getTime.getTimeTimes = 0x00;
-            WIFI_Power(POWER_OFF);
-            WIFI_ReInit();
+            wifi->getTimeTimes = 0x00;
+            WIFI_Power(wifi, POWER_OFF);
+            WIFI_ReInit(wifi);
         }
     } else {
-        WIFI_Power(POWER_OFF);
+        WIFI_Power(wifi, POWER_OFF);
     }
 
-    g_getTime.rxInfoCtr = WIFI_RETURN_TIME;
+    wifi->rxInfoCtr = WIFI_RETURN_TIME;
 }
 
 static const struct WifiRxType g_wifiRxHandlerTable[] = {
@@ -279,74 +263,49 @@ static const struct WifiRxType g_wifiRxHandlerTable[] = {
     { WIFI_RETURN_TIME, "+CIPSNTPTIME:", WIFI_ReturnTime },
 };
 
-void WIFI_ReInit(void)
-{
-    g_wifiInitComplete = WIFI_NOT_INIT;
-}
-
-bool WIFI_Init(void)
-{
-    if (g_wifiInitComplete == WIFI_INIT_COMPLETE) {
-        return true;
-    }
-    if (g_getTime.wifiConnectedStatus == WIFI_IS_CONNECTED) {
-        return true;
-    }
-    if (g_getTime.cmdType > WIFI_INIT_NAME_PASSWD) {
-        g_wifiInitComplete = WIFI_INIT_COMPLETE;
-        return true;
-    }
-
-    printf(g_wifiCmdTable[g_getTime.cmdType]);
-    TRACE_PRINTF("wifi init:%s\r\n", g_wifiCmdTable[g_getTime.cmdType]);
-    g_getTime.cmdType++;
-
-    return false;
-}
-
-void WIFI_Power(enum PowerFlag flag)
+void WIFI_Power(struct Esp8266GetTimeType *wifi, enum PowerFlag flag)
 {
     if (flag == POWER_ON) {
-        WIFI_CH_PD                 = 1;
-        g_getTime.wifiPowerOffTime = WIFI_ON_TIME;
+        WIFI_CH_PD             = 1;
+        wifi->wifiPowerOffTime = WIFI_ON_TIME;
         TRACE_PRINTF("wifi power on\r\n");
     } else {
         WIFI_CH_PD = 0;
-        memset(&g_getTime, 0, sizeof(struct Esp8266GetTimeType));
+        memset(wifi, 0, sizeof(struct Esp8266GetTimeType));
         TRACE_PRINTF("wifi power off\r\n");
     }
 }
 
-void WIFI_GetTime(void)
+void WIFI_SendCommand(struct Esp8266GetTimeType *wifi)
 {
-    if (WIFI_Init() == false) {
+    if (WIFI_Init(wifi) == false) {
         return;
     }
 
-    if (g_getTime.wifiPowerOffTime != 0x00) {
-        g_getTime.wifiPowerOffTime--;
-        if (g_getTime.wifiPowerOffTime == 0x00) {
-            WIFI_Power(POWER_OFF);
+    if (wifi->wifiPowerOffTime != 0x00) {
+        wifi->wifiPowerOffTime--;
+        if (wifi->wifiPowerOffTime == 0x00) {
+            WIFI_Power(wifi, POWER_OFF);
         }
     }
 
-    if (g_getTime.getTimeCtr != 0x00) {
-        g_getTime.getTimeCtr--;
-        if (g_getTime.getTimeCtr == 0x00) {
+    if (wifi->getTimeCtr != 0x00) {
+        wifi->getTimeCtr--;
+        if (wifi->getTimeCtr == 0x00) {
             printf(g_wifiCmdTable[WIFI_GET_SNTP_TIME]);
         }
     }
 
-    if (g_getTime.setSntpCtr != 0x00) {
-        g_getTime.setSntpCtr--;
-        if (g_getTime.setSntpCtr == 0x00) {
+    if (wifi->setSntpCtr != 0x00) {
+        wifi->setSntpCtr--;
+        if (wifi->setSntpCtr == 0x00) {
             printf(g_wifiCmdTable[WIFI_SET_SNTP_CONFIG]);
-            g_getTime.getTimeCtr = GET_TIME_DELAY_SEC;
+            wifi->getTimeCtr = GET_TIME_DELAY_SEC;
         }
     }
 }
 
-void WIFI_ReceiveProcess(uint8_t *buf)
+void WIFI_ReceiveProcess(struct Esp8266GetTimeType *wifi, uint8_t *buf)
 {
     enum WifiReceiveInfo info;
     char *strPosition;
@@ -354,7 +313,7 @@ void WIFI_ReceiveProcess(uint8_t *buf)
     for (info = WIFI_DISCONNECT; info < sizeof(g_wifiRxHandlerTable) / sizeof(g_wifiRxHandlerTable[0]); info++) {
         strPosition = strstr((char *)buf, g_wifiRxHandlerTable[info].str);
         if (strPosition != NULL) {
-            g_wifiRxHandlerTable[info].handler(strPosition);
+            g_wifiRxHandlerTable[info].handler(wifi, strPosition);
             break;
         }
     }

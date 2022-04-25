@@ -15,7 +15,7 @@
 #include "emw3060_at.h"
 #endif
 #include "wifi_uart_if.h"
-#include "trace_uart_if.h"
+//#include "trace_uart_if.h"
 #include "trace_printf.h"
 #include "time_stamp.h"
 #include "display_task.h"
@@ -29,6 +29,7 @@ static void ClearGpioExtiIT(uint16_t GPIO_Pin)
     }
 }
 
+/*
 static void COMMON_EnterStandbyMode(void)
 {
     //TRACE_PRINTF("enter stop mode\r\n");
@@ -36,7 +37,7 @@ static void COMMON_EnterStandbyMode(void)
     //HAL_TIM_Base_Stop_IT(&htim4);
     //HAL_TIM_Base_MspDeInit(&htim4);
 
-    WIFI_Power(POWER_OFF);
+    //WIFI_Power(POWER_OFF);
     //HUB75D_Disp(DISP_TIME_OFF);
     WORK_LED_OFF();
 
@@ -55,22 +56,22 @@ static void COMMON_EnterStandbyMode(void)
     MX_USART2_UART_Init();
 
     COMMON_Init();
-    WIFI_ReInit();
+    //WIFI_ReInit();
 
     TRACE_PRINTF("exit stop mode\r\n");
-}
+}*/
 
 void COMMON_Init(void)
 {
-    if (TRACE_Init() != UTIL_ADV_TRACE_OK) {
-        __asm("nop");
-    } else {
-        TRACE_PRINTF("trace init ok\r\n");
-    }
+    //if (TRACE_Init() != UTIL_ADV_TRACE_OK) {
+    //    __asm("nop");
+    //} else {
+    //    TRACE_PRINTF("trace init ok\r\n");
+    //}
     TRACE_PRINTF("%s, %s, %s\r\n", SOFTWARE_VERSION, __TIME__, __DATE__);
 
-    WIFI_ReceiveDmaInit();
-    WIFI_Power(POWER_ON);
+    //WIFI_ReceiveDmaInit();
+    //WIFI_Power(POWER_ON);
 
     HAL_RTC_MspInit(&hrtc);
     HAL_RTCEx_SetSecond_IT(&hrtc);
@@ -92,7 +93,7 @@ void COMMON_Init(void)
 void COMMON_Process(void)
 {
     //IsPirIntFlagSet();
-    WIFI_HandlerUartData();
+    //WIFI_HandlerUartData();
 
     //if (Get1sFlag() == false) {
     //    return;
@@ -100,14 +101,14 @@ void COMMON_Process(void)
     //SetOneSecondFlag(false);
 
     TimestampAdd();
-    WIFI_GetTime();
+    //WIFI_SendCommand();
     //HTU21D_Sampling();
     //if (ClockRun() == true) {
     //    CalculationLunarCalendar(GetTimeData());
     //}
     //HUB75D_GetCalendar(GetTimeData());
     //if (HUB75D_CtrDec() == true) {
-        COMMON_EnterStandbyMode();
+    //    COMMON_EnterStandbyMode();
     //}
     //HUB75D_GetScanRgb();
 }
@@ -124,7 +125,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
     if (huart->Instance == USART1) {
         WIFI_UART_TxCpltCallback(huart);
     } else if (huart->Instance == USART2) {
-        TRACE_UART_TxCpltCallback(huart);
+        //TRACE_UART_TxCpltCallback(huart);
     }
 }
 
@@ -133,6 +134,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     if (huart->Instance == USART1) {
         WIFI_UART_RxCpltCallback(huart);
     } else if (huart->Instance == USART2) {
-        TRACE_UART_RxCpltCallback(huart);
+        //TRACE_UART_RxCpltCallback(huart);
     }
 }

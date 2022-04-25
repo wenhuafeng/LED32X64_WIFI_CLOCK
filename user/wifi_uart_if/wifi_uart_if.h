@@ -6,7 +6,7 @@
 
 extern void WIFI_ReceiveDmaInit(void);
 extern void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart);
-extern void WIFI_SendDataDMA(uint8_t *pdata, uint16_t Length);
+extern void WIFI_SendDataDMA(uint8_t *data, uint16_t length);
 extern void WIFI_HandlerUartData(void);
 extern void WIFI_ComDeInit(void);
 extern void WIFI_UART_TxCpltCallback(UART_HandleTypeDef *huart);

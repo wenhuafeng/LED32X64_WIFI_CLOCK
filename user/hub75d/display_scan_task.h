@@ -1,6 +1,7 @@
 #ifndef DISPLAY_SCAN_TASK_H
 #define DISPLAY_SCAN_TASK_H
 
+#include <stdint.h>
 #include "cmsis_os2.h"
 
 #define DISP_SCAN_TASK_EVENT_SCAN_LED          (1 << 0)

@@ -14,6 +14,7 @@
         "stm32f1xx_hal_conf.h": "c",
         "trace_uart_if.h": "c",
         "limits": "c",
-        "cmsis_os2.h": "c"
+        "cmsis_os2.h": "c",
+        "wifi_task.h": "c"
     }
 }
