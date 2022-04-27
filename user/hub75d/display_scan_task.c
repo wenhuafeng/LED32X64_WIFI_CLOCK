@@ -3,7 +3,7 @@
 #include "FreeRTOS.h"
 #include "hub75d.h"
 #include "display_task.h"
-#include "trace_printf.h"
+#include "trace.h"
 
 #define DISP_SCAN_TASK_EVENT_ALL (0xffffffff)
 

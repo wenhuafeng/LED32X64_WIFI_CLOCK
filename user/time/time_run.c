@@ -5,7 +5,7 @@
 #include "rtc.h"
 #include "hub75d.h"
 #include "lunar_calendar.h"
-#include "trace_printf.h"
+#include "trace.h"
 #include "time_stamp.h"
 
 static uint8_t GetMaxDay(uint16_t year, uint8_t month)

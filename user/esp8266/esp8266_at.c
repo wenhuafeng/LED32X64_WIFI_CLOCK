@@ -8,7 +8,7 @@
 #include "usart.h"
 #include "time_run.h"
 #include "lunar_calendar.h"
-#include "trace_printf.h"
+#include "trace.h"
 #include "time_stamp.h"
 
 #if (WIFI_MODULE == WIFI_ESP8266)

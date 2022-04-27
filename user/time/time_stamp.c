@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <time.h>
 #include "time_run.h"
-#include "trace_printf.h"
+#include "trace.h"
 
 #define TIME_STAMP_OFFSET     (8 * 60 * 60) /* 8 hour */
 #define TIME_STAMP_START_YEAR 1900

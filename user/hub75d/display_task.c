@@ -8,7 +8,7 @@
 #include "display_scan_task.h"
 #include "temp_humi_task.h"
 #include "wifi_task.h"
-#include "trace_printf.h"
+#include "trace.h"
 
 #define DISP_TASK_SCAN_MSG_MAX  1
 #define DISP_TASK_SCAN_MSG_SIZE (sizeof(struct RgbType))

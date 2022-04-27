@@ -61,6 +61,7 @@ user/hub75d/hub75d.c \
 user/lunar_calendar/lunar_calendar.c \
 user/time/time_run.c \
 user/time/time_stamp.c \
+user/trace_uart_if/trace.c \
 user/wifi_uart_if/wifi_uart_if.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c \
@@ -156,6 +157,7 @@ C_INCLUDES =  \
 -Iuser/hub75d \
 -Iuser/lunar_calendar \
 -Iuser/time \
+-Iuser/trace_uart_if \
 -Iuser/wifi_uart_if \
 -IMiddlewares/Third_Party/FreeRTOS/Source/include \
 -IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \

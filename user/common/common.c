@@ -1,5 +1,6 @@
 #include "common.h"
 #include <stdio.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include "main.h"
 #include "gpio.h"
@@ -16,18 +17,18 @@
 #endif
 #include "wifi_uart_if.h"
 //#include "trace_uart_if.h"
-#include "trace_printf.h"
+#include "trace.h"
 #include "time_stamp.h"
 #include "display_task.h"
 
 #define SOFTWARE_VERSION "V101"
 
-static void ClearGpioExtiIT(uint16_t GPIO_Pin)
-{
-    if (__HAL_GPIO_EXTI_GET_IT(GPIO_Pin) != 0x00u) {
-        __HAL_GPIO_EXTI_CLEAR_IT(GPIO_Pin);
-    }
-}
+//static void ClearGpioExtiIT(uint16_t GPIO_Pin)
+//{
+//    if (__HAL_GPIO_EXTI_GET_IT(GPIO_Pin) != 0x00u) {
+//        __HAL_GPIO_EXTI_CLEAR_IT(GPIO_Pin);
+//    }
+//}
 
 /*
 static void COMMON_EnterStandbyMode(void)

@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "cmsis_os2.h"
 #include "i2c.h"
-#include "trace_printf.h"
+#include "trace.h"
 
 #define HUMI_MAX_VALUE 999 /* 99.9% */
 #define TEMP_MAX_VALUE 999 /* 99.9C */

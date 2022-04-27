@@ -19,7 +19,7 @@
                 "${workspaceFolder}/user/hub75d",
                 "${workspaceFolder}/user/lunar_calendar",
                 "${workspaceFolder}/user/time",
-                "${workspaceFolder}/user/trace",
+                "${workspaceFolder}/user/trace_uart_if",
                 "${workspaceFolder}/user/wifi_uart_if"
             ],
             "defines": [
