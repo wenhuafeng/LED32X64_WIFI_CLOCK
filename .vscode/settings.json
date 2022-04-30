@@ -18,6 +18,9 @@
         "wifi_task.h": "c",
         "task.h": "c",
         "trace.h": "c",
-        "cstdio": "c"
+        "cstdio": "c",
+        "display_scan_task.h": "c",
+        "display_task.h": "c",
+        "time_run.h": "c"
     }
 }

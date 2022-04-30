@@ -47,16 +47,6 @@ void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
     }
 }
 
-//void WIFI_HandlerUartData(void)
-//{
-//    if (g_usartType.receiveFlag) {
-//        g_usartType.receiveFlag = 0;
-//        //WIFI_ReceiveProcess(g_usartType.buffer);
-//        //memset(g_usartType.buffer, 0, sizeof(g_usartType.buffer));
-//        (void)WIFI_TaskSendBuffer(g_usartType.buffer);
-//    }
-//}
-
 void WIFI_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     __HAL_DMA_DISABLE(huart->hdmatx);

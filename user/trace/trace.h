@@ -6,7 +6,6 @@
 
 extern void TRACE_ReceiveDmaInit(void);
 extern void TRACE_UART_ReceiveIDLE(UART_HandleTypeDef *huart);
-//extern void TRACE_HandlerUartData(void);
 extern void TRACE_UART_TxCpltCallback(UART_HandleTypeDef *huart);
 extern void TRACE_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 extern void PrintUsart2(char *format, ...);

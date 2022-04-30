@@ -1,12 +1,8 @@
 #include "time_run.h"
 #include <stdbool.h>
-//#include <stdio.h>
 #include "common.h"
 #include "rtc.h"
-#include "hub75d.h"
-#include "lunar_calendar.h"
 #include "trace.h"
-#include "time_stamp.h"
 
 #define LOG_TAG "time_run"
 
@@ -109,10 +105,6 @@ void GetClock(struct TimeType *time)
     time->month  = sDate.Month;
     time->week   = sDate.WeekDay;
     time->year   = (sDate.Year + 2000);
-
-    //HUB75D_GetCalendar(&g_time);
-    //CalculationLunarCalendar(&g_time);
-    //TimeConvertTimestamp(&g_time);
 
     LOGI(LOG_TAG, "get time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour,
          time->minute, time->second);

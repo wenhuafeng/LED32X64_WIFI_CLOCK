@@ -16,7 +16,4 @@
         HAL_GPIO_WritePin(WORK_LED_GPIO_Port, WORK_LED_Pin, GPIO_PIN_SET); \
     } while (0)
 
-void COMMON_Init(void);
-void COMMON_Process(void);
-
 #endif

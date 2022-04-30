@@ -1,10 +1,10 @@
 #include "display_scan_task.h"
 #include "cmsis_os2.h"
 #include "FreeRTOS.h"
+#include "tim.h"
 #include "hub75d.h"
 #include "display_task.h"
 #include "trace.h"
-#include "tim.h"
 
 #define LOG_TAG "display_scan_task"
 
@@ -34,9 +34,6 @@ static void DISP_ScanTask(void *argument)
     while (1) {
         event = osEventFlagsWait(g_dispScanEvent, DISP_SCAN_TASK_EVENT_ALL, osFlagsWaitAny, osWaitForever);
 
-        //if ((event & DISP_SCAN_TASK_EVENT_SCAN_LED) == DISP_SCAN_TASK_EVENT_SCAN_LED) {
-        //    HUB75D_DispScan(&rgbScan);
-        //}
         if ((event & DISP_SCAN_TASK_EVENT_RECEIVED_NEW_DATA) == DISP_SCAN_TASK_EVENT_RECEIVED_NEW_DATA) {
             if (DISP_TaskGetDispScanData(&g_rgbScan) != osOK) {
                 LOGI(LOG_TAG, "Get rgb scan data error!\r\n");

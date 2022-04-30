@@ -7,12 +7,8 @@
 #include "gpio_bit_ctrl.h"
 #include "usart.h"
 #include "time_run.h"
-#include "lunar_calendar.h"
-#include "trace.h"
-#include "time_stamp.h"
 #include "wifi_uart_if.h"
-
-#if (WIFI_MODULE == WIFI_ESP8266)
+#include "trace.h"
 
 #define LOG_TAG "esp8266"
 
@@ -324,5 +320,3 @@ enum WifiReceiveInfo WIFI_ReceiveProcess(struct Esp8266GetTimeType *wifi, uint8_
 
     return (wifi->rxInfoCtr);
 }
-
-#endif

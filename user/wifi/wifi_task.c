@@ -2,10 +2,10 @@
 #include <string.h>
 #include "cmsis_os2.h"
 #include "FreeRTOS.h"
-#include "wifi_uart_if.h"
 #include "esp8266_at.h"
 #include "time_run.h"
 #include "display_task.h"
+#include "wifi_uart_if.h"
 #include "trace.h"
 
 #define LOG_TAG "wifi_task"

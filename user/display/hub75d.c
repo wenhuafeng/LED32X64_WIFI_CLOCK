@@ -1,14 +1,8 @@
 #include "hub75d.h"
-#include <math.h>
-//#include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include "tim.h"
 #include "gpio_bit_ctrl.h"
-#include "htu21d.h"
-#include "lunar_calendar.h"
-#include "main.h"
-#include "time_run.h"
 #include "trace.h"
 
 #define LOG_TAG "hub75d"

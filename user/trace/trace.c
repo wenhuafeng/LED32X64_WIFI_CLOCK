@@ -45,13 +45,6 @@ void TRACE_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
     }
 }
 
-//void TRACE_HandlerUartData(void)
-//{
-//    if (g_usartType.receiveFlag) {
-//        g_usartType.receiveFlag = 0;
-//    }
-//}
-
 void TRACE_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     __HAL_DMA_DISABLE(huart->hdmatx);

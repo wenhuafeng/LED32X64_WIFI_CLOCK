@@ -10,7 +10,8 @@
 #include "wifi_task.h"
 #include "trace.h"
 
-#define LOG_TAG "display_task"
+#define LOG_TAG          "display_task"
+#define SOFTWARE_VERSION "V101"
 
 #define DISP_TASK_SCAN_MSG_MAX  1
 #define DISP_TASK_SCAN_MSG_SIZE (sizeof(struct RgbType))
@@ -19,7 +20,7 @@
 
 #define DISP_TASK_NAME       "dispTask"
 #define DISP_TASK_STACK_SIZE (128 * 20)
-#define DISP_TASK_PRIORITY   (osPriority_t)osPriorityNormal6
+#define DISP_TASK_PRIORITY   (osPriority_t) osPriorityNormal6
 
 const osThreadAttr_t g_dispTaskAttributes = {
     .name       = DISP_TASK_NAME,
@@ -30,10 +31,7 @@ const osThreadAttr_t g_dispTaskAttributes = {
 osEventFlagsId_t g_dispEvent;
 osMessageQueueId_t g_dispScanMsgId;
 
-enum DispPowerStatus {
-    DISP_POWER_OFF,
-    DISP_POWER_ON
-};
+enum DispPowerStatus { DISP_POWER_OFF, DISP_POWER_ON };
 
 static void DISP_Task(void *argument)
 {
@@ -44,6 +42,7 @@ static void DISP_Task(void *argument)
 
     DISP_TaskSetEvent(DISP_TASK_EVENT_DISP_ON);
     LOGI(LOG_TAG, "display task enter\r\n");
+    LOGI(LOG_TAG, "%s, %s, %s\r\n", SOFTWARE_VERSION, __TIME__, __DATE__);
 
     while (1) {
         event = osEventFlagsWait(g_dispEvent, DISP_TASK_EVENT_ALL, osFlagsWaitAny, osWaitForever);
