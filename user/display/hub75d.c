@@ -1,6 +1,6 @@
 #include "hub75d.h"
 #include <math.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include "tim.h"
@@ -10,6 +10,8 @@
 #include "main.h"
 #include "time_run.h"
 #include "trace.h"
+
+#define LOG_TAG "hub75d"
 
 #define TEMP_HUMI_DISP_TIME (2) /* seconds */
 
@@ -474,7 +476,7 @@ void HUB75D_Disp(uint16_t *count, enum DispTime time)
         HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
     }
 
-    TRACE_PRINTF("display time: %d\r\n\r\n", time);
+    LOGI(LOG_TAG, "display time: %d\r\n\r\n", time);
 }
 
 bool HUB75D_CtrDec(struct Hub75dType *hub75d)

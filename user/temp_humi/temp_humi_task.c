@@ -3,12 +3,15 @@
 #include "FreeRTOS.h"
 #include "htu21d.h"
 #include "display_task.h"
+#include "trace.h"
+
+#define LOG_TAG "temp_humi_task"
 
 #define TH_TASK_MSG_MAX  1
 #define TH_TASK_MSG_SIZE (sizeof(struct Htu21dDataType))
 
 #define TH_TASK_NAME       "thTask"
-#define TH_TASK_STACK_SIZE (128 * 4)
+#define TH_TASK_STACK_SIZE (128 * 8)
 #define TH_TASK_PRIORITY   (osPriority_t)osPriorityNormal
 
 const osThreadAttr_t g_thTaskAttributes = {
@@ -24,6 +27,7 @@ static void TH_Task(void *argument)
     struct Htu21dDataType th;
 
     HTU21D_Init();
+    LOGI(LOG_TAG, "temp humi task enter\r\n");
 
     while (1) {
         HTU21D_GetData(&th);

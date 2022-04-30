@@ -10,8 +10,11 @@
 #include "lunar_calendar.h"
 #include "trace.h"
 #include "time_stamp.h"
+#include "wifi_uart_if.h"
 
 #if (WIFI_MODULE == WIFI_ESP8266)
+
+#define LOG_TAG "esp8266"
 
 #define WEEK_STR_INDEX          13
 #define MONTH_STR_INDEX         17
@@ -50,7 +53,7 @@
 /* wifi init hander */
 #define WIFI_INIT_TOTAL_STEP (6U)
 
-const char *g_wifiCmdTable[WIFI_INIT_TOTAL_STEP] = {
+char *g_wifiCmdTable[WIFI_INIT_TOTAL_STEP] = {
     "AT+RST\r\n",
     "AT+CWMODE=1\r\n",
     "AT+CWJAP_DEF=\"HSG2\",\"13537011631\"\r\n",
@@ -99,7 +102,7 @@ static uint8_t GetWeek(char *weekString)
         }
     }
 
-    TRACE_PRINTF("week:%d\r\n", i);
+    LOGI(LOG_TAG, "week:%d\r\n", i);
     return i;
 }
 
@@ -116,7 +119,7 @@ static uint8_t GetMonth(char *monthString)
         }
     }
 
-    TRACE_PRINTF("month:%d\r\n", i);
+    LOGI(LOG_TAG, "month:%d\r\n", i);
     return i;
 }
 
@@ -128,14 +131,14 @@ static bool ProcessClock(struct Esp8266GetTimeType *wifi, char *cRxBuf)
 
     ret = snprintf(str, sizeof(str), "%s", &cRxBuf[WEEK_STR_INDEX]);
     if (ret <= 0) {
-        TRACE_PRINTF("%s snprintf error!\r\n", __LINE__);
+        LOGI(LOG_TAG, "%s snprintf error!\r\n", __LINE__);
         return false;
     }
     time.week = GetWeek(str);
 
     ret = snprintf(str, sizeof(str), "%s", &cRxBuf[MONTH_STR_INDEX]);
     if (ret <= 0) {
-        TRACE_PRINTF("%s snprintf error!\r\n", __LINE__);
+        LOGI(LOG_TAG, "%s snprintf error!\r\n", __LINE__);
         return false;
     }
     time.month = GetMonth(str);
@@ -145,7 +148,7 @@ static bool ProcessClock(struct Esp8266GetTimeType *wifi, char *cRxBuf)
     time.minute = AscToHex(cRxBuf[MIN_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[MIN_STR_INDEX_LOW]);
     time.second = AscToHex(cRxBuf[SEC_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[SEC_STR_INDEX_LOW]);
     time.year   = AscToHex(cRxBuf[YEAR_STR_INDEX_THOUSAND]) * 1000 + AscToHex(cRxBuf[YEAR_STR_INDEX_HUNDRED]) * 100 +
-             AscToHex(cRxBuf[YEAR_STR_INDEX_TEN]) * 10 + AscToHex(cRxBuf[YEAR_STR_INDEX]);
+                  AscToHex(cRxBuf[YEAR_STR_INDEX_TEN]) * 10 + AscToHex(cRxBuf[YEAR_STR_INDEX]);
 
     if (time.year < YEAR_MIN || time.year > YEAR_MAX) {
         return false;
@@ -171,6 +174,7 @@ static bool ProcessClock(struct Esp8266GetTimeType *wifi, char *cRxBuf)
 
     memcpy(&wifi->time, &time, sizeof(struct TimeType));
     wifi->rxInfoCtr = WIFI_GET_TIME_COMPLETE;
+    LOGI(LOG_TAG, "get time and date complete\r\n");
 
     return true;
 }
@@ -193,8 +197,8 @@ static bool WIFI_Init(struct Esp8266GetTimeType *wifi)
         return true;
     }
 
-    printf(g_wifiCmdTable[wifi->cmdType]);
-    TRACE_PRINTF("wifi init:%s\r\n", g_wifiCmdTable[wifi->cmdType]);
+    PrintUsart1(g_wifiCmdTable[wifi->cmdType]);
+    LOGI(LOG_TAG, "wifi init:%s\r\n", g_wifiCmdTable[wifi->cmdType]);
     wifi->cmdType++;
 
     return false;
@@ -202,22 +206,22 @@ static bool WIFI_Init(struct Esp8266GetTimeType *wifi)
 
 static void WIFI_Disconnect(struct Esp8266GetTimeType *wifi, char *buf)
 {
-    TRACE_PRINTF("wifi disconnect\r\n");
-    printf(g_wifiCmdTable[WIFI_INIT_NAME_PASSWD]);
+    LOGI(LOG_TAG, "wifi disconnect\r\n");
+    PrintUsart1(g_wifiCmdTable[WIFI_INIT_NAME_PASSWD]);
     wifi->wifiConnectedStatus = WIFI_IS_DISCONNECT;
     wifi->rxInfoCtr           = WIFI_DISCONNECT;
 }
 
 static void WIFI_Connected(struct Esp8266GetTimeType *wifi, char *buf)
 {
-    TRACE_PRINTF("wifi connected\r\n");
+    LOGI(LOG_TAG, "wifi connected\r\n");
     wifi->wifiConnectedStatus = WIFI_IS_CONNECTED;
     wifi->rxInfoCtr           = WIFI_CONNECTED;
 }
 
 static void WIFI_GotIp(struct Esp8266GetTimeType *wifi, char *buf)
 {
-    TRACE_PRINTF("wifi got ip\r\n");
+    LOGI(LOG_TAG, "wifi got ip\r\n");
     if (wifi->wifiConnectedStatus == WIFI_IS_CONNECTED) {
         wifi->setSntpCtr = SET_SNTP_DELAY_SEC;
     }
@@ -227,19 +231,21 @@ static void WIFI_GotIp(struct Esp8266GetTimeType *wifi, char *buf)
 
 static void WIFI_ConnectedFail(struct Esp8266GetTimeType *wifi, char *buf)
 {
-    TRACE_PRINTF("wifi connect fail\r\n");
-    printf(g_wifiCmdTable[WIFI_INIT_NAME_PASSWD]);
+    LOGI(LOG_TAG, "wifi connect fail\r\n");
+    PrintUsart1(g_wifiCmdTable[WIFI_INIT_NAME_PASSWD]);
     wifi->rxInfoCtr = WIFI_CONNECT_FAIL;
 }
 
 static void WIFI_ReturnTime(struct Esp8266GetTimeType *wifi, char *buf)
 {
     bool ret;
-    TRACE_PRINTF("wifi return time\r\n");
+
+    LOGI(LOG_TAG, "wifi return time\r\n");
+    wifi->rxInfoCtr = WIFI_RETURN_TIME;
 
     ret = ProcessClock(wifi, buf);
     if (ret == false) {
-        TRACE_PRINTF("process clock error!\r\n");
+        LOGI(LOG_TAG, "process clock error!\r\n");
         if (wifi->getTimeTimes < WIFI_GET_TIME_TIMES) {
             wifi->getTimeTimes++;
             wifi->getTimeCtr = GET_TIME_DELAY_SEC;
@@ -251,8 +257,6 @@ static void WIFI_ReturnTime(struct Esp8266GetTimeType *wifi, char *buf)
     } else {
         WIFI_Power(wifi, POWER_OFF);
     }
-
-    wifi->rxInfoCtr = WIFI_RETURN_TIME;
 }
 
 static const struct WifiRxType g_wifiRxHandlerTable[] = {
@@ -266,13 +270,13 @@ static const struct WifiRxType g_wifiRxHandlerTable[] = {
 void WIFI_Power(struct Esp8266GetTimeType *wifi, enum PowerFlag flag)
 {
     if (flag == POWER_ON) {
+        memset(wifi, 0, sizeof(struct Esp8266GetTimeType));
         WIFI_CH_PD             = 1;
         wifi->wifiPowerOffTime = WIFI_ON_TIME;
-        TRACE_PRINTF("wifi power on\r\n");
+        LOGI(LOG_TAG, "wifi power on\r\n");
     } else {
         WIFI_CH_PD = 0;
-        memset(wifi, 0, sizeof(struct Esp8266GetTimeType));
-        TRACE_PRINTF("wifi power off\r\n");
+        LOGI(LOG_TAG, "wifi power off\r\n");
     }
 }
 
@@ -292,20 +296,20 @@ void WIFI_SendCommand(struct Esp8266GetTimeType *wifi)
     if (wifi->getTimeCtr != 0x00) {
         wifi->getTimeCtr--;
         if (wifi->getTimeCtr == 0x00) {
-            printf(g_wifiCmdTable[WIFI_GET_SNTP_TIME]);
+            PrintUsart1(g_wifiCmdTable[WIFI_GET_SNTP_TIME]);
         }
     }
 
     if (wifi->setSntpCtr != 0x00) {
         wifi->setSntpCtr--;
         if (wifi->setSntpCtr == 0x00) {
-            printf(g_wifiCmdTable[WIFI_SET_SNTP_CONFIG]);
+            PrintUsart1(g_wifiCmdTable[WIFI_SET_SNTP_CONFIG]);
             wifi->getTimeCtr = GET_TIME_DELAY_SEC;
         }
     }
 }
 
-void WIFI_ReceiveProcess(struct Esp8266GetTimeType *wifi, uint8_t *buf)
+enum WifiReceiveInfo WIFI_ReceiveProcess(struct Esp8266GetTimeType *wifi, uint8_t *buf)
 {
     enum WifiReceiveInfo info;
     char *strPosition;
@@ -317,6 +321,8 @@ void WIFI_ReceiveProcess(struct Esp8266GetTimeType *wifi, uint8_t *buf)
             break;
         }
     }
+
+    return (wifi->rxInfoCtr);
 }
 
 #endif

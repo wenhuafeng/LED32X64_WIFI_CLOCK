@@ -7,6 +7,8 @@
 #include "i2c.h"
 #include "trace.h"
 
+#define LOG_TAG "htu21d_hw"
+
 #define HUMI_MAX_VALUE 999 /* 99.9% */
 #define TEMP_MAX_VALUE 999 /* 99.9C */
 
@@ -80,7 +82,7 @@ static bool HTU21D_FuncInit(void)
     return true;
 
 error:
-    TRACE_PRINTF("error, HTU21D function init\r\n");
+    LOGI(LOG_TAG, "error, HTU21D function init\r\n");
     return false;
 }
 
@@ -94,11 +96,11 @@ static bool HTU21D_SoftReset(void)
         goto error;
     }
 
-    TRACE_PRINTF("HTU21D Reset OK\r\n");
+    LOGI(LOG_TAG, "HTU21D Reset OK\r\n");
     return true;
 
 error:
-    TRACE_PRINTF("HTU21D Reset NG\r\n");
+    LOGI(LOG_TAG, "HTU21D Reset NG\r\n");
     return false;
 }
 
@@ -110,10 +112,10 @@ void HTU21D_Init(void)
     HTU21D_SoftReset();
     osDelay(10);
     if (HTU21D_FuncInit() == false) {
-        TRACE_PRINTF("HTU21D Init NG\r\n");
+        LOGI(LOG_TAG, "HTU21D Init NG\r\n");
         return;
     } else {
-        TRACE_PRINTF("HTU21D Init OK\r\n");
+        LOGI(LOG_TAG, "HTU21D Init OK\r\n");
     }
 
     osDelay(100);
@@ -141,7 +143,7 @@ bool HTU21D_GetData(struct Htu21dDataType *th)
     }
 
     if (CalcCrc(read, 2) != read[DATA_CRC8]) {
-        TRACE_PRINTF("humi crc8 error\r\n");
+        LOGI(LOG_TAG, "humi crc8 error\r\n");
         return false;
     }
     humiData = read[DATA_HIGH];
@@ -167,7 +169,7 @@ bool HTU21D_GetData(struct Htu21dDataType *th)
     }
 
     if (CalcCrc(read, 2) != read[DATA_CRC8]) {
-        TRACE_PRINTF("temp crc8 error\r\n");
+        LOGI(LOG_TAG, "temp crc8 error\r\n");
         return false;
     }
     tempData = read[DATA_HIGH];
@@ -180,11 +182,11 @@ bool HTU21D_GetData(struct Htu21dDataType *th)
         th->temperature = TEMP_MAX_VALUE;
     }
 
-    TRACE_PRINTF("Humi: %d, Temp: %d\r\n", th->humidity, th->temperature);
+    LOGI(LOG_TAG, "Humi: %d, Temp: %d\r\n", th->humidity, th->temperature);
     return true;
 
 error:
-    TRACE_PRINTF("error! read temperature and humidity\r\n");
+    LOGI(LOG_TAG, "error! read temperature and humidity\r\n");
     HTU21D_Init();
     return false;
 }

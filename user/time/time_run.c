@@ -1,12 +1,14 @@
 #include "time_run.h"
 #include <stdbool.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include "common.h"
 #include "rtc.h"
 #include "hub75d.h"
 #include "lunar_calendar.h"
 #include "trace.h"
 #include "time_stamp.h"
+
+#define LOG_TAG "time_run"
 
 static uint8_t GetMaxDay(uint16_t year, uint8_t month)
 {
@@ -112,8 +114,8 @@ void GetClock(struct TimeType *time)
     //CalculationLunarCalendar(&g_time);
     //TimeConvertTimestamp(&g_time);
 
-    TRACE_PRINTF("get time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
-                 time->sec);
+    LOGI(LOG_TAG, "get time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour,
+         time->minute, time->second);
 }
 
 void SetClock(struct TimeType *time)
@@ -133,6 +135,6 @@ void SetClock(struct TimeType *time)
     HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-    TRACE_PRINTF("set time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour, time->min,
-                 time->sec);
+    LOGI(LOG_TAG, "set time: %d-%d-%d %02d:%02d:%02d \r\n", time->year, time->month, time->day, time->hour,
+         time->minute, time->second);
 }

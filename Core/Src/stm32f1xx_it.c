@@ -297,7 +297,8 @@ void TIM4_IRQHandler(void)
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
-  DISP_ScanTaskSetEvent(DISP_SCAN_TASK_EVENT_SCAN_LED);
+  //DISP_ScanTaskSetEvent(DISP_SCAN_TASK_EVENT_SCAN_LED);
+  DISP_ScanLed();
   /* USER CODE END TIM4_IRQn 1 */
 }
 

@@ -14,13 +14,11 @@
                 "${workspaceFolder}/Middlewares/Third_Party/FreeRTOS/Source/include",
                 "${workspaceFolder}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3",
                 "${workspaceFolder}/user/common",
-                "${workspaceFolder}/user/esp8266",
-                "${workspaceFolder}/user/htu21d",
-                "${workspaceFolder}/user/hub75d",
-                "${workspaceFolder}/user/lunar_calendar",
+                "${workspaceFolder}/user/display",
+                "${workspaceFolder}/user/temp_humi",
                 "${workspaceFolder}/user/time",
-                "${workspaceFolder}/user/trace_uart_if",
-                "${workspaceFolder}/user/wifi_uart_if"
+                "${workspaceFolder}/user/trace",
+                "${workspaceFolder}/user/wifi"
             ],
             "defines": [
                 "USE_HAL_DRIVER",

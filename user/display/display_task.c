@@ -10,13 +10,15 @@
 #include "wifi_task.h"
 #include "trace.h"
 
+#define LOG_TAG "display_task"
+
 #define DISP_TASK_SCAN_MSG_MAX  1
 #define DISP_TASK_SCAN_MSG_SIZE (sizeof(struct RgbType))
 
-#define DISP_TASK_EVENT_ALL (0xffffffff)
+#define DISP_TASK_EVENT_ALL (0x00ffffff)
 
 #define DISP_TASK_NAME       "dispTask"
-#define DISP_TASK_STACK_SIZE (128 * 4)
+#define DISP_TASK_STACK_SIZE (128 * 20)
 #define DISP_TASK_PRIORITY   (osPriority_t)osPriorityNormal6
 
 const osThreadAttr_t g_dispTaskAttributes = {
@@ -28,13 +30,20 @@ const osThreadAttr_t g_dispTaskAttributes = {
 osEventFlagsId_t g_dispEvent;
 osMessageQueueId_t g_dispScanMsgId;
 
+enum DispPowerStatus {
+    DISP_POWER_OFF,
+    DISP_POWER_ON
+};
+
 static void DISP_Task(void *argument)
 {
     uint32_t event;
     struct Hub75dType hub75d;
     struct TimeType time;
+    static enum DispPowerStatus dispPowerStatus = DISP_POWER_OFF;
 
     DISP_TaskSetEvent(DISP_TASK_EVENT_DISP_ON);
+    LOGI(LOG_TAG, "display task enter\r\n");
 
     while (1) {
         event = osEventFlagsWait(g_dispEvent, DISP_TASK_EVENT_ALL, osFlagsWaitAny, osWaitForever);
@@ -48,6 +57,7 @@ static void DISP_Task(void *argument)
                 HAL_TIM_Base_Stop_IT(&htim4);
                 HAL_TIM_Base_MspDeInit(&htim4);
                 HUB75D_Disp(&hub75d.displayCount, DISP_TIME_OFF);
+                dispPowerStatus = DISP_POWER_OFF;
             }
             HUB75D_GetScanRgb(&hub75d);
             if (osMessageQueuePut(g_dispScanMsgId, &hub75d.rgbScan, 0, 0) == osOK) {
@@ -61,12 +71,23 @@ static void DISP_Task(void *argument)
             WIFI_TaskGetTimeData(&time);
         }
         if ((event & DISP_TASK_EVENT_DISP_ON) == DISP_TASK_EVENT_DISP_ON) {
-            HUB75D_Init();
-            HUB75D_Disp(&hub75d.displayCount, DISP_TIME);
-            HAL_TIM_Base_MspInit(&htim4);
-            HAL_TIM_Base_Start_IT(&htim4);
-            GetClock(&time);
-            TRACE_PRINTF("pir interrupt, renew set display 5 minute\r\n");
+            if (dispPowerStatus == DISP_POWER_OFF) {
+                dispPowerStatus = DISP_POWER_ON;
+                HUB75D_Init();
+                HUB75D_Disp(&hub75d.displayCount, DISP_TIME);
+                HAL_TIM_Base_MspInit(&htim4);
+                HAL_TIM_Base_Start_IT(&htim4);
+                GetClock(&time);
+                GetLunarCalendar(&hub75d.lunarCalendar, &time);
+            }
+        }
+        if ((event & DISP_TASK_EVENT_PIR_INT) == DISP_TASK_EVENT_PIR_INT) {
+            LOGI(LOG_TAG, "pir interrupt, renew set display 5 minute\r\n");
+            if (dispPowerStatus == DISP_POWER_OFF) {
+                DISP_TaskSetEvent(DISP_TASK_EVENT_DISP_ON);
+            } else {
+                HUB75D_Disp(&hub75d.displayCount, DISP_TIME);
+            }
         }
     }
 }

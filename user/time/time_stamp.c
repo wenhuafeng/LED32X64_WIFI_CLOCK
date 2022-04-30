@@ -45,7 +45,7 @@ void TimeConvertTimestamp(struct TimeType *time)
 void TimestampAdd(void)
 {
     //g_timestamp++;
-    //TRACE_PRINTF("timestamp: %d\r\n", g_timestamp);
+    //LOGI(LOG_TAG, "timestamp: %d\r\n", g_timestamp);
 }
 
 #else

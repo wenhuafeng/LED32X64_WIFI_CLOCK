@@ -119,7 +119,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  COMMON_Init();
+  //COMMON_Init();
+  HAL_RTC_MspInit(&hrtc);
+  HAL_RTCEx_SetSecond_IT(&hrtc);
   /* USER CODE END 2 */
 
   /* Init scheduler */

@@ -6,15 +6,19 @@
 #include "esp8266_at.h"
 #include "time_run.h"
 #include "display_task.h"
+#include "trace.h"
 
-#define WIFI_TASK_EVENT_ALL (0xffffffff)
+#define LOG_TAG "wifi_task"
 
-#define WIFI_RX_BUFFER_SIZE     200
-#define WIFI_TASK_SEND_MSG_MAX  1
-#define WIFI_TASK_SEND_MSG_SIZE (sizeof(struct Esp8266GetTimeType))
+#define WIFI_TASK_EVENT_ALL (0x00ffffff)
+
+#define WIFI_TASK_SEND_MSG_MAX     1
+#define WIFI_TASK_SEND_MSG_SIZE    (sizeof(struct TimeType))
+#define WIFI_TASK_RECEIVE_MSG_MAX  1
+#define WIFI_TASK_RECEIVE_MSG_SIZE (200)
 
 #define WIFI_TASK_NAME       "wifiTask"
-#define WIFI_TASK_STACK_SIZE (128 * 4)
+#define WIFI_TASK_STACK_SIZE (128 * 8)
 #define WIFI_TASK_PRIORITY   (osPriority_t) osPriorityNormal
 
 const osThreadAttr_t g_wifiTaskAttributes = {
@@ -30,7 +34,7 @@ osTimerId_t g_wifiTimerId;
 
 static void WIFI_TimerCallback(void *arg)
 {
-    DISP_TaskSetEvent(WIFI_TASK_EVENT_SEND_CMD);
+    WIFI_TaskSetEvent(WIFI_TASK_EVENT_SEND_CMD);
 }
 
 static void WIFI_Task(void *argument)
@@ -38,8 +42,10 @@ static void WIFI_Task(void *argument)
     uint32_t event;
     struct Esp8266GetTimeType wifi;
     uint8_t *buffer = NULL;
+    osStatus_t ret;
 
     WIFI_TaskSetEvent(WIFI_TASK_EVENT_POWER_ON);
+    LOGI(LOG_TAG, "wifi task enter!\r\n");
 
     while (1) {
         event = osEventFlagsWait(g_wifiEvent, WIFI_TASK_EVENT_ALL, osFlagsWaitAny, osWaitForever);
@@ -50,11 +56,11 @@ static void WIFI_Task(void *argument)
         if ((event & WIFI_TASK_EVENT_GET_TIME_DATA) == WIFI_TASK_EVENT_GET_TIME_DATA) {
             buffer = pvPortMalloc(200);
             osMessageQueueGet(g_wifiReceiveMsgId, buffer, NULL, 0);
-            WIFI_ReceiveProcess(&wifi, buffer);
-            if (wifi.rxInfoCtr == WIFI_GET_TIME_COMPLETE) {
+            if (WIFI_ReceiveProcess(&wifi, buffer) == WIFI_GET_TIME_COMPLETE) {
                 if (osMessageQueuePut(g_wifiSendMsgId, &wifi.time, 0, 0) == osOK) {
-                    DISP_TaskSetEvent(WIFI_TASK_EVENT_SEND_TIME_DATA);
+                    DISP_TaskSetEvent(DISP_TASK_EVENT_GET_TIME_DATA);
                 }
+                SetClock(&wifi.time);
                 osTimerStop(g_wifiTimerId);
             }
             vPortFree(buffer);
@@ -63,8 +69,9 @@ static void WIFI_Task(void *argument)
             memset(&wifi, 0, sizeof(struct Esp8266GetTimeType));
             WIFI_ReceiveDmaInit();
             WIFI_Power(&wifi, POWER_ON);
-            if (osTimerStart(g_wifiTimerId, 1000) != osOK) {
-                ;
+            ret = osTimerStart(g_wifiTimerId, 1000);
+            if (ret != osOK) {
+                LOGE(LOG_TAG, "timer start error!, ret: %d\r\n", ret);
             }
         }
     }
@@ -85,6 +92,11 @@ osStatus_t WIFI_TaskInit(void)
 
     g_wifiSendMsgId = osMessageQueueNew(WIFI_TASK_SEND_MSG_MAX, WIFI_TASK_SEND_MSG_SIZE, NULL);
     if (g_wifiSendMsgId == NULL) {
+        return osError;
+    }
+
+    g_wifiReceiveMsgId = osMessageQueueNew(WIFI_TASK_RECEIVE_MSG_MAX, WIFI_TASK_RECEIVE_MSG_SIZE, NULL);
+    if (g_wifiReceiveMsgId == NULL) {
         return osError;
     }
 

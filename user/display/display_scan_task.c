@@ -4,11 +4,14 @@
 #include "hub75d.h"
 #include "display_task.h"
 #include "trace.h"
+#include "tim.h"
 
-#define DISP_SCAN_TASK_EVENT_ALL (0xffffffff)
+#define LOG_TAG "display_scan_task"
+
+#define DISP_SCAN_TASK_EVENT_ALL (0x00ffffff)
 
 #define DISP_TASK_NAME       "dispScanTask"
-#define DISP_TASK_STACK_SIZE (128 * 4)
+#define DISP_TASK_STACK_SIZE (128 * 16)
 #define DISP_TASK_PRIORITY   (osPriority_t)osPriorityNormal7
 
 const osThreadAttr_t g_dispScanTaskAttributes = {
@@ -17,22 +20,26 @@ const osThreadAttr_t g_dispScanTaskAttributes = {
     .priority   = DISP_TASK_PRIORITY,
 };
 
-osEventFlagsId_t g_dispScanEvent;
+static osEventFlagsId_t g_dispScanEvent;
+static struct RgbType g_rgbScan;
 
 static void DISP_ScanTask(void *argument)
 {
     uint32_t event;
-    struct RgbType rgbScan;
+
+    HAL_TIM_Base_MspInit(&htim4);
+    HAL_TIM_Base_Start_IT(&htim4);
+    LOGI(LOG_TAG, "display scan task enter!\r\n");
 
     while (1) {
         event = osEventFlagsWait(g_dispScanEvent, DISP_SCAN_TASK_EVENT_ALL, osFlagsWaitAny, osWaitForever);
 
-        if ((event & DISP_SCAN_TASK_EVENT_SCAN_LED) == DISP_SCAN_TASK_EVENT_SCAN_LED) {
-            HUB75D_DispScan(&rgbScan);
-        }
+        //if ((event & DISP_SCAN_TASK_EVENT_SCAN_LED) == DISP_SCAN_TASK_EVENT_SCAN_LED) {
+        //    HUB75D_DispScan(&rgbScan);
+        //}
         if ((event & DISP_SCAN_TASK_EVENT_RECEIVED_NEW_DATA) == DISP_SCAN_TASK_EVENT_RECEIVED_NEW_DATA) {
-            if (DISP_TaskGetDispScanData(&rgbScan) != osOK) {
-                TRACE_PRINTF("Get rgb scan data error!\r\n");
+            if (DISP_TaskGetDispScanData(&g_rgbScan) != osOK) {
+                LOGI(LOG_TAG, "Get rgb scan data error!\r\n");
             }
         }
     }
@@ -62,4 +69,9 @@ osStatus_t DISP_ScanTaskInit(void)
 void DISP_ScanTaskSetEvent(uint32_t event)
 {
     osEventFlagsSet(g_dispScanEvent, event);
+}
+
+void DISP_ScanLed(void)
+{
+    HUB75D_DispScan(&g_rgbScan);
 }

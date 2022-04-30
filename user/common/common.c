@@ -1,5 +1,5 @@
 #include "common.h"
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "main.h"
@@ -21,6 +21,8 @@
 #include "time_stamp.h"
 #include "display_task.h"
 
+#define LOG_TAG "common"
+
 #define SOFTWARE_VERSION "V101"
 
 //static void ClearGpioExtiIT(uint16_t GPIO_Pin)
@@ -33,7 +35,7 @@
 /*
 static void COMMON_EnterStandbyMode(void)
 {
-    //TRACE_PRINTF("enter stop mode\r\n");
+    //LOGI(LOG_TAG, "enter stop mode\r\n");
 
     //HAL_TIM_Base_Stop_IT(&htim4);
     //HAL_TIM_Base_MspDeInit(&htim4);
@@ -59,7 +61,7 @@ static void COMMON_EnterStandbyMode(void)
     COMMON_Init();
     //WIFI_ReInit();
 
-    TRACE_PRINTF("exit stop mode\r\n");
+    LOGI(LOG_TAG, "exit stop mode\r\n");
 }*/
 
 void COMMON_Init(void)
@@ -67,15 +69,15 @@ void COMMON_Init(void)
     //if (TRACE_Init() != UTIL_ADV_TRACE_OK) {
     //    __asm("nop");
     //} else {
-    //    TRACE_PRINTF("trace init ok\r\n");
+    //    LOGI(LOG_TAG, "trace init ok\r\n");
     //}
-    TRACE_PRINTF("%s, %s, %s\r\n", SOFTWARE_VERSION, __TIME__, __DATE__);
+    LOGI(LOG_TAG, LOG_TAG, "%s, %s, %s\r\n", SOFTWARE_VERSION, __TIME__, __DATE__);
 
     //WIFI_ReceiveDmaInit();
     //WIFI_Power(POWER_ON);
 
-    HAL_RTC_MspInit(&hrtc);
-    HAL_RTCEx_SetSecond_IT(&hrtc);
+    //HAL_RTC_MspInit(&hrtc);
+    //HAL_RTCEx_SetSecond_IT(&hrtc);
 
     //HAL_Delay(100);
     //HTU21D_Init();
@@ -101,7 +103,7 @@ void COMMON_Process(void)
     //}
     //SetOneSecondFlag(false);
 
-    TimestampAdd();
+    //TimestampAdd();
     //WIFI_SendCommand();
     //HTU21D_Sampling();
     //if (ClockRun() == true) {
@@ -117,7 +119,7 @@ void COMMON_Process(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == GPIO_PIN_0) {
-        DISP_TaskSetEvent(DISP_TASK_EVENT_DISP_ON);
+        DISP_TaskSetEvent(DISP_TASK_EVENT_PIR_INT);
     }
 }
 
@@ -126,7 +128,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
     if (huart->Instance == USART1) {
         WIFI_UART_TxCpltCallback(huart);
     } else if (huart->Instance == USART2) {
-        //TRACE_UART_TxCpltCallback(huart);
+        TRACE_UART_TxCpltCallback(huart);
     }
 }
 
@@ -135,6 +137,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     if (huart->Instance == USART1) {
         WIFI_UART_RxCpltCallback(huart);
     } else if (huart->Instance == USART2) {
-        //TRACE_UART_RxCpltCallback(huart);
+        TRACE_UART_RxCpltCallback(huart);
     }
 }

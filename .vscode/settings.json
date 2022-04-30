@@ -16,6 +16,8 @@
         "limits": "c",
         "cmsis_os2.h": "c",
         "wifi_task.h": "c",
-        "task.h": "c"
+        "task.h": "c",
+        "trace.h": "c",
+        "cstdio": "c"
     }
 }

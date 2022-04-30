@@ -8,7 +8,7 @@
 #define WIFI_TASK_EVENT_POWER_ON       (1 << 0)
 #define WIFI_TASK_EVENT_SEND_CMD       (1 << 1)
 #define WIFI_TASK_EVENT_GET_TIME_DATA  (1 << 2)
-#define WIFI_TASK_EVENT_SEND_TIME_DATA (1 << 3)
+//#define WIFI_TASK_EVENT_SEND_TIME_DATA (1 << 3)
 
 osStatus_t WIFI_TaskInit(void);
 osStatus_t WIFI_TaskGetTimeData(struct TimeType *time);
