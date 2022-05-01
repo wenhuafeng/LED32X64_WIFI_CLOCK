@@ -1,8 +1,12 @@
 #include "common.h"
 #include <stdint.h>
+#include <stdbool.h>
+#include "main.h"
 #include "wifi_uart_if.h"
-#include "trace.h"
 #include "display_task.h"
+#include "trace.h"
+
+#define LOG_TAG "common"
 
 //static void ClearGpioExtiIT(uint16_t GPIO_Pin)
 //{
@@ -34,4 +38,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     } else if (huart->Instance == USART2) {
         TRACE_UART_RxCpltCallback(huart);
     }
+}
+
+void PreSleepProcessing(uint32_t *ulExpectedIdleTime)
+{
+}
+
+void PostSleepProcessing(uint32_t *ulExpectedIdleTime)
+{
 }

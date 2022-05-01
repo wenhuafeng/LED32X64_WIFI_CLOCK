@@ -21,6 +21,7 @@
         "cstdio": "c",
         "display_scan_task.h": "c",
         "display_task.h": "c",
-        "time_run.h": "c"
+        "time_run.h": "c",
+        "freertosconfig.h": "c"
     }
 }

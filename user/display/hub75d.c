@@ -38,6 +38,11 @@
 
 #define DATE_TABLE_DISP_NULL_INDEX 11
 
+enum {
+    DISP_OFF = 0,
+    DISP_ON  = 1,
+};
+
 typedef union {
     uint16_t flag;
     struct {
@@ -355,7 +360,6 @@ void HUB75D_GetScanRgb(struct Hub75dType *hub75d)
             DispTemperatureHumidity(hub75d, count);
         }
     }
-    memcpy(&hub75d->rgbScan, &hub75d->rgb, sizeof(struct RgbType));
 }
 
 void HUB75D_DispScan(struct RgbType *rgb)
@@ -447,7 +451,6 @@ void HUB75D_GetCalendar(struct CalendarDecimal *calendar, struct TimeType *time)
 void HUB75D_Disp(uint16_t *count, enum DispTime time)
 {
     *count = time;
-
     if (time == DISP_TIME_OFF) {
         HUB75D_DISP_POWER_PIN = DISP_OFF;
 

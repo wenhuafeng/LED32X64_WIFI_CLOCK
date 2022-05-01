@@ -25,6 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "common.h"
 #include "display_task.h"
 #include "display_scan_task.h"
 #include "temp_humi_task.h"
@@ -50,10 +51,10 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-/* Definitions for mainTask */
-osThreadId_t mainTaskHandle;
-const osThreadAttr_t mainTask_attributes = {
-  .name = "mainTask",
+/* Definitions for displayTask */
+osThreadId_t displayTaskHandle;
+const osThreadAttr_t displayTask_attributes = {
+  .name = "displayTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -63,7 +64,7 @@ const osThreadAttr_t mainTask_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void MainTask(void *argument);
+void DISP_Task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -94,8 +95,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of mainTask */
-  mainTaskHandle = osThreadNew(MainTask, NULL, &mainTask_attributes);
+  /* creation of displayTask */
+  displayTaskHandle = osThreadNew(DISP_Task, NULL, &displayTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -119,22 +120,22 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_MainTask */
+/* USER CODE BEGIN Header_DISP_Task */
 /**
-  * @brief  Function implementing the mainTask thread.
+  * @brief  Function implementing the displayTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_MainTask */
-void MainTask(void *argument)
+/* USER CODE END Header_DISP_Task */
+__weak void DISP_Task(void *argument)
 {
-  /* USER CODE BEGIN MainTask */
+  /* USER CODE BEGIN DISP_Task */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END MainTask */
+  /* USER CODE END DISP_Task */
 }
 
 /* Private application code --------------------------------------------------*/

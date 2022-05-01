@@ -27,10 +27,11 @@ const osThreadAttr_t g_wifiTaskAttributes = {
     .priority   = WIFI_TASK_PRIORITY,
 };
 
-osEventFlagsId_t g_wifiEvent;
-osMessageQueueId_t g_wifiSendMsgId;
-osMessageQueueId_t g_wifiReceiveMsgId;
-osTimerId_t g_wifiTimerId;
+static osThreadId_t g_wifiTaskId = NULL;
+static osEventFlagsId_t g_wifiEvent = NULL;
+static osMessageQueueId_t g_wifiSendMsgId = NULL;
+static osMessageQueueId_t g_wifiReceiveMsgId = NULL;
+static osTimerId_t g_wifiTimerId = NULL;
 
 static void WIFI_TimerCallback(void *arg)
 {
@@ -40,12 +41,13 @@ static void WIFI_TimerCallback(void *arg)
 static void WIFI_Task(void *argument)
 {
     uint32_t event;
+    enum WifiReceiveInfo info;
     struct Esp8266GetTimeType wifi;
     uint8_t *buffer = NULL;
     osStatus_t ret;
 
-    WIFI_TaskSetEvent(WIFI_TASK_EVENT_POWER_ON);
     LOGI(LOG_TAG, "wifi task enter!\r\n");
+    WIFI_TaskSetEvent(WIFI_TASK_EVENT_POWER_ON);
 
     while (1) {
         event = osEventFlagsWait(g_wifiEvent, WIFI_TASK_EVENT_ALL, osFlagsWaitAny, osWaitForever);
@@ -54,9 +56,11 @@ static void WIFI_Task(void *argument)
             WIFI_SendCommand(&wifi);
         }
         if ((event & WIFI_TASK_EVENT_GET_TIME_DATA) == WIFI_TASK_EVENT_GET_TIME_DATA) {
-            buffer = pvPortMalloc(200);
+            buffer = pvPortMalloc(WIFI_TASK_RECEIVE_MSG_SIZE);
             osMessageQueueGet(g_wifiReceiveMsgId, buffer, NULL, 0);
-            if (WIFI_ReceiveProcess(&wifi, buffer) == WIFI_GET_TIME_COMPLETE) {
+            osMessageQueueReset(g_wifiReceiveMsgId);
+            info = WIFI_ReceiveProcess(&wifi, buffer);
+            if (info == WIFI_GET_TIME_COMPLETE) {
                 if (osMessageQueuePut(g_wifiSendMsgId, &wifi.time, 0, 0) == osOK) {
                     DISP_TaskSetEvent(DISP_TASK_EVENT_GET_TIME_DATA);
                 }
@@ -68,7 +72,7 @@ static void WIFI_Task(void *argument)
         if ((event & WIFI_TASK_EVENT_POWER_ON) == WIFI_TASK_EVENT_POWER_ON) {
             memset(&wifi, 0, sizeof(struct Esp8266GetTimeType));
             WIFI_ReceiveDmaInit();
-            WIFI_Power(&wifi, POWER_ON);
+            WIFI_Power(&wifi, WIFI_POWER_ON);
             ret = osTimerStart(g_wifiTimerId, 1000);
             if (ret != osOK) {
                 LOGE(LOG_TAG, "timer start error!, ret: %d\r\n", ret);
@@ -79,9 +83,7 @@ static void WIFI_Task(void *argument)
 
 osStatus_t WIFI_TaskInit(void)
 {
-    static osThreadId_t wifiTaskId = NULL;
-
-    if (wifiTaskId != NULL) {
+    if (g_wifiTaskId != NULL) {
         return osError;
     }
 
@@ -105,8 +107,8 @@ osStatus_t WIFI_TaskInit(void)
         return osError;
     }
 
-    wifiTaskId = osThreadNew(WIFI_Task, NULL, &g_wifiTaskAttributes);
-    if (wifiTaskId == NULL) {
+    g_wifiTaskId = osThreadNew(WIFI_Task, NULL, &g_wifiTaskAttributes);
+    if (g_wifiTaskId == NULL) {
         return osError;
     }
 
@@ -137,4 +139,29 @@ osStatus_t WIFI_TaskSendBuffer(uint8_t *buffer)
 void WIFI_TaskSetEvent(uint32_t event)
 {
     osEventFlagsSet(g_wifiEvent, event);
+}
+
+void WIFI_TaskSuspend(void)
+{
+    osStatus_t ret;
+
+    ret = osThreadSuspend(g_wifiTaskId);
+    if (ret != osOK) {
+        LOGE(LOG_TAG, "wifi task suspend\r\n");
+    } else {
+        LOGI(LOG_TAG, "wifi task suspend\r\n");
+    }
+}
+
+void WIFI_TaskResume(void)
+{
+    osStatus_t ret;
+
+    ret = osThreadResume(g_wifiTaskId);
+    if (ret != osOK) {
+        LOGE(LOG_TAG, "wifi task resume\r\n");
+    } else {
+        LOGI(LOG_TAG, "wifi task resume\r\n");
+        WIFI_TaskSetEvent(WIFI_TASK_EVENT_POWER_ON);
+    }
 }

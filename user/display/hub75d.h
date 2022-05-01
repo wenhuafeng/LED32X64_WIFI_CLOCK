@@ -18,11 +18,6 @@ enum DispTH {
     DISP_H,
 };
 
-enum {
-    DISP_OFF = 0,
-    DISP_ON  = 1,
-};
-
 struct CalendarDecimal {
     uint8_t yearH;
     uint8_t yearL;
@@ -55,7 +50,6 @@ struct Hub75dType {
     uint16_t displayCount;
     struct Htu21dDataType tempHumi;
     struct RgbType rgb;
-    struct RgbType rgbScan;
 };
 
 void HUB75D_DispScan(struct RgbType *rgb);

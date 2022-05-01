@@ -20,15 +20,14 @@ const osThreadAttr_t g_dispScanTaskAttributes = {
     .priority   = DISP_TASK_PRIORITY,
 };
 
-static osEventFlagsId_t g_dispScanEvent;
-static struct RgbType g_rgbScan;
+static osEventFlagsId_t g_dispScanEvent = NULL;
+static osThreadId_t g_dispScanTaskId = NULL;
+static struct RgbType g_rgbScan = {0};
 
 static void DISP_ScanTask(void *argument)
 {
     uint32_t event;
 
-    HAL_TIM_Base_MspInit(&htim4);
-    HAL_TIM_Base_Start_IT(&htim4);
     LOGI(LOG_TAG, "display scan task enter!\r\n");
 
     while (1) {
@@ -44,9 +43,7 @@ static void DISP_ScanTask(void *argument)
 
 osStatus_t DISP_ScanTaskInit(void)
 {
-    static osThreadId_t dispScanTaskId = NULL;
-
-    if (dispScanTaskId != NULL) {
+    if (g_dispScanTaskId != NULL) {
         return osError;
     }
 
@@ -55,8 +52,8 @@ osStatus_t DISP_ScanTaskInit(void)
         return osError;
     }
 
-    dispScanTaskId = osThreadNew(DISP_ScanTask, NULL, &g_dispScanTaskAttributes);
-    if (dispScanTaskId == NULL) {
+    g_dispScanTaskId = osThreadNew(DISP_ScanTask, NULL, &g_dispScanTaskAttributes);
+    if (g_dispScanTaskId == NULL) {
         return osError;
     }
 
@@ -71,4 +68,28 @@ void DISP_ScanTaskSetEvent(uint32_t event)
 void DISP_ScanLed(void)
 {
     HUB75D_DispScan(&g_rgbScan);
+}
+
+void DISP_ScanTaskSuspend(void)
+{
+    osStatus_t ret;
+
+    ret = osThreadSuspend(g_dispScanTaskId);
+    if (ret != osOK) {
+        LOGE(LOG_TAG, "display scan task suspend\r\n");
+    } else {
+        LOGI(LOG_TAG, "display scan task suspend\r\n");
+    }
+}
+
+void DISP_ScanTaskResume(void)
+{
+    osStatus_t ret;
+
+    ret = osThreadResume(g_dispScanTaskId);
+    if (ret != osOK) {
+        LOGE(LOG_TAG, "display scan task resume\r\n");
+    } else {
+        LOGI(LOG_TAG, "display scan task resume\r\n");
+    }
 }

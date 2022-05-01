@@ -9,5 +9,7 @@
 osStatus_t DISP_ScanTaskInit(void);
 void DISP_ScanTaskSetEvent(uint32_t event);
 void DISP_ScanLed(void);
+void DISP_ScanTaskSuspend(void);
+void DISP_ScanTaskResume(void);
 
 #endif

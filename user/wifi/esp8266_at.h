@@ -6,8 +6,8 @@
 #include "time_run.h"
 
 enum PowerFlag {
-    POWER_OFF,
-    POWER_ON,
+    WIFI_POWER_OFF,
+    WIFI_POWER_ON,
 };
 
 enum WifiInitStatus {

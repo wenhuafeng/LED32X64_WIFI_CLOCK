@@ -44,6 +44,7 @@ void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
         g_usartType.receiveFlag = 1;
         HAL_UART_Receive_DMA(&huart1, g_usartType.buffer, sizeof(g_usartType.buffer));
         (void)WIFI_TaskSendBuffer(g_usartType.buffer);
+        memset(&g_usartType.buffer, 0, sizeof(g_usartType.buffer));
     }
 }
 

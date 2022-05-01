@@ -39,7 +39,8 @@
 #define SEC_MAX   59
 
 #define WIFI_CH_PD          PBout(5)
-#define WIFI_ON_TIME        (3 * 60) /* 3 min */
+#define WIFI_OFF            0
+#define WIFI_ON_TIME        (2 * 60) /* 3 min */
 #define WIFI_GET_TIME_TIMES (5U)
 #define WIFI_SET_SNTP_TIMES (5U)
 
@@ -247,11 +248,11 @@ static void WIFI_ReturnTime(struct Esp8266GetTimeType *wifi, char *buf)
             wifi->getTimeCtr = GET_TIME_DELAY_SEC;
         } else {
             wifi->getTimeTimes = 0x00;
-            WIFI_Power(wifi, POWER_OFF);
+            WIFI_Power(wifi, WIFI_POWER_OFF);
             WIFI_ReInit(wifi);
         }
     } else {
-        WIFI_Power(wifi, POWER_OFF);
+        WIFI_Power(wifi, WIFI_POWER_OFF);
     }
 }
 
@@ -265,13 +266,16 @@ static const struct WifiRxType g_wifiRxHandlerTable[] = {
 
 void WIFI_Power(struct Esp8266GetTimeType *wifi, enum PowerFlag flag)
 {
-    if (flag == POWER_ON) {
+    if (flag == WIFI_POWER_ON) {
         memset(wifi, 0, sizeof(struct Esp8266GetTimeType));
         WIFI_CH_PD             = 1;
         wifi->wifiPowerOffTime = WIFI_ON_TIME;
+        wifi->wifiPowerStatus = WIFI_POWER_ON;
         LOGI(LOG_TAG, "wifi power on\r\n");
     } else {
         WIFI_CH_PD = 0;
+        wifi->wifiPowerOffTime = WIFI_OFF;
+        wifi->wifiPowerStatus = WIFI_POWER_OFF;
         LOGI(LOG_TAG, "wifi power off\r\n");
     }
 }
@@ -285,7 +289,7 @@ void WIFI_SendCommand(struct Esp8266GetTimeType *wifi)
     if (wifi->wifiPowerOffTime != 0x00) {
         wifi->wifiPowerOffTime--;
         if (wifi->wifiPowerOffTime == 0x00) {
-            WIFI_Power(wifi, POWER_OFF);
+            WIFI_Power(wifi, WIFI_POWER_OFF);
         }
     }
 
