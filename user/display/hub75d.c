@@ -7,7 +7,7 @@
 
 #define LOG_TAG "hub75d"
 
-#define TEMP_HUMI_DISP_TIME (2) /* seconds */
+#define TEMP_HUMI_DISP_TIME (1) /* seconds */
 
 #define HUB_A   PBout(13)
 #define HUB_B   PBout(14)

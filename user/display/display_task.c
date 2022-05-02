@@ -90,6 +90,11 @@ static void DISP_Task(void *argument)
                 TH_TaskResume();
                 DISP_ScanTaskResume();
                 DISP_TaskSetEvent(DISP_TASK_EVENT_DISP_ON);
+                HUB75D_GetCalendar(&hub75d.calendarDecimal, &time);
+                HUB75D_GetScanRgb(&hub75d);
+                if (osMessageQueuePut(g_dispScanMsgId, &hub75d.rgb, 0, 0) == osOK) {
+                    DISP_ScanTaskSetEvent(DISP_SCAN_TASK_EVENT_RECEIVED_NEW_DATA);
+                }
             } else {
                 HUB75D_Disp(&hub75d.displayCount, DISP_TIME);
             }
