@@ -8,13 +8,6 @@
 
 #define LOG_TAG "common"
 
-//static void ClearGpioExtiIT(uint16_t GPIO_Pin)
-//{
-//    if (__HAL_GPIO_EXTI_GET_IT(GPIO_Pin) != 0x00u) {
-//        __HAL_GPIO_EXTI_CLEAR_IT(GPIO_Pin);
-//    }
-//}
-
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == GPIO_PIN_0) {

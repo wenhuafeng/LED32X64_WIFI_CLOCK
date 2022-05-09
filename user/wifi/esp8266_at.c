@@ -51,12 +51,8 @@
 #define WIFI_INIT_TOTAL_STEP (6U)
 
 char *g_wifiCmdTable[WIFI_INIT_TOTAL_STEP] = {
-    "AT+RST\r\n",
-    "AT+CWMODE=1\r\n",
-    "AT+CWJAP_DEF=\"HSG2\",\"13537011631\"\r\n",
-    "AT+CIPSNTPCFG=1,8\r\n",
-    "AT+CIPSNTPTIME?\r\n",
-    "AT+GMR\r\n",
+    "AT+RST\r\n",          "AT+CWMODE=1\r\n", "AT+CWJAP_DEF=\"HSG2\",\"13537011631\"\r\n", "AT+CIPSNTPCFG=1,8\r\n",
+    "AT+CIPSNTPTIME?\r\n", "AT+GMR\r\n",
 };
 
 /* wifi receive data handler */
@@ -115,14 +111,14 @@ static uint8_t GetMonth(char *monthString)
             break;
         }
     }
-
     LOGI(LOG_TAG, "month:%d\r\n", i);
+
     return i;
 }
 
 static bool ProcessClock(struct Esp8266GetTimeType *wifi, char *cRxBuf)
 {
-    char str[4] = {0};
+    char str[4] = { 0 };
     struct TimeType time;
     int ret;
 
@@ -145,7 +141,7 @@ static bool ProcessClock(struct Esp8266GetTimeType *wifi, char *cRxBuf)
     time.minute = AscToHex(cRxBuf[MIN_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[MIN_STR_INDEX_LOW]);
     time.second = AscToHex(cRxBuf[SEC_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[SEC_STR_INDEX_LOW]);
     time.year   = AscToHex(cRxBuf[YEAR_STR_INDEX_THOUSAND]) * 1000 + AscToHex(cRxBuf[YEAR_STR_INDEX_HUNDRED]) * 100 +
-                  AscToHex(cRxBuf[YEAR_STR_INDEX_TEN]) * 10 + AscToHex(cRxBuf[YEAR_STR_INDEX]);
+                AscToHex(cRxBuf[YEAR_STR_INDEX_TEN]) * 10 + AscToHex(cRxBuf[YEAR_STR_INDEX]);
 
     if (time.year < YEAR_MIN || time.year > YEAR_MAX) {
         return false;
@@ -270,12 +266,12 @@ void WIFI_Power(struct Esp8266GetTimeType *wifi, enum PowerFlag flag)
         memset(wifi, 0, sizeof(struct Esp8266GetTimeType));
         WIFI_CH_PD             = 1;
         wifi->wifiPowerOffTime = WIFI_ON_TIME;
-        wifi->wifiPowerStatus = WIFI_POWER_ON;
+        wifi->wifiPowerStatus  = WIFI_POWER_ON;
         LOGI(LOG_TAG, "wifi power on\r\n");
     } else {
-        WIFI_CH_PD = 0;
+        WIFI_CH_PD             = 0;
         wifi->wifiPowerOffTime = WIFI_OFF;
-        wifi->wifiPowerStatus = WIFI_POWER_OFF;
+        wifi->wifiPowerStatus  = WIFI_POWER_OFF;
         LOGI(LOG_TAG, "wifi power off\r\n");
     }
 }

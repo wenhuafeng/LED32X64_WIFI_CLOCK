@@ -27,11 +27,11 @@ const osThreadAttr_t g_wifiTaskAttributes = {
     .priority   = WIFI_TASK_PRIORITY,
 };
 
-static osThreadId_t g_wifiTaskId = NULL;
-static osEventFlagsId_t g_wifiEvent = NULL;
-static osMessageQueueId_t g_wifiSendMsgId = NULL;
+static osThreadId_t g_wifiTaskId             = NULL;
+static osEventFlagsId_t g_wifiEvent          = NULL;
+static osMessageQueueId_t g_wifiSendMsgId    = NULL;
 static osMessageQueueId_t g_wifiReceiveMsgId = NULL;
-static osTimerId_t g_wifiTimerId = NULL;
+static osTimerId_t g_wifiTimerId             = NULL;
 
 static void WIFI_TimerCallback(void *arg)
 {

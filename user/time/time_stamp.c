@@ -50,6 +50,8 @@ void TimestampAdd(void)
 
 #else
 
+#include "time_run.h"
+
 void TimeConvertTimestamp(struct TimeType *time)
 {
 }

@@ -59,7 +59,7 @@ extern "C" {
 /* USER CODE BEGIN ET */
 #define HTU21D_I2C_SOFTWARE 0
 #define HTU21D_I2C_HARDWARE 1
-#define UNIX_TIME_STAMP     1
+#define UNIX_TIME_STAMP     0
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

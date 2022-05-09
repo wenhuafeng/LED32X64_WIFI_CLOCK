@@ -15,7 +15,7 @@
 
 #define TH_TASK_NAME       "thTask"
 #define TH_TASK_STACK_SIZE (128 * 8)
-#define TH_TASK_PRIORITY   (osPriority_t)osPriorityNormal
+#define TH_TASK_PRIORITY   (osPriority_t) osPriorityNormal
 
 const osThreadAttr_t g_thTaskAttributes = {
     .name       = TH_TASK_NAME,
@@ -23,10 +23,10 @@ const osThreadAttr_t g_thTaskAttributes = {
     .priority   = TH_TASK_PRIORITY,
 };
 
-static osEventFlagsId_t g_thEvent = NULL;
+static osEventFlagsId_t g_thEvent   = NULL;
 static osMessageQueueId_t g_thMsgId = NULL;
-static osTimerId_t g_thTimerId = NULL;
-static osThreadId_t g_thTaskId = NULL;
+static osTimerId_t g_thTimerId      = NULL;
+static osThreadId_t g_thTaskId      = NULL;
 
 static void TH_TimerCallback(void *arg)
 {

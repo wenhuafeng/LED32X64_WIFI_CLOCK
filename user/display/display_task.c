@@ -29,9 +29,9 @@ const osThreadAttr_t g_dispTaskAttributes = {
     .priority   = DISP_TASK_PRIORITY,
 };
 
-static osEventFlagsId_t g_dispEvent = NULL;
+static osEventFlagsId_t g_dispEvent       = NULL;
 static osMessageQueueId_t g_dispScanMsgId = NULL;
-static osThreadId_t g_dispTaskId = NULL;
+static osThreadId_t g_dispTaskId          = NULL;
 
 static void DISP_Task(void *argument)
 {

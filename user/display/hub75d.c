@@ -265,10 +265,10 @@ static void DispDate(struct Hub75dType *hub75d, uint8_t index)
 
 static void DispLunarCalendar(struct Hub75dType *hub75d, uint8_t index)
 {
-    uint8_t m1 = hub75d->lunarCalendar.month / 10;
-    uint8_t m0 = hub75d->lunarCalendar.month % 10;
-    uint8_t d1 = hub75d->lunarCalendar.day / 10;
-    uint8_t d0 = hub75d->lunarCalendar.day % 10;
+    uint8_t m1         = hub75d->lunarCalendar.month / 10;
+    uint8_t m0         = hub75d->lunarCalendar.month % 10;
+    uint8_t d1         = hub75d->lunarCalendar.day / 10;
+    uint8_t d0         = hub75d->lunarCalendar.day % 10;
     uint8_t tableIndex = index - (SCAN_ALL_LINE / 2);
 
     hub75d->rgb.g[8][index] |= g_chineseWeekDateTable[CHINESE_LUNAR_CALENDAR_INDEX][tableIndex];
@@ -365,7 +365,7 @@ void HUB75D_GetScanRgb(struct Hub75dType *hub75d)
 void HUB75D_DispScan(struct RgbType *rgb)
 {
     static uint8_t index = 0;
-    PinFlags flags = {0};
+    PinFlags flags       = { 0 };
     uint8_t move;
 
     HUB_LAT = 0;
@@ -432,12 +432,12 @@ void HUB75D_DispScan(struct RgbType *rgb)
 
 void HUB75D_GetCalendar(struct CalendarDecimal *calendar, struct TimeType *time)
 {
-    calendar->hourL = time->hour % 10;
-    calendar->hourH = time->hour / 10;
-    calendar->minL  = time->minute % 10;
-    calendar->minH  = time->minute / 10;
-    calendar->secL  = time->second % 10;
-    calendar->secH  = time->second / 10;
+    calendar->hourL  = time->hour % 10;
+    calendar->hourH  = time->hour / 10;
+    calendar->minL   = time->minute % 10;
+    calendar->minH   = time->minute / 10;
+    calendar->secL   = time->second % 10;
+    calendar->secH   = time->second / 10;
     calendar->dayL   = time->day % 10;
     calendar->dayH   = time->day / 10;
     calendar->monthL = time->month % 10;
@@ -478,7 +478,7 @@ void HUB75D_Disp(uint16_t *count, enum DispTime time)
 
 bool HUB75D_CtrDec(struct Hub75dType *hub75d)
 {
-    bool ret = false;
+    bool ret                 = false;
     static uint8_t changeCtr = 0;
 
     changeCtr++;
@@ -501,4 +501,6 @@ bool HUB75D_CtrDec(struct Hub75dType *hub75d)
     return ret;
 }
 
-void HUB75D_Init(void) {}
+void HUB75D_Init(void)
+{
+}

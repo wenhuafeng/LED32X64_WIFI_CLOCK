@@ -185,7 +185,7 @@ bool HTU21D_GetData(struct Htu21dDataType *th)
     htu_data = read[DATA_HIGH];
     htu_data = htu_data << 8;
     htu_data += read[DATA_LOW];
-    htu               = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
+    htu          = ((htu_data & 0xfffc) / 65536.0 * 125.0 - 6.0) * 10;
     th->humidity = (uint16_t)htu;
     if (th->humidity > HUMI_MAX_VALUE) {
         th->humidity = HUMI_MAX_VALUE;

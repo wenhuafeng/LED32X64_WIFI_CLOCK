@@ -51,8 +51,6 @@ struct Esp8266GetTimeType {
     struct TimeType time;
 };
 
-//void WIFI_ReInit(struct Esp8266GetTimeType *wifi);
-//bool WIFI_Init(struct Esp8266GetTimeType *wifi);
 void WIFI_Power(struct Esp8266GetTimeType *wifi, enum PowerFlag flag);
 void WIFI_SendCommand(struct Esp8266GetTimeType *wifi);
 enum WifiReceiveInfo WIFI_ReceiveProcess(struct Esp8266GetTimeType *wifi, uint8_t *buf);
