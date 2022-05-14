@@ -1,8 +1,0 @@
-r
-erase
-h
-
-loadfile "build/CLOCK_STM32F103C8T6_WIFI.hex"
-
-r
-exit
