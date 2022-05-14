@@ -6,7 +6,7 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon May 09 21:31:52 2022
+# Make data base, printed on Sat May 14 15:36:05 2022
 
 # Variables
 
@@ -49,7 +49,8 @@ BIN = $(CP) -O binary -S
 # environment
 WINDIR = C:\WINDOWS
 # environment
-VSCODE_NLS_CONFIG = {"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"a78078f10f99ab7adc9063c14c25e7ae.zh-cn","_translationsConfigFile":"C:\\Users\\wenhuafeng\\AppData\\Roaming\\Code\\clp\\a78078f10f99ab7adc9063c14c25e7ae.zh-cn\\tcf.json","_cacheRoot":"C:\\Users\\wenhuafeng\\AppData\\Roaming\\Code\\clp\\a78078f10f99ab7adc9063c14c25e7ae.zh-cn","_resolvedLanguagePackCoreLocation":"C:\\Users\\wenhuafeng\\AppData\\Roaming\\Code\\clp\\a78078f10f99ab7adc9063c14c25e7ae.zh-cn\\57fd6d0195bb9b9d1b49f6da5db789060795de47","_corruptedFile":"C:\\Users\\wenhuafeng\\AppData\\Roaming\\Code\\clp\\a78078f10f99ab7adc9063c14c25e7ae.zh-cn\\corrupted.info","_languagePackSupport":true}
+VSCODE_NLS_CONFIG = {"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"42e84e0914b17800d483f69e299e1b00.zh-cn","_translationsConfigFile":"C:\\Users\\wenhuafeng\\AppData\\Roaming\\Code\\clp\\42e84e0914b17800d483f69e299e1b00.zh-cn\\tcf.json","_cacheRoot":"C:\\Users\\wenhuafeng\\AppData\\Roaming\\Code\\clp\\42e84e0914b17800d483f69e299e1b00.zh-cn","_resolvedLanguagePackCoreLocation":"C:\\Users\\wenhuafeng\\AppData\\Roaming\\Code\\clp\\42e84e0914b17800d483f69e299e1b00.zh-cn\\da15b6fd3ef856477bf6f4fb29ba1b7af717770d","_corruptedFile":"C:\\Use 
+rs\\wenhuafeng\\AppData\\Roaming\\Code\\clp\\42e84e0914b17800d483f69e299e1b00.zh-cn\\corrupted.info","_languagePackSupport":true}
 # makefile (from 'Makefile', line 114)
 SZ = $(PREFIX)size
 # environment
@@ -79,7 +80,7 @@ PROGRAMW6432 = C:\Program Files
 # environment
 PROGRAMDATA = C:\ProgramData
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-09376730-8b7b-4150-87e5-aa5d594aa524-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-c2a467fa-3b66-40ac-9fd2-2735e8903032-sock
 # environment
 VSCODE_CWD = D:\Program Files\Microsoft VS Code
 # default
@@ -99,8 +100,7 @@ VSCODE_LOG_STACK = false
 # environment
 NUMBER_OF_PROCESSORS = 12
 # environment
-ELEC 
-TRON_RUN_AS_NODE = 1
+ELECTRON_RUN_AS_NODE = 1
 # makefile (from 'Makefile', line 187)
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 # default
@@ -108,7 +108,7 @@ LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BU
 # automatic
 %F = $(notdir $%)
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_25908_HOUFRJJCTEXIKVNF
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_10016_IPLJUPBEPPCQUBGT
 # makefile (from 'Makefile', line 95)
 ASM_SOURCES = startup_stm32f103xb.s
 # makefile (from 'Makefile', line 25)
@@ -132,9 +132,9 @@ PUBLIC = C:\Users\Public
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\wenhuafeng\AppData\Roaming\Code\CachedData\57fd6d0195bb9b9d1b49f6da5db789060795de47
+VSCODE_CODE_CACHE_PATH = C:\Users\wenhuafeng\AppData\Roaming\Code\CachedData\da15b6fd3ef856477bf6f4fb29ba1b7af717770d
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
 # environment
 COMMONPROGRAMFILES = C:\Program Files\Common Files
 # environment
@@ -194,7 +194,7 @@ PROCESSOR_IDENTIFIER = AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD
 # environment
 OS = Windows_NT
 # environment
-VSCODE_IPC_HOOK = \\.\pipe\d0f9ff90f2b0f15191b4ed40651aea96-1.67.0-main-sock
+VSCODE_IPC_HOOK = \\.\pipe\d0f9ff90f2b0f15191b4ed40651aea96-1.67.1-main-sock
 # environment
 HOMEPATH = \Users\wenhuafeng
 # environment
@@ -250,7 +250,7 @@ PROCESSOR_LEVEL = 23
 # environment
 FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
 # environment
-VSCODE_PID = 25908
+VSCODE_PID = 10016
 # environment
 USERDOMAIN_ROAMINGPROFILE = LAPTOP-PRAVS7GT
 # variable set hash-table stats:
@@ -263,7 +263,7 @@ USERDOMAIN_ROAMINGPROFILE = LAPTOP-PRAVS7GT
 # Directories
 
 # user/trace (key d:/src/LED32X64_WIFI_CLOCK/user/trace, mtime 1651447464): 4 files, no impossibilities.
-# . (key d:/src/LED32X64_WIFI_CLOCK, mtime 1651454269): 21 files, no impossibilities.
+# . (key d:/src/LED32X64_WIFI_CLOCK, mtime 1652105006): 21 files, no impossibilities.
 # build: could not be stat'd.
 # Middlewares/Third_Party/FreeRTOS/Source (key d:/src/LED32X64_WIFI_CLOCK/Middlewares/Third_Party/FreeRTOS/Source, mtime 1651447464): No files, no impossibilities so far.
 # user/common (key d:/src/LED32X64_WIFI_CLOCK/user/common, mtime 1651447464): No files, no impossibilities so far.
@@ -744,6 +744,6 @@ vpath %.c Core/Src;Drivers/STM32F1xx_HAL_Driver/Src;Middlewares/Third_Party/Free
 # strcache performance: lookups = 171 / hit rate = 28%
 # hash-table stats:
 # Load=123/8192=2%, Rehash=0, Collisions=7/171=4%
-# Finished Make data base on Mon May 09 21:31:52 2022
+# Finished Make data base on Sat May 14 15:36:05 2022
 
  
