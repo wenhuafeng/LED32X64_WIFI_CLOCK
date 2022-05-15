@@ -1,0 +1,5 @@
+h
+loadfile user/output/CLOCK_STM32F103C8T6_WIFI.hex 0x8000000
+g
+r
+qc

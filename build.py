@@ -5,11 +5,21 @@ import os
 import datetime
 import platform
 import subprocess
+import shutil
 
+# MDK build
 mdk_build_command = 'D:/Keil_v5/UV4/UV4.exe -j0 -r ./MDK-ARM/CLOCK_STM32F103C8T6_WIFI.uvprojx -o build_log.txt'
 mdk_build_log     = 'cat ./MDK-ARM/build_log.txt'
-gcc_loadfile = 'build/CLOCK_STM32F103C8T6_WIFI.hex'
-mdk_loadfile = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.hex'
+
+# build out file
+gcc_source_file_hex = 'build/CLOCK_STM32F103C8T6_WIFI.hex'
+mdk_source_file_hex = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.hex'
+gcc_source_file_bin = 'build/CLOCK_STM32F103C8T6_WIFI.bin'
+mdk_source_file_bin = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.bin'
+target_path = 'user/output'
+
+# JLink define
+jlink_loadfile = 'user/output/CLOCK_STM32F103C8T6_WIFI.hex'
 device = "STM32F103C8"
 interface = "SWD"
 speed = "1000"
@@ -56,14 +66,29 @@ def jlink_run(loadfile):
 
     subprocess.call(exec_cmd, shell=True)
 
+def cp_build_file(source, target):
+    assert not os.path.isabs(source)
+
+    try:
+        shutil.copy(source, target)
+    except IOError as e:
+        print("Unable to copy file. %s" % e)
+    except:
+        print("Unexpected error:", sys.exc_info())
+    return
+
 def gcc_build():
     os.system('make clean')
     os.system('make -j8')
+    cp_build_file(gcc_source_file_hex, target_path)
+    cp_build_file(gcc_source_file_bin, target_path)
     return
 
 def mdk_build():
     os.system(mdk_build_command)
     os.system(mdk_build_log)
+    cp_build_file(mdk_source_file_hex, target_path)
+    cp_build_file(mdk_source_file_bin, target_path)
     return
 
 def main_func(parameter):
@@ -75,12 +100,8 @@ def main_func(parameter):
     elif parameter == 'mdk':
         print("cc type = MDK")
         mdk_build()
-    elif parameter == 'gcc_bin_download':
-        print("gcc bin download")
-        jlink_run(gcc_loadfile)
-    elif parameter == 'mdk_bin_download':
-        print("mdk bin download")
-        jlink_run(mdk_loadfile)
+    elif parameter == 'download':
+        jlink_run(jlink_loadfile)
     else:
         print("input parameter error!")
 
