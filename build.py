@@ -13,8 +13,8 @@ mdk_build_log     = 'cat ./MDK-ARM/build_log.txt'
 
 # build out file
 gcc_source_file_hex = 'build/CLOCK_STM32F103C8T6_WIFI.hex'
-mdk_source_file_hex = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.hex'
 gcc_source_file_bin = 'build/CLOCK_STM32F103C8T6_WIFI.bin'
+mdk_source_file_hex = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.hex'
 mdk_source_file_bin = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.bin'
 target_path = 'user/output'
 
@@ -78,6 +78,7 @@ def cp_build_file(source, target):
     return
 
 def gcc_build():
+    print("cc type = gcc")
     os.system('make clean')
     os.system('make -j8')
     cp_build_file(gcc_source_file_hex, target_path)
@@ -85,6 +86,7 @@ def gcc_build():
     return
 
 def mdk_build():
+    print("cc type = MDK")
     os.system(mdk_build_command)
     os.system(mdk_build_log)
     cp_build_file(mdk_source_file_hex, target_path)
@@ -95,10 +97,8 @@ def main_func(parameter):
     start = datetime.datetime.now()
 
     if parameter == 'gcc':
-        print("cc type = gcc")
         gcc_build()
     elif parameter == 'mdk':
-        print("cc type = MDK")
         mdk_build()
     elif parameter == 'download':
         jlink_run(jlink_loadfile)
