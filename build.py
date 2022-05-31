@@ -75,7 +75,6 @@ def cp_build_file(source, target):
         print("Unable to copy file. %s" % e)
     except:
         print("Unexpected error:", sys.exc_info())
-    return
 
 def gcc_build():
     print("cc type = gcc")
@@ -83,7 +82,6 @@ def gcc_build():
     os.system('make -j8')
     cp_build_file(gcc_source_file_hex, target_path)
     cp_build_file(gcc_source_file_bin, target_path)
-    return
 
 def mdk_build():
     print("cc type = MDK")
@@ -91,7 +89,6 @@ def mdk_build():
     os.system(mdk_build_log)
     cp_build_file(mdk_source_file_hex, target_path)
     cp_build_file(mdk_source_file_bin, target_path)
-    return
 
 def main_func(parameter):
     start = datetime.datetime.now()
@@ -107,10 +104,6 @@ def main_func(parameter):
 
     end = datetime.datetime.now()
     print('run time: %s second' %(end - start))
-    return
-
-def main():
-    main_func(sys.argv[1])
 
 if __name__ == "__main__":
-    main()
+    main_func(sys.argv[1])
