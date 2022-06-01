@@ -19,11 +19,11 @@
 #define HUB_R1  PAout(6)
 #define HUB_G1  PAout(5)
 #define HUB_B1  PAout(7)
-#define HUB_R2  PBout(0)
-#define HUB_G2  PBout(1)
-#define HUB_B2  PBout(10)
+#define HUB_R2  PAout(11)
+#define HUB_G2  PAout(12)
+#define HUB_B2  PAout(4)
 
-#define HUB75D_DISP_POWER_PIN PBout(11)
+#define HUB75D_DISP_POWER_PIN PAout(1)
 
 #define CHINESE_YEAR_INDEX           10
 #define CHINESE_MONTH_INDEX          9

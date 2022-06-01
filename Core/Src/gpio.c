@@ -53,13 +53,13 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, HUB_G1_Pin|HUB_R1_Pin|HUB_B1_Pin|HUB_D_Pin
+  HAL_GPIO_WritePin(GPIOA, DISP_POWER_Pin|HUB_B2_Pin|HUB_G1_Pin|HUB_R1_Pin
+                          |HUB_B1_Pin|HUB_D_Pin|HUB_R2_Pin|HUB_G2_Pin
                           |HUB_CA15_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, HUB_R2_Pin|HUB_G2_Pin|HUB_B2_Pin|DISP_POWER_Pin
-                          |WORK_LED_Pin|HUB_A_Pin|HUB_B_Pin|HUB_C_Pin
-                          |HUB_LAT_Pin|WIFI_POWER_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPS_LED_Pin|GPS_ENABLE_Pin|WORK_LED_Pin|HUB_A_Pin
+                          |HUB_B_Pin|HUB_C_Pin|HUB_LAT_Pin|WIFI_POWER_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PC13 */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
@@ -72,14 +72,11 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(PIR_INT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PA1 PA4 PA11 PA12 */
-  GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_11|GPIO_PIN_12;
-  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
   /*Configure GPIO pins : PAPin PAPin PAPin PAPin
+                           PAPin PAPin PAPin PAPin
                            PAPin */
-  GPIO_InitStruct.Pin = HUB_G1_Pin|HUB_R1_Pin|HUB_B1_Pin|HUB_D_Pin
+  GPIO_InitStruct.Pin = DISP_POWER_Pin|HUB_B2_Pin|HUB_G1_Pin|HUB_R1_Pin
+                          |HUB_B1_Pin|HUB_D_Pin|HUB_R2_Pin|HUB_G2_Pin
                           |HUB_CA15_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -87,11 +84,9 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin PBPin
-                           PBPin PBPin PBPin PBPin
-                           PBPin PBPin */
-  GPIO_InitStruct.Pin = HUB_R2_Pin|HUB_G2_Pin|HUB_B2_Pin|DISP_POWER_Pin
-                          |WORK_LED_Pin|HUB_A_Pin|HUB_B_Pin|HUB_C_Pin
-                          |HUB_LAT_Pin|WIFI_POWER_Pin;
+                           PBPin PBPin PBPin PBPin */
+  GPIO_InitStruct.Pin = GPS_LED_Pin|GPS_ENABLE_Pin|WORK_LED_Pin|HUB_A_Pin
+                          |HUB_B_Pin|HUB_C_Pin|HUB_LAT_Pin|WIFI_POWER_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
