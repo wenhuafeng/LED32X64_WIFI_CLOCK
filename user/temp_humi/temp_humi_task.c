@@ -7,7 +7,10 @@
 
 #define LOG_TAG "temp_humi_task"
 
-#define TH_TASK_EVENT_ALL   (0x00ffffff)
+#define TH_TASK_EVENT_ALL    (0x00ffffff)
+#define TH_TASK_EVENT_START  (1 << 0)
+#define TH_TASK_EVENT_GET_TH (1 << 1)
+
 #define TH_TASK_GET_TH_TIME 10000
 
 #define TH_TASK_MSG_MAX  1

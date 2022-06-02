@@ -15,6 +15,7 @@
                 "${workspaceFolder}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3",
                 "${workspaceFolder}/user/common",
                 "${workspaceFolder}/user/display",
+                "${workspaceFolder}/user/gps",
                 "${workspaceFolder}/user/temp_humi",
                 "${workspaceFolder}/user/time",
                 "${workspaceFolder}/user/trace",

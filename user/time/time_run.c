@@ -24,7 +24,7 @@ static uint8_t GetMaxDay(uint16_t year, uint8_t month)
     return day;
 }
 
-static void CalculateWeek(struct TimeType *time)
+void CalculateWeek(struct TimeType *time)
 {
     int16_t yearTemp = 0;
     int16_t yearHigh;

@@ -59,6 +59,8 @@ extern "C" {
 /* USER CODE BEGIN ET */
 #define HTU21D_I2C_SOFTWARE 0
 #define HTU21D_I2C_HARDWARE 1
+#define WIFI_GET_TIME       1
+#define GPS_GET_TIME        0
 #define UNIX_TIME_STAMP     0
 /* USER CODE END ET */
 

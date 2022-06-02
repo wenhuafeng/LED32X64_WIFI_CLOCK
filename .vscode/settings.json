@@ -22,6 +22,8 @@
         "display_scan_task.h": "c",
         "display_task.h": "c",
         "time_run.h": "c",
-        "freertosconfig.h": "c"
+        "freertosconfig.h": "c",
+        "common.h": "c",
+        "temp_humi_task.h": "c"
     }
 }

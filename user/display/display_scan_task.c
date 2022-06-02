@@ -22,7 +22,7 @@ const osThreadAttr_t g_dispScanTaskAttributes = {
 
 static osEventFlagsId_t g_dispScanEvent = NULL;
 static osThreadId_t g_dispScanTaskId    = NULL;
-static struct RgbType g_rgbScan         = {0};
+static struct RgbType g_rgbScan         = { 0 };
 
 static void DISP_ScanTask(void *argument)
 {

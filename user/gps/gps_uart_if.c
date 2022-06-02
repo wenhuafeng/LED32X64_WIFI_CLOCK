@@ -1,6 +1,6 @@
 #include "main.h"
-#if defined(WIFI_GET_TIME) && WIFI_GET_TIME
-#include "wifi_uart_if.h"
+#if defined(GPS_GET_TIME) && GPS_GET_TIME
+#include "gps_uart_if.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -9,10 +9,10 @@
 #include "task.h"
 #include "main.h"
 #include "usart.h"
-#include "wifi_task.h"
+#include "gps_task.h"
 
-#define RECEIVE_LENGTH     200
-#define SEND_LENGTH        200
+#define RECEIVE_LENGTH     512
+#define SEND_LENGTH        10
 #define USART_DMA_SENDING  1
 #define USART_DMA_SENDOVER 0
 
@@ -24,13 +24,13 @@ struct UsartReceiveType {
 };
 static struct UsartReceiveType g_usartType;
 
-void WIFI_ReceiveDmaInit(void)
+void GPS_ReceiveDmaInit(void)
 {
-    HAL_UART_Receive_DMA(&huart1, g_usartType.buffer, RECEIVE_LENGTH);
-    __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+    HAL_UART_Receive_DMA(&huart3, g_usartType.buffer, RECEIVE_LENGTH);
+    __HAL_UART_ENABLE_IT(&huart3, UART_IT_IDLE);
 }
 
-void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
+void GPS_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
 {
     uint32_t temp;
 
@@ -40,25 +40,25 @@ void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
     __HAL_UART_CLEAR_IDLEFLAG(huart);
     HAL_UART_DMAStop(huart);
 
-    if (huart->Instance == huart1.Instance) {
-        temp                    = huart1.hdmarx->Instance->CNDTR;
+    if (huart->Instance == huart3.Instance) {
+        temp                    = huart3.hdmarx->Instance->CNDTR;
         g_usartType.rxLength    = RECEIVE_LENGTH - temp;
         g_usartType.receiveFlag = 1;
-        HAL_UART_Receive_DMA(&huart1, g_usartType.buffer, sizeof(g_usartType.buffer));
-        (void)WIFI_TaskSendBuffer(g_usartType.buffer);
+        HAL_UART_Receive_DMA(&huart3, g_usartType.buffer, sizeof(g_usartType.buffer));
+        (void)GPS_TaskSendBuffer(g_usartType.buffer);
         memset(&g_usartType.buffer, 0, sizeof(g_usartType.buffer));
     }
 }
 
-void WIFI_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+void GPS_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     __HAL_DMA_DISABLE(huart->hdmatx);
-    if (huart->Instance == huart1.Instance) {
+    if (huart->Instance == huart3.Instance) {
         g_usartType.sendFlag = USART_DMA_SENDOVER;
     }
 }
 
-void WIFI_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+void GPS_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 }
 
@@ -67,7 +67,7 @@ static int inHandlerMode (void)
     return __get_IPSR() != 0;
 }
 
-void PrintUsart1(char *format, ...)
+void PrintUsart3(char *format, ...)
 {
     char buf[SEND_LENGTH];
     int length;
@@ -75,7 +75,7 @@ void PrintUsart1(char *format, ...)
     if (inHandlerMode() != 0) {
         taskDISABLE_INTERRUPTS();
     } else {
-        while (HAL_UART_GetState(&huart1) == HAL_UART_STATE_BUSY_TX) {
+        while (HAL_UART_GetState(&huart3) == HAL_UART_STATE_BUSY_TX) {
             osThreadYield();
         }
     }
@@ -84,7 +84,7 @@ void PrintUsart1(char *format, ...)
     va_start(ap, format);
     length = vsprintf(buf, format, ap);
     if (length > 0) {
-        HAL_UART_Transmit(&huart1, (uint8_t *)buf, length, 1000);
+        HAL_UART_Transmit(&huart3, (uint8_t *)buf, length, 1000);
     }
     va_end(ap);
 
@@ -95,15 +95,15 @@ void PrintUsart1(char *format, ...)
 
 #else
 
-void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
+void GPS_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
 {
     (void)huart;
 }
-void WIFI_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+void GPS_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     (void)huart;
 }
-void WIFI_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+void GPS_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     (void)huart;
 }

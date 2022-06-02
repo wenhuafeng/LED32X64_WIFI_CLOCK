@@ -11,22 +11,19 @@
 
 time_t g_timestamp;
 
-struct TimeType TimestampConvertTime(time_t timestamp)
+void TimestampConvertTime(time_t timestamp, struct TimeType *time)
 {
-    struct TimeType time;
     struct tm *t;
 
     timestamp += TIME_STAMP_OFFSET;
     t = localtime(&timestamp);
 
-    time.year   = t->tm_year + TIME_STAMP_START_YEAR;
-    time.month  = t->tm_mon + 1;
-    time.day    = t->tm_mday;
-    time.hour   = t->tm_hour;
-    time.minute = t->tm_min;
-    time.second = t->tm_sec;
-
-    return time;
+    time->year   = t->tm_year + TIME_STAMP_START_YEAR;
+    time->month  = t->tm_mon + 1;
+    time->day    = t->tm_mday;
+    time->hour   = t->tm_hour;
+    time->minute = t->tm_min;
+    time->second = t->tm_sec;
 }
 
 void TimeConvertTimestamp(struct TimeType *time)

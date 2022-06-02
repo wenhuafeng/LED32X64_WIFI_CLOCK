@@ -9,6 +9,7 @@
 #include "display_scan_task.h"
 #include "temp_humi_task.h"
 #include "wifi_task.h"
+#include "gps_task.h"
 #include "trace.h"
 
 #define LOG_TAG          "display_task"
@@ -57,6 +58,7 @@ static void DISP_Task(void *argument)
                 HAL_TIM_Base_MspDeInit(&htim4);
                 HUB75D_Disp(&hub75d.displayCount, DISP_TIME_OFF);
                 WIFI_TaskSuspend();
+                GPS_TaskSuspend();
                 TH_TaskSuspend();
                 DISP_ScanTaskSuspend();
             }
@@ -70,6 +72,7 @@ static void DISP_Task(void *argument)
         }
         if ((event & DISP_TASK_EVENT_GET_TIME_DATA) == DISP_TASK_EVENT_GET_TIME_DATA) {
             WIFI_TaskGetTimeData(&time);
+            GPS_TaskGetTimeData(&time);
             GetLunarCalendar(&hub75d.lunarCalendar, &time);
         }
         if ((event & DISP_TASK_EVENT_DISP_ON) == DISP_TASK_EVENT_DISP_ON) {
@@ -87,6 +90,7 @@ static void DISP_Task(void *argument)
             LOGI(LOG_TAG, "pir interrupt, renew set display 5 minute\r\n");
             if (hub75d.displayCount == DISP_TIME_OFF) {
                 WIFI_TaskResume();
+                GPS_TaskResume();
                 TH_TaskResume();
                 DISP_ScanTaskResume();
                 DISP_TaskSetEvent(DISP_TASK_EVENT_DISP_ON);

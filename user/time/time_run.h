@@ -14,6 +14,7 @@ struct TimeType {
     uint16_t year;
 };
 
+void CalculateWeek(struct TimeType *time);
 bool ClockRun(struct TimeType *time);
 void GetClock(struct TimeType *time);
 void SetClock(struct TimeType *time);

@@ -30,6 +30,7 @@
 #include "display_scan_task.h"
 #include "temp_humi_task.h"
 #include "wifi_task.h"
+#include "gps_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -110,6 +111,9 @@ void MX_FREERTOS_Init(void) {
     return;
   }
   if (WIFI_TaskInit() != osOK) {
+    return;
+  }
+  if (GPS_TaskInit() != osOK) {
     return;
   }
   /* USER CODE END RTOS_THREADS */

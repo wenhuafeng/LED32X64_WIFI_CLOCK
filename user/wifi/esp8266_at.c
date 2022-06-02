@@ -1,3 +1,5 @@
+#include "main.h"
+#if defined(WIFI_GET_TIME) && WIFI_GET_TIME
 #include "esp8266_at.h"
 #include <stdio.h>
 #include <string.h>
@@ -324,3 +326,5 @@ enum WifiReceiveInfo WIFI_ReceiveProcess(struct Esp8266GetTimeType *wifi, uint8_
 
     return (wifi->rxInfoCtr);
 }
+
+#endif

@@ -1,3 +1,5 @@
+#include "main.h"
+#if defined(WIFI_GET_TIME) && WIFI_GET_TIME
 #include "wifi_task.h"
 #include <string.h>
 #include "cmsis_os2.h"
@@ -10,7 +12,12 @@
 
 #define LOG_TAG "wifi_task"
 
-#define WIFI_TASK_EVENT_ALL (0x00ffffff)
+#define WIFI_TASK_EVENT_ALL           (0x00ffffff)
+#define WIFI_TASK_EVENT_POWER_ON      (1 << 0)
+#define WIFI_TASK_EVENT_SEND_CMD      (1 << 1)
+#define WIFI_TASK_EVENT_GET_TIME_DATA (1 << 2)
+
+#define WIFI_TASK_SEND_CMD_TIME (1000)
 
 #define WIFI_TASK_SEND_MSG_MAX     1
 #define WIFI_TASK_SEND_MSG_SIZE    (sizeof(struct TimeType))
@@ -57,6 +64,11 @@ static void WIFI_Task(void *argument)
         }
         if ((event & WIFI_TASK_EVENT_GET_TIME_DATA) == WIFI_TASK_EVENT_GET_TIME_DATA) {
             buffer = pvPortMalloc(WIFI_TASK_RECEIVE_MSG_SIZE);
+            if (buffer == NULL) {
+                LOGI(LOG_TAG, "malloc error!\r\n");
+                vPortFree(buffer);
+                continue;
+            }
             osMessageQueueGet(g_wifiReceiveMsgId, buffer, NULL, 0);
             osMessageQueueReset(g_wifiReceiveMsgId);
             info = WIFI_ReceiveProcess(&wifi, buffer);
@@ -73,7 +85,7 @@ static void WIFI_Task(void *argument)
             memset(&wifi, 0, sizeof(struct Esp8266GetTimeType));
             WIFI_ReceiveDmaInit();
             WIFI_Power(&wifi, WIFI_POWER_ON);
-            ret = osTimerStart(g_wifiTimerId, 1000);
+            ret = osTimerStart(g_wifiTimerId, WIFI_TASK_SEND_CMD_TIME);
             if (ret != osOK) {
                 LOGE(LOG_TAG, "timer start error!, ret: %d\r\n", ret);
             }
@@ -165,3 +177,32 @@ void WIFI_TaskResume(void)
         WIFI_TaskSetEvent(WIFI_TASK_EVENT_POWER_ON);
     }
 }
+
+#else
+
+#include "cmsis_os2.h"
+#include "FreeRTOS.h"
+#include "time_run.h"
+
+osStatus_t WIFI_TaskInit(void)
+{
+    return osOK;
+}
+osStatus_t WIFI_TaskGetTimeData(struct TimeType *time)
+{
+    (void)time;
+    return osOK;
+}
+osStatus_t WIFI_TaskSendBuffer(uint8_t *buffer)
+{
+    (void)buffer;
+    return osOK;
+}
+void WIFI_TaskSetEvent(uint32_t event)
+{
+    (void)event;
+}
+void WIFI_TaskSuspend(void) {}
+void WIFI_TaskResume(void) {}
+
+#endif
