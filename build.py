@@ -63,7 +63,6 @@ def jlink_run(loadfile):
 
     exec_cmd = "%s -device %s -if %s -speed %s -CommanderScript %s" % (jlink_exe, device, interface, speed, jlink_cmdfile)
     print("execute cmd: %s" % exec_cmd)
-
     subprocess.call(exec_cmd, shell=True)
 
 def cp_build_file(source, target):
