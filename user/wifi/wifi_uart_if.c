@@ -34,6 +34,10 @@ void WIFI_UART_ReceiveIDLE(UART_HandleTypeDef *huart)
 {
     uint32_t temp;
 
+    if (huart == NULL) {
+        return;
+    }
+
     if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) == RESET) {
         return;
     }
