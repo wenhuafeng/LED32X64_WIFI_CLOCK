@@ -350,6 +350,10 @@ void HUB75D_GetScanRgb(struct Hub75dType *hub75d)
 {
     uint8_t count;
 
+    if (hub75d == NULL) {
+        return;
+    }
+
     memset(&hub75d->rgb, 0, sizeof(struct RgbType));
     for (count = 0; count < SCAN_ALL_LINE; count++) {
         DispTime(hub75d, count);
@@ -367,6 +371,10 @@ void HUB75D_DispScan(struct RgbType *rgb)
     static uint8_t index = 0;
     PinFlags flags       = { 0 };
     uint8_t move;
+
+    if (rgb == NULL) {
+        return;
+    }
 
     HUB_LAT = 0;
     for (uint8_t i = 0; i < 8; i++) {
@@ -432,6 +440,10 @@ void HUB75D_DispScan(struct RgbType *rgb)
 
 void HUB75D_GetCalendar(struct CalendarDecimal *calendar, struct TimeType *time)
 {
+    if (calendar == NULL || time == NULL) {
+        return;
+    }
+
     calendar->hourL  = time->hour % 10;
     calendar->hourH  = time->hour / 10;
     calendar->minL   = time->minute % 10;
@@ -450,6 +462,10 @@ void HUB75D_GetCalendar(struct CalendarDecimal *calendar, struct TimeType *time)
 
 void HUB75D_Disp(uint16_t *count, enum DispTime time)
 {
+    if (count == NULL) {
+        return;
+    }
+
     *count = time;
     if (time == DISP_TIME_OFF) {
         HUB75D_DISP_POWER_PIN = DISP_OFF;
@@ -480,6 +496,10 @@ bool HUB75D_CtrDec(struct Hub75dType *hub75d)
 {
     bool ret                 = false;
     static uint8_t changeCtr = 0;
+
+    if (hub75d == NULL) {
+        return false;
+    }
 
     changeCtr++;
     if (changeCtr > TEMP_HUMI_DISP_TIME) {
