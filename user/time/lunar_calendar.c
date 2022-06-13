@@ -1,6 +1,7 @@
 #include "lunar_calendar.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define YEAR_TABLE_NUM 199
 
@@ -38,6 +39,14 @@ bool GetLunarCalendar(struct LunarCalendarType *lcData, struct TimeType *time)
     uint16_t year = time->year;
     uint8_t month = time->month;
     uint8_t day   = time->day;
+
+    if (lcData == NULL || time == NULL) {
+        return false;
+    }
+
+    year = time->year;
+    month = time->month;
+    day   = time->day;
 
     if (((g_lunarCalendarTable[year - 1901] & 0x0060) >> 5) == 1) {
         springToNY = (g_lunarCalendarTable[year - 1901] & 0x001F) - 1;
