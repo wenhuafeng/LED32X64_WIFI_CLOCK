@@ -15,6 +15,10 @@ void TimestampConvertTime(time_t timestamp, struct TimeType *time)
 {
     struct tm *t;
 
+    if (time == NULL) {
+        return;
+    }
+
     timestamp += TIME_STAMP_OFFSET;
     t = localtime(&timestamp);
 
@@ -29,6 +33,10 @@ void TimestampConvertTime(time_t timestamp, struct TimeType *time)
 void TimeConvertTimestamp(struct TimeType *time)
 {
     struct tm t;
+
+    if (time == NULL) {
+        return;
+    }
 
     t.tm_year   = time->year - TIME_STAMP_START_YEAR;
     t.tm_mon    = time->month - 1;
@@ -51,6 +59,7 @@ void TimestampAdd(void)
 
 void TimeConvertTimestamp(struct TimeType *time)
 {
+    (void)time;
 }
 void TimestampAdd(void)
 {
