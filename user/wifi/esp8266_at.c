@@ -268,6 +268,10 @@ static const struct WifiRxType g_wifiRxHandlerTable[] = {
 
 void WIFI_Power(struct Esp8266GetTimeType *wifi, enum PowerFlag flag)
 {
+    if (wifi == NULL) {
+        return;
+    }
+
     if (flag == WIFI_POWER_ON) {
         memset(wifi, 0, sizeof(struct Esp8266GetTimeType));
         WIFI_CH_PD             = 1;
@@ -284,6 +288,10 @@ void WIFI_Power(struct Esp8266GetTimeType *wifi, enum PowerFlag flag)
 
 void WIFI_SendCommand(struct Esp8266GetTimeType *wifi)
 {
+    if (wifi == NULL) {
+        return;
+    }
+
     if (WIFI_Init(wifi) == false) {
         return;
     }
@@ -315,6 +323,10 @@ enum WifiReceiveInfo WIFI_ReceiveProcess(struct Esp8266GetTimeType *wifi, uint8_
 {
     enum WifiReceiveInfo info;
     char *strPosition;
+
+    if (wifi == NULL || buf == NULL) {
+        return WIFI_DISCONNECT;
+    }
 
     for (info = WIFI_DISCONNECT; info < sizeof(g_wifiRxHandlerTable) / sizeof(g_wifiRxHandlerTable[0]); info++) {
         strPosition = strstr((char *)buf, g_wifiRxHandlerTable[info].str);
