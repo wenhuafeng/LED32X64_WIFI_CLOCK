@@ -32,6 +32,10 @@ void CalculateWeek(struct TimeType *time)
     int8_t monthTemp = 0;
     int8_t wk;
 
+    if (time == NULL) {
+        return;
+    }
+
     if (time->month < 3) {
         monthTemp = time->month + 12;
         yearTemp  = time->year - 1;
@@ -52,6 +56,10 @@ void CalculateWeek(struct TimeType *time)
 
 bool ClockRun(struct TimeType *time)
 {
+    if (time == NULL) {
+        return false;
+    }
+
     time->second++;
     if (time->second < 60) {
         return false;
@@ -95,6 +103,10 @@ void GetClock(struct TimeType *time)
     RTC_TimeTypeDef sTime;
     RTC_DateTypeDef sDate;
 
+    if (time == NULL) {
+        return;
+    }
+
     HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
@@ -114,6 +126,10 @@ void SetClock(struct TimeType *time)
 {
     RTC_TimeTypeDef sTime;
     RTC_DateTypeDef sDate;
+
+    if (time == NULL) {
+        return;
+    }
 
     sTime.Seconds = time->second;
     sTime.Minutes = time->minute;
