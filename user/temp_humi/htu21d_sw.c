@@ -152,6 +152,10 @@ bool HTU21D_GetData(struct Htu21dDataType *th)
     uint8_t read[3];
     bool status;
 
+    if (th == NULL) {
+        return false;
+    }
+
     I2C_Start();
     status = I2C_WriteByte(DEVICE_ADDR | WRITE);
     if (status == false) {

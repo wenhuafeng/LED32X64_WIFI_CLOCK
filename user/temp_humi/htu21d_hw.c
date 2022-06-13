@@ -131,6 +131,10 @@ bool HTU21D_GetData(struct Htu21dDataType *th)
     uint8_t read[3];
     HAL_StatusTypeDef status;
 
+    if (th == NULL) {
+        return false;
+    }
+
     write[0] = HUMI_NO_HOLD;
     status   = HAL_I2C_Master_Transmit(&hi2c1, DEVICE_WRITE_ADDR, write, 1, 100);
     if (status != HAL_OK) {
