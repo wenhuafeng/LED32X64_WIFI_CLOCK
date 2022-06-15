@@ -24,7 +24,7 @@ stlink_config_file = "user/openocd/stlink.cfg"
 chip_config_file = "user/openocd/stm32f1x.cfg"
 program_cmd = "\"program user/output/CLOCK_STM32F103C8T6_WIFI.bin 0x8000000\""
 
-def openocd_run():
+def stlink_download():
     host_os = platform.system()
     print("host os: %s" % host_os)
 
@@ -67,7 +67,7 @@ def gen_jlink_cmdfile(loadfile):
         print(IOError)  # will print something like "option -a not recognized"
         sys.exit(2)
 
-def jlink_run(loadfile):
+def jlink_download(loadfile):
     global device, interface, speed, jlink_cmdfile
 
     host_os = platform.system()
@@ -121,9 +121,9 @@ def main_func(parameter):
     elif parameter == 'mdk':
         mdk_build()
     elif parameter == 'jlink':
-        jlink_run(jlink_loadfile)
+        jlink_download(jlink_loadfile)
     elif parameter == 'stlink':
-        openocd_run()
+        stlink_download()
     else:
         print("input parameter error!")
 
