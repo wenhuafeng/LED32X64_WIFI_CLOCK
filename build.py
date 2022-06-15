@@ -18,6 +18,29 @@ mdk_source_file_hex = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI
 mdk_source_file_bin = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.bin'
 target_path = 'user/output'
 
+
+# openocd define
+stlink_config_file = "user/openocd/stlink.cfg"
+chip_config_file = "user/openocd/stm32f1x.cfg"
+program_cmd = "\"program user/output/CLOCK_STM32F103C8T6_WIFI.bin 0x8000000\""
+
+def openocd_run():
+    host_os = platform.system()
+    print("host os: %s" % host_os)
+
+    if host_os == 'Windows':
+        openocd_exe = "openocd.exe"
+    elif host_os == 'Linux':
+        openocd_exe = "openocd"
+    else:
+        print("unsupport platform")
+        sys.exit(2)
+
+    exec_cmd = "%s -f %s -f %s -c init -c halt -c %s -c reset -c shutdown\n" % \
+               (openocd_exe, stlink_config_file, chip_config_file, program_cmd)
+    print("execute cmd: %s" % exec_cmd)
+    subprocess.call(exec_cmd, shell=True)
+
 # JLink define
 jlink_loadfile = 'user/output/CLOCK_STM32F103C8T6_WIFI.hex'
 device = "STM32F103C8"
@@ -61,7 +84,8 @@ def jlink_run(loadfile):
         print("unsupport platform")
         sys.exit(2)
 
-    exec_cmd = "%s -device %s -if %s -speed %s -CommanderScript %s" % (jlink_exe, device, interface, speed, jlink_cmdfile)
+    exec_cmd = "%s -device %s -if %s -speed %s -CommanderScript %s" % \
+               (jlink_exe, device, interface, speed, jlink_cmdfile)
     print("execute cmd: %s" % exec_cmd)
     subprocess.call(exec_cmd, shell=True)
 
@@ -96,8 +120,10 @@ def main_func(parameter):
         gcc_build()
     elif parameter == 'mdk':
         mdk_build()
-    elif parameter == 'download':
+    elif parameter == 'jlink':
         jlink_run(jlink_loadfile)
+    elif parameter == 'stlink':
+        openocd_run()
     else:
         print("input parameter error!")
 
