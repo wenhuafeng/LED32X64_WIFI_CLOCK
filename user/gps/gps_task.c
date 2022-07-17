@@ -39,7 +39,7 @@ enum {
 
 #define GPS_TASK_NAME       "gpsTask"
 #define GPS_TASK_STACK_SIZE (128 * 11)
-#define GPS_TASK_PRIORITY   (osPriority_t) osPriorityNormal1
+#define GPS_TASK_PRIORITY   (osPriority_t) osPriorityNormal2
 
 const osThreadAttr_t g_gpsTaskAttributes = {
     .name       = GPS_TASK_NAME,

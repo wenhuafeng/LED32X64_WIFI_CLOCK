@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Drivers/CMSIS/RTOS2/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../user/common;../user/display;../user/gps;../user/temp_humi;../user/time;../user/trace;../user/wifi</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Drivers/CMSIS/RTOS2/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../user/common;../user/display;../user/gps;../user/oled;../user/temp_humi;../user/time;../user/trace;../user/wifi</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1317,6 +1317,26 @@
               <FileName>minmea.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\gps\minmea.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>user/oled</GroupName>
+          <Files>
+            <File>
+              <FileName>fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\oled\fonts.c</FilePath>
+            </File>
+            <File>
+              <FileName>oled_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\oled\oled_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>ssd1306.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\oled\ssd1306.c</FilePath>
             </File>
           </Files>
         </Group>

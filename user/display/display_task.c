@@ -10,6 +10,7 @@
 #include "temp_humi_task.h"
 #include "wifi_task.h"
 #include "gps_task.h"
+#include "oled_task.h"
 #include "trace.h"
 
 #define LOG_TAG          "display_task"
@@ -18,11 +19,14 @@
 #define DISP_TASK_SCAN_MSG_MAX  1
 #define DISP_TASK_SCAN_MSG_SIZE (sizeof(struct RgbType))
 
+#define DISP_TASK_OLED_MSG_MAX  1
+#define DISP_TASK_OLED_MSG_SIZE (sizeof(struct OledType))
+
 #define DISP_TASK_EVENT_ALL (0x00ffffff)
 
 #define DISP_TASK_NAME       "dispTask"
-#define DISP_TASK_STACK_SIZE (128 * 20)
-#define DISP_TASK_PRIORITY   (osPriority_t) osPriorityNormal6
+#define DISP_TASK_STACK_SIZE (128 * 22)
+#define DISP_TASK_PRIORITY   (osPriority_t) osPriorityNormal7
 
 const osThreadAttr_t g_dispTaskAttributes = {
     .name       = DISP_TASK_NAME,
@@ -32,6 +36,7 @@ const osThreadAttr_t g_dispTaskAttributes = {
 
 static osEventFlagsId_t g_dispEvent       = NULL;
 static osMessageQueueId_t g_dispScanMsgId = NULL;
+static osMessageQueueId_t g_oledMsgId     = NULL;
 static osThreadId_t g_dispTaskId          = NULL;
 
 static void DISP_Task(void *argument)
@@ -39,6 +44,7 @@ static void DISP_Task(void *argument)
     uint32_t event;
     struct Hub75dType hub75d;
     struct TimeType time;
+    struct OledType oled;
 
     LOGI(LOG_TAG, "display task enter\r\n");
     LOGI(LOG_TAG, "%s, %s, %s\r\n", SOFTWARE_VERSION, __TIME__, __DATE__);
@@ -51,8 +57,10 @@ static void DISP_Task(void *argument)
         if ((event & DISP_TASK_EVENT_GET_SCAN_RGB) == DISP_TASK_EVENT_GET_SCAN_RGB) {
             if (ClockRun(&time) == true) {
                 GetLunarCalendar(&hub75d.lunarCalendar, &time);
+                memcpy(&oled.lunarCalendar, &hub75d.lunarCalendar, sizeof(struct LunarCalendarType));
             }
             HUB75D_GetCalendar(&hub75d.calendarDecimal, &time);
+            memcpy(&oled.calendarDecimal, &hub75d.calendarDecimal, sizeof(struct CalendarDecimal));
             if (HUB75D_CtrDec(&hub75d) == true) {
                 HAL_TIM_Base_Stop_IT(&htim4);
                 HAL_TIM_Base_MspDeInit(&htim4);
@@ -61,14 +69,19 @@ static void DISP_Task(void *argument)
                 GPS_TaskSuspend();
                 TH_TaskSuspend();
                 DISP_ScanTaskSuspend();
+                OLED_TaskSuspend();
             }
             HUB75D_GetScanRgb(&hub75d);
             if (osMessageQueuePut(g_dispScanMsgId, &hub75d.rgb, 0, 0) == osOK) {
                 DISP_ScanTaskSetEvent(DISP_SCAN_TASK_EVENT_RECEIVED_NEW_DATA);
             }
+            if (osMessageQueuePut(g_oledMsgId, &oled, 0, 0) == osOK) {
+                OLED_TaskSetEvent(DISP_OLED_TASK_EVENT_RECEIVED_NEW_DATA);
+            }
         }
         if ((event & DISP_TASK_EVENT_GET_TH_DATA) == DISP_TASK_EVENT_GET_TH_DATA) {
             TH_TaskGetThData(&hub75d.tempHumi);
+            memcpy(&oled.tempHumi, &hub75d.tempHumi, sizeof(struct Htu21dDataType));
         }
         if ((event & DISP_TASK_EVENT_GET_TIME_DATA) == DISP_TASK_EVENT_GET_TIME_DATA) {
             WIFI_TaskGetTimeData(&time);
@@ -93,6 +106,7 @@ static void DISP_Task(void *argument)
                 GPS_TaskResume();
                 TH_TaskResume();
                 DISP_ScanTaskResume();
+                OLED_TaskResume();
                 DISP_TaskSetEvent(DISP_TASK_EVENT_DISP_ON);
                 HUB75D_GetCalendar(&hub75d.calendarDecimal, &time);
                 HUB75D_GetScanRgb(&hub75d);
@@ -122,6 +136,11 @@ osStatus_t DISP_TaskInit(void)
         return osError;
     }
 
+    g_oledMsgId = osMessageQueueNew(DISP_TASK_OLED_MSG_MAX, DISP_TASK_OLED_MSG_SIZE, NULL);
+    if (g_oledMsgId == NULL) {
+        return osError;
+    }
+
     g_dispTaskId = osThreadNew(DISP_Task, NULL, &g_dispTaskAttributes);
     if (g_dispTaskId == NULL) {
         return osError;
@@ -143,3 +162,13 @@ osStatus_t DISP_TaskGetDispScanData(struct RgbType *scanRgb)
 
     return status;
 }
+
+osStatus_t DISP_TaskGetOledData(struct OledType *oled)
+{
+    osStatus_t status;
+
+    status = osMessageQueueGet(g_oledMsgId, oled, NULL, 0);
+
+    return status;
+}
+

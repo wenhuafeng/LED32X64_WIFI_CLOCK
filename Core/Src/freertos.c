@@ -31,6 +31,7 @@
 #include "temp_humi_task.h"
 #include "wifi_task.h"
 #include "gps_task.h"
+#include "oled_task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,6 +106,9 @@ void MX_FREERTOS_Init(void) {
     return;
   }
   if (DISP_ScanTaskInit() != osOK) {
+    return;
+  }
+  if (OLED_TaskInit() != osOK) {
     return;
   }
   if (TH_TaskInit() != osOK) {

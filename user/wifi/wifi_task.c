@@ -26,7 +26,7 @@
 
 #define WIFI_TASK_NAME       "wifiTask"
 #define WIFI_TASK_STACK_SIZE (128 * 8)
-#define WIFI_TASK_PRIORITY   (osPriority_t) osPriorityNormal
+#define WIFI_TASK_PRIORITY   (osPriority_t) osPriorityNormal4
 
 const osThreadAttr_t g_wifiTaskAttributes = {
     .name       = WIFI_TASK_NAME,

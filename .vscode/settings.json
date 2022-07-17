@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.c": "c",
         "wifi_uart_if.h": "c",
         "type_define.h": "c",
         "main.h": "c",
@@ -24,6 +25,7 @@
         "time_run.h": "c",
         "freertosconfig.h": "c",
         "common.h": "c",
-        "temp_humi_task.h": "c"
+        "temp_humi_task.h": "c",
+        "ssd1306.h": "c"
     }
 }

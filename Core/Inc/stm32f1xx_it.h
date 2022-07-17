@@ -70,8 +70,6 @@ void UsageFault_Handler(void);
 void DebugMon_Handler(void);
 void RTC_IRQHandler(void);
 void EXTI0_IRQHandler(void);
-void DMA1_Channel2_IRQHandler(void);
-void DMA1_Channel3_IRQHandler(void);
 void DMA1_Channel4_IRQHandler(void);
 void DMA1_Channel5_IRQHandler(void);
 void DMA1_Channel6_IRQHandler(void);
@@ -80,7 +78,6 @@ void TIM1_UP_IRQHandler(void);
 void TIM4_IRQHandler(void);
 void USART1_IRQHandler(void);
 void USART2_IRQHandler(void);
-void USART3_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

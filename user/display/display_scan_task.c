@@ -12,7 +12,7 @@
 
 #define DISP_TASK_NAME       "dispScanTask"
 #define DISP_TASK_STACK_SIZE (128 * 16)
-#define DISP_TASK_PRIORITY   (osPriority_t) osPriorityNormal7
+#define DISP_TASK_PRIORITY   (osPriority_t) osPriorityNormal6
 
 const osThreadAttr_t g_dispScanTaskAttributes = {
     .name       = DISP_TASK_NAME,

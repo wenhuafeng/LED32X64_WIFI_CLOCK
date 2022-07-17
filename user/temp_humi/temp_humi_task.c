@@ -18,7 +18,7 @@
 
 #define TH_TASK_NAME       "thTask"
 #define TH_TASK_STACK_SIZE (128 * 8)
-#define TH_TASK_PRIORITY   (osPriority_t) osPriorityNormal
+#define TH_TASK_PRIORITY   (osPriority_t) osPriorityNormal3
 
 const osThreadAttr_t g_thTaskAttributes = {
     .name       = TH_TASK_NAME,
