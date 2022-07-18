@@ -32,13 +32,13 @@ static osThreadId_t g_oledTaskId    = NULL;
 
 static void OLED_Task(void *argument)
 {
-    bool ssd1306Init = false;
+    bool init = false;
     uint32_t event;
     struct OledType oled;
 
     LOGI(LOG_TAG, "oled task enter!\r\n");
-    ssd1306Init = SSD1306_Init();
-    if (ssd1306Init == false) {
+    init = SSD1306_Init();
+    if (init == false) {
         LOGE(LOG_TAG, "SSD1306 init error!\r\n");
     }
 
@@ -49,8 +49,8 @@ static void OLED_Task(void *argument)
             if (DISP_TaskGetOledData(&oled) != osOK) {
                 LOGI(LOG_TAG, "Get oled data error!\r\n");
             }
-            if (ssd1306Init == true) {
-                SSD1306_GotoXY (0,0);
+            if (init == true) {
+                SSD1306_GotoXY (0, 0);
                 SSD1306_Puts("Hello!", &Font_7x10, SSD1306_COLOR_WHITE);
                 SSD1306_UpdateScreen();
             }
