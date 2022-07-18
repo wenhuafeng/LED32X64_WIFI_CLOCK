@@ -65,7 +65,8 @@ static void OLED_Task(void *argument)
                 SSD1306_Puts(data, &Font_11x18, SSD1306_COLOR_WHITE);
 
                 SSD1306_GotoXY(4, 42);
-                sprintf(data, "%.1fC %.1f%%", ((float)oled.tempHumi.temperature / 10), ((float)oled.tempHumi.humidity / 10));
+                sprintf(data, "%d.%01dC %d.%01d%%", oled.tempHumi.temperature / 10, oled.tempHumi.temperature % 10,
+                        oled.tempHumi.humidity / 10, oled.tempHumi.humidity % 10);
                 SSD1306_Puts(data, &Font_11x18, SSD1306_COLOR_WHITE);
 
                 SSD1306_UpdateScreen();
