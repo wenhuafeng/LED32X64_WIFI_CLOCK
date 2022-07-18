@@ -46,21 +46,7 @@ enum Ssd1306ColorType {
     SSD1306_COLOR_WHITE = 0x01  /*!< Pixel is set. Color depends on LCD */
 };
 
-/**
- * @brief  Initializes SSD1306 LCD
- * @param  None
- * @retval Initialization status:
- *           - 0: LCD was not detected on I2C port
- *           - > 0: LCD initialized OK and ready to use
- */
 bool SSD1306_Init(void);
-
-/**
- * @brief  Updates buffer from internal RAM to LCD
- * @note   This function must be called each time you do some changes to LCD, to update buffer from RAM to LCD
- * @param  None
- * @retval None
- */
 void SSD1306_UpdateScreen(void);
 
 /**
@@ -97,7 +83,7 @@ void SSD1306_GotoXY(uint16_t x, uint16_t y);
  * @param  color: Color used for drawing. This parameter can be a value of @ref enum Ssd1306ColorType enumeration
  * @retval Character written
  */
-char SSD1306_Putc(char ch, struct FontDefineType* Font, enum Ssd1306ColorType color);
+char SSD1306_Putc(char ch, struct FontDefineType* font, enum Ssd1306ColorType color);
 
 /**
  * @brief  Puts string to internal RAM
@@ -107,7 +93,7 @@ char SSD1306_Putc(char ch, struct FontDefineType* Font, enum Ssd1306ColorType co
  * @param  color: Color used for drawing. This parameter can be a value of @ref enum Ssd1306ColorType enumeration
  * @retval Zero on success or character value when function failed
  */
-char SSD1306_Puts(char* str, struct FontDefineType* Font, enum Ssd1306ColorType color);
+char SSD1306_Puts(char* str, struct FontDefineType* font, enum Ssd1306ColorType color);
 
 /**
  * @brief  Draws line on LCD
