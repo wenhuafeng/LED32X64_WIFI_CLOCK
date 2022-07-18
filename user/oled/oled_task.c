@@ -2,6 +2,7 @@
 #if defined(SUPPORT_OLED_DISPLAY) && SUPPORT_OLED_DISPLAY
 #include "oled_task.h"
 #include <stdint.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include "cmsis_os2.h"
 #include "FreeRTOS.h"
@@ -34,6 +35,7 @@ static void OLED_Task(void *argument)
 {
     bool init = false;
     uint32_t event;
+    char data[16];
     struct OledType oled;
 
     LOGI(LOG_TAG, "oled task enter!\r\n");
@@ -50,8 +52,22 @@ static void OLED_Task(void *argument)
                 LOGI(LOG_TAG, "Get oled data error!\r\n");
             }
             if (init == true) {
-                SSD1306_GotoXY (0, 0);
-                SSD1306_Puts("Hello!", &Font_7x10, SSD1306_COLOR_WHITE);
+                SSD1306_GotoXY(2, 0);
+
+                sprintf(data, "%02d:%02d", oled.time.hour, oled.time.minute);
+                SSD1306_Puts(data, &Font_16x26, SSD1306_COLOR_WHITE);
+
+                sprintf(data, ":%02d", oled.time.second);
+                SSD1306_Puts(data, &Font_11x18, SSD1306_COLOR_WHITE);
+
+                SSD1306_GotoXY(4, 24);
+                sprintf(data, "%02d-%02d-%02d", oled.time.day, oled.time.month, oled.time.year);
+                SSD1306_Puts(data, &Font_11x18, SSD1306_COLOR_WHITE);
+
+                SSD1306_GotoXY(4, 42);
+                sprintf(data, "%.1fC %.1f%%", ((float)oled.tempHumi.temperature / 10), ((float)oled.tempHumi.humidity / 10));
+                SSD1306_Puts(data, &Font_11x18, SSD1306_COLOR_WHITE);
+
                 SSD1306_UpdateScreen();
             }
         }
@@ -92,6 +108,7 @@ void OLED_TaskSuspend(void)
     } else {
         LOGI(LOG_TAG, "oled task suspend\r\n");
     }
+    SSD1306_OFF();
 }
 
 void OLED_TaskResume(void)
@@ -104,6 +121,7 @@ void OLED_TaskResume(void)
     } else {
         LOGI(LOG_TAG, "oled task resume\r\n");
     }
+    SSD1306_ON();
 }
 
 #else

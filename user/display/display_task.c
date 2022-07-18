@@ -60,7 +60,7 @@ static void DISP_Task(void *argument)
                 memcpy(&oled.lunarCalendar, &hub75d.lunarCalendar, sizeof(struct LunarCalendarType));
             }
             HUB75D_GetCalendar(&hub75d.calendarDecimal, &time);
-            memcpy(&oled.calendarDecimal, &hub75d.calendarDecimal, sizeof(struct CalendarDecimal));
+            memcpy(&oled.time, &time, sizeof(struct TimeType));
             if (HUB75D_CtrDec(&hub75d) == true) {
                 HAL_TIM_Base_Stop_IT(&htim4);
                 HAL_TIM_Base_MspDeInit(&htim4);

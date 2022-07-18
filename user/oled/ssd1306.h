@@ -209,6 +209,8 @@ void SSD1306_Stopscroll(void);
 // inverts the display i = 1->inverted, i = 0->normal
 void SSD1306_InvertDisplay (int i);
 void SSD1306_Clear (void);
+void SSD1306_ON(void);
+void SSD1306_OFF(void);
 
 /* C++ detection */
 #ifdef __cplusplus
