@@ -126,9 +126,12 @@ void OLED_TaskResume(void)
 
 #else
 
+#include <stdint.h>
+#include "cmsis_os2.h"
+
 osStatus_t OLED_TaskInit(void)
 {
-    return osError;
+    return osOK;
 }
 
 void OLED_TaskSetEvent(uint32_t event)
