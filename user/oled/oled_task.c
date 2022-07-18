@@ -29,7 +29,6 @@ const osThreadAttr_t g_oledTaskAttributes = {
 
 static osEventFlagsId_t g_oledEvent = NULL;
 static osThreadId_t g_oledTaskId    = NULL;
-//static struct OledType g_oled = {0};
 
 static void OLED_Task(void *argument)
 {
@@ -65,8 +64,9 @@ static void OLED_Task(void *argument)
                 SSD1306_Puts(data, &Font_11x18, SSD1306_COLOR_WHITE);
 
                 SSD1306_GotoXY(4, 42);
-                sprintf(data, "%d.%01dC %d.%01d%%", oled.tempHumi.temperature / 10, oled.tempHumi.temperature % 10,
-                        oled.tempHumi.humidity / 10, oled.tempHumi.humidity % 10);
+                sprintf(data, "%d.%01dC %d.%01d%%", (char)(oled.tempHumi.temperature / 10),
+                        (char)(oled.tempHumi.temperature % 10), (char)(oled.tempHumi.humidity / 10),
+                        (char)(oled.tempHumi.humidity % 10));
                 SSD1306_Puts(data, &Font_11x18, SSD1306_COLOR_WHITE);
 
                 SSD1306_UpdateScreen();
@@ -109,7 +109,7 @@ void OLED_TaskSuspend(void)
     } else {
         LOGI(LOG_TAG, "oled task suspend\r\n");
     }
-    SSD1306_OFF();
+    SSD1306_Off();
 }
 
 void OLED_TaskResume(void)
@@ -122,7 +122,7 @@ void OLED_TaskResume(void)
     } else {
         LOGI(LOG_TAG, "oled task resume\r\n");
     }
-    SSD1306_ON();
+    SSD1306_On();
 }
 
 #else

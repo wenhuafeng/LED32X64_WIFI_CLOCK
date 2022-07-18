@@ -11,7 +11,6 @@
 
 struct OledType {
     struct LunarCalendarType lunarCalendar;
-    //struct CalendarDecimal calendarDecimal;
     struct TimeType time;
     struct Htu21dDataType tempHumi;
 };
