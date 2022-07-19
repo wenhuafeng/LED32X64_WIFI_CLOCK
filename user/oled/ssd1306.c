@@ -2,6 +2,7 @@
 #if defined(SUPPORT_OLED_DISPLAY) && SUPPORT_OLED_DISPLAY
 #include "ssd1306.h"
 #include <stdint.h>
+#include <string.h>
 #include <stdbool.h>
 #include "i2c.h"
 #include "trace.h"

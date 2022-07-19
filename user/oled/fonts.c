@@ -1,6 +1,8 @@
 #include "main.h"
 #if defined(SUPPORT_OLED_DISPLAY) && SUPPORT_OLED_DISPLAY
 #include "fonts.h"
+#include <stdint.h>
+#include <string.h>
 
 const uint16_t Font7x10[] = {
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, // sp
