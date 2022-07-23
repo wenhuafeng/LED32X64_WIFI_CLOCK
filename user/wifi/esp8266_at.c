@@ -140,14 +140,13 @@ static bool ProcessClock(struct Esp8266GetTimeType *wifi, char *cRxBuf)
         LOGI(LOG_TAG, "%s snprintf error!\r\n", __LINE__);
         return false;
     }
-    time.month = GetMonth(str);
-
+    time.month  = GetMonth(str);
     time.day    = AscToHex(cRxBuf[DAY_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[DAY_STR_INDEX_LOW]);
     time.hour   = AscToHex(cRxBuf[HOUR_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[HOUR_STR_INDEX_LOW]);
     time.minute = AscToHex(cRxBuf[MIN_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[MIN_STR_INDEX_LOW]);
     time.second = AscToHex(cRxBuf[SEC_STR_INDEX_HIGH]) * 10 + AscToHex(cRxBuf[SEC_STR_INDEX_LOW]);
     time.year   = AscToHex(cRxBuf[YEAR_STR_INDEX_THOUSAND]) * 1000 + AscToHex(cRxBuf[YEAR_STR_INDEX_HUNDRED]) * 100 +
-                AscToHex(cRxBuf[YEAR_STR_INDEX_TEN]) * 10 + AscToHex(cRxBuf[YEAR_STR_INDEX]);
+                  AscToHex(cRxBuf[YEAR_STR_INDEX_TEN]) * 10 + AscToHex(cRxBuf[YEAR_STR_INDEX]);
 
     if (time.year < YEAR_MIN || time.year > YEAR_MAX) {
         return false;
