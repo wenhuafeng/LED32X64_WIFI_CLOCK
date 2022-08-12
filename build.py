@@ -7,7 +7,7 @@ import platform
 import subprocess
 import shutil
 
-# MDK build
+# mdk build
 mdk_build_command = 'D:/Keil_v5/UV4/UV4.exe -j0 -r ./MDK-ARM/CLOCK_STM32F103C8T6_WIFI.uvprojx -o build_log.txt'
 mdk_build_log     = 'cat ./MDK-ARM/build_log.txt'
 
@@ -18,11 +18,18 @@ mdk_source_file_hex = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI
 mdk_source_file_bin = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.bin'
 target_path = 'user/output'
 
-
 # openocd define
 stlink_config_file = "user/openocd/stlink.cfg"
 chip_config_file = "user/openocd/stm32f1x.cfg"
 program_cmd = "\"program user/output/CLOCK_STM32F103C8T6_WIFI.bin 0x8000000\""
+
+# JLink file define
+jlink_loadfile = 'user/output/CLOCK_STM32F103C8T6_WIFI.hex'
+device = "STM32F103C8"
+interface = "SWD"
+speed = "1000"
+address = "0x8000000"
+jlink_cmdfile = ""
 
 def stlink_download():
     host_os = platform.system()
@@ -40,14 +47,6 @@ def stlink_download():
                (openocd_exe, stlink_config_file, chip_config_file, program_cmd)
     print("execute cmd: %s" % exec_cmd)
     subprocess.call(exec_cmd, shell=True)
-
-# JLink define
-jlink_loadfile = 'user/output/CLOCK_STM32F103C8T6_WIFI.hex'
-device = "STM32F103C8"
-interface = "SWD"
-speed = "1000"
-address = "0x8000000"
-jlink_cmdfile = ""
 
 def gen_jlink_cmdfile(loadfile):
     global address, jlink_cmdfile
@@ -107,26 +106,27 @@ def gcc_build():
     cp_build_file(gcc_source_file_bin, target_path)
 
 def mdk_build():
-    print("cc type = MDK")
+    print("cc type = mdk")
     os.system(mdk_build_command)
     os.system(mdk_build_log)
     cp_build_file(mdk_source_file_hex, target_path)
     cp_build_file(mdk_source_file_bin, target_path)
 
-def main_func(parameter):
-    start = datetime.datetime.now()
-
-    if parameter == 'gcc':
+def build_select(para):
+    if para == 'gcc':
         gcc_build()
-    elif parameter == 'mdk':
+    elif para == 'mdk':
         mdk_build()
-    elif parameter == 'jlink':
+    elif para == 'jlink':
         jlink_download(jlink_loadfile)
-    elif parameter == 'stlink':
+    elif para == 'stlink':
         stlink_download()
     else:
         print("input parameter error!")
 
+def main_func(para):
+    start = datetime.datetime.now()
+    build_select(para)
     end = datetime.datetime.now()
     print('run time: %s second' %(end - start))
 

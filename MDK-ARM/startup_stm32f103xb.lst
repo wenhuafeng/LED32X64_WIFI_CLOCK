@@ -464,10 +464,11 @@ ARM Macro Assembler    Page 8
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
 ork --depend=clock_stm32f103c8t6_wifi\startup_stm32f103xb.d -oclock_stm32f103c8
 t6_wifi\startup_stm32f103xb.o -I..\Core\Inc -I.\RTE\_CLOCK_STM32F103C8T6_WIFI -
-ID:\Keil_v5\ARM\PACK\ARM\CMSIS\5.1.1\CMSIS\Include -ID:\Keil_v5\ARM\PACK\Keil\S
-TM32F1xx_DFP\2.3.0\Device\Include --predefine="__MICROLIB SETA 1" --predefine="
-__UVISION_VERSION SETA 524" --predefine="_RTE_ SETA 1" --predefine="STM32F10X_M
-D SETA 1" --list=startup_stm32f103xb.lst startup_stm32f103xb.s
+ID:\Keil_v5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include -ID:\Keil_v5\ARM\PACK\K
+eil\STM32F1xx_DFP\2.3.0\Device\Include --predefine="__MICROLIB SETA 1" --predef
+ine="__UVISION_VERSION SETA 537" --predefine="_RTE_ SETA 1" --predefine="STM32F
+10X_MD SETA 1" --predefine="_RTE_ SETA 1" --list=startup_stm32f103xb.lst startu
+p_stm32f103xb.s
 
 
 
