@@ -7,6 +7,12 @@ import platform
 import subprocess
 import shutil
 
+CHECKSUM_ALL      = 'checksum.exe CLOCK_STM32F103C8T6_WIFI.hex ALL'
+CHECKSUM_CHECKSUM = 'checksum.exe CLOCK_STM32F103C8T6_WIFI.hex CHECKSUM'
+CHECKSUM_CRC16    = 'checksum.exe CLOCK_STM32F103C8T6_WIFI.hex CRC16'
+CHECKSUM_CRC32    = 'checksum.exe CLOCK_STM32F103C8T6_WIFI.hex CRC32'
+CHECKSUM_SHA256   = 'checksum.exe CLOCK_STM32F103C8T6_WIFI.hex SHA256'
+
 # mdk build
 mdk_build_command = 'D:/Keil_v5/UV4/UV4.exe -j0 -r ./MDK-ARM/CLOCK_STM32F103C8T6_WIFI.uvprojx -o build_log.txt'
 mdk_build_log     = 'cat ./MDK-ARM/build_log.txt'
@@ -124,9 +130,24 @@ def build_select(para):
     else:
         print("input parameter error!")
 
+def checksum_hex_file():
+    # 切换目录到
+    os.chdir(target_path)
+
+    # 输出文件需要的信息
+    #os.system(CHECKSUM_ALL)
+    #os.system(CHECKSUM_CHECKSUM)
+    #os.system(CHECKSUM_CRC16)
+    #os.system(CHECKSUM_CRC32)
+    os.system(CHECKSUM_SHA256)
+
 def main_func(para):
     start = datetime.datetime.now()
+
     build_select(para)
+    if para == 'gcc' or 'mdk':
+        checksum_hex_file()
+
     end = datetime.datetime.now()
     print('run time: %s second' %(end - start))
 

@@ -1,0 +1,14 @@
+[Time]2022-08-17 22:44:03 : Info:  [main] argc:3
+[Time]2022-08-17 22:44:03 : Info:  [main] argv[0]:checksum.exe
+[Time]2022-08-17 22:44:03 : Info:  [main] argv[1]:CLOCK_STM32F103C8T6_WIFI.hex
+[Time]2022-08-17 22:44:03 : Info:  [main] argv[2]:SHA256
+[Time]2022-08-17 22:44:03 : Info:  [main] software version and build time: v1.0.1 Aug  3 2022 21:32:15
+[Time]2022-08-17 22:44:03 : Info:  [common] CLOCK_STM32F103C8T6_WIFI.hex modify time: 2022-08-17 22:44:03
+[Time]2022-08-17 22:44:03 : Info:  [common] fseek file: CLOCK_STM32F103C8T6_WIFI.hex fileSize: 180564
+[Time]2022-08-17 22:44:03 : Info:  [common] read file: CLOCK_STM32F103C8T6_WIFI.hex length: 180564
+[Time]2022-08-17 22:44:03 : Info:  [sha256] 
+--------------------------------------------------------------------------------------------------------------
+[Time]2022-08-17 22:44:03 : Info:  [sha256] HASH256_OUTPUT:
+[Time]2022-08-17 22:44:03 : Info:  [sha256] 6987b97fad33c208df62cacb74adddcdf49bd3b863fe5be7e858f6aab5a5db47
+[Time]2022-08-17 22:44:03 : Info:  [sha256] 
+--------------------------------------------------------------------------------------------------------------
