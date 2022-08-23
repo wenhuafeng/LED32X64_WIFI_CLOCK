@@ -1,5 +1,8 @@
-h
-loadfile user/output/CLOCK_STM32F103C8T6_WIFI.hex 0x8000000
-g
+si 1
+speed 4000
+device STM32F103C8T6
 r
-qc
+h
+erase
+loadfile user/output/CLOCK_STM32F103C8T6_WIFI.hex 0x8000000
+q

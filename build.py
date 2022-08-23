@@ -63,11 +63,14 @@ def gen_jlink_cmdfile(loadfile):
 
     try:
         f = open(jlink_cmdfile, 'w')
-        f.write("h\n")
-        f.write("loadfile %s %s\n" % (loadfile, address))
-        f.write("g\n")
+        f.write("si 1\n")
+        f.write("speed 4000\n")
+        f.write("device STM32F103C8T6\n")
         f.write("r\n")
-        f.write("qc")
+        f.write("h\n")
+        f.write("erase\n")
+        f.write("loadfile %s %s\n" % (loadfile, address))
+        f.write("q\n")
     except IOError:
         print(IOError)  # will print something like "option -a not recognized"
         sys.exit(2)
@@ -146,6 +149,7 @@ def main_func(para):
 
     build_select(para)
     if para == 'gcc' or 'mdk':
+        print("\r\n")
         checksum_hex_file()
 
     end = datetime.datetime.now()
