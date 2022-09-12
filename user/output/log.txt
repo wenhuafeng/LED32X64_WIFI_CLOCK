@@ -1,14 +1,14 @@
-[Time]2022-08-23 21:30:53 : Info:  [main] argc:3
-[Time]2022-08-23 21:30:53 : Info:  [main] argv[0]:checksum.exe
-[Time]2022-08-23 21:30:53 : Info:  [main] argv[1]:CLOCK_STM32F103C8T6_WIFI.hex
-[Time]2022-08-23 21:30:53 : Info:  [main] argv[2]:SHA256
-[Time]2022-08-23 21:30:53 : Info:  [main] software version and build time: v1.0.1 Aug  3 2022 21:32:15
-[Time]2022-08-23 21:30:53 : Info:  [common] CLOCK_STM32F103C8T6_WIFI.hex modify time: 2022-08-23 21:30:36
-[Time]2022-08-23 21:30:53 : Info:  [common] fseek file: CLOCK_STM32F103C8T6_WIFI.hex fileSize: 180564
-[Time]2022-08-23 21:30:53 : Info:  [common] read file: CLOCK_STM32F103C8T6_WIFI.hex length: 180564
-[Time]2022-08-23 21:30:53 : Info:  [sha256] 
+[Time]2022-09-13 07:30:15 : Info:  [main] argc:3
+[Time]2022-09-13 07:30:15 : Info:  [main] argv[0]:checksum.exe
+[Time]2022-09-13 07:30:15 : Info:  [main] argv[1]:CLOCK_STM32F103C8T6_WIFI.hex
+[Time]2022-09-13 07:30:15 : Info:  [main] argv[2]:SHA256
+[Time]2022-09-13 07:30:15 : Info:  [main] software version and build time: v1.0.1 Aug  3 2022 21:32:15
+[Time]2022-09-13 07:30:15 : Info:  [common] CLOCK_STM32F103C8T6_WIFI.hex modify time: 2022-09-13 07:30:14
+[Time]2022-09-13 07:30:15 : Info:  [common] fseek file: CLOCK_STM32F103C8T6_WIFI.hex fileSize: 180564
+[Time]2022-09-13 07:30:15 : Info:  [common] read file: CLOCK_STM32F103C8T6_WIFI.hex length: 180564
+[Time]2022-09-13 07:30:15 : Info:  [sha256] 
 --------------------------------------------------------------------------------------------------------------
-[Time]2022-08-23 21:30:53 : Info:  [sha256] HASH256_OUTPUT:
-[Time]2022-08-23 21:30:53 : Info:  [sha256] 83f3aae8a9c49afaa97edf09d92fbc77913953d766b6cc6420c292951c37ea7f
-[Time]2022-08-23 21:30:53 : Info:  [sha256] 
+[Time]2022-09-13 07:30:15 : Info:  [sha256] HASH256_OUTPUT:
+[Time]2022-09-13 07:30:15 : Info:  [sha256] 776f07afab27f9dd28ee4c9aedf5e2a26fc9ab6722e9e9f39b2ac7ddd8df0363
+[Time]2022-09-13 07:30:15 : Info:  [sha256] 
 --------------------------------------------------------------------------------------------------------------
