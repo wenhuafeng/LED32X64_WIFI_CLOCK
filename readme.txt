@@ -7,9 +7,30 @@
 6，可以通过GPS方式更新时间和日期，更新成功关闭GPS模块。（通过宏开关打开此功能）
 
 编译说明：
-1，用MDK，命令行输入“python build.py mdk”开始编译，需要修改build.py内部MDK安装路途。
-2，用GCC，命令行输入“python build.py gcc”开始编译。
+1，进入source目录。
+2，用MDK，命令行输入“python build.py mdk”开始编译，需要修改build.py内部MDK安装路途。
+3，用GCC，命令行输入“python build.py gcc”开始编译。
 
 下载说明：
-1，用JLink，命令行输入“python build.py jlink”，开始下载固件到芯片。
-2，用ST-Link，命令行输入“python build.py stlink”，开始下载固件到芯片。
+1，进入source目录。
+2，用JLink，命令行输入“python build.py jlink”，开始下载固件到芯片。
+3，用ST-Link，命令行输入“python build.py stlink”，开始下载固件到芯片。
+
+
+Function description:
+1. LED32X64 RGB three color LED dot matrix display, HUB75D interface.
+2. STM32F103C8T6 MCU development. RTC runs with low power consumption after the display is turned off (this function is only available for non FreeRTOS versions, and FreeRTOS versions will always run).
+3. Clock, perpetual calendar, week, lunar calendar, temperature and humidity, etc. Display, display brightness can be adjusted.
+4. The human body infrared induction lights up the display function, and no one turns off the display function automatically for 5 minutes (if the infrared module is triggered, the display will restart for 5 minutes).
+5. When it is lit, the time and date are automatically updated through WiFi SNTP, and the WiFi power is turned off after the update. (This function is turned on through the macro switch)
+6. The time and date can be updated through GPS, and the GPS module is closed successfully. (This function is turned on through the macro switch)
+
+Compilation description:
+1. Enter the source directory.
+2. With MDK, enter "python build. py mdk" on the command line to start compiling. You need to modify the internal MDK installation path of build.py.
+3. Use GCC and enter "python build. py gcc" on the command line to start compiling.
+
+Download instructions:
+1. Enter the source directory.
+2. Use JLink and enter "python build. py jlink" on the command line to start downloading firmware to the chip.
+3. Use ST Link and enter "python build. py stlink" on the command line to start downloading firmware to the chip.
