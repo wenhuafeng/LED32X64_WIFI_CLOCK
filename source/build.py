@@ -61,7 +61,7 @@ def gen_jlink_cmdfile(loadfile):
         f = open(jlink_cmdfile, 'w')
         f.write("si 1\n")
         f.write("speed 4000\n")
-        f.write("device STM32F103C8T6\n")
+        f.write("device STM32F103C8\n")
         f.write("r\n")
         f.write("h\n")
         f.write("erase\n")

@@ -1,6 +1,6 @@
 si 1
 speed 4000
-device STM32F103C8T6
+device STM32F103C8
 r
 h
 erase
