@@ -7,7 +7,7 @@ import platform
 import subprocess
 import shutil
 
-CHECKSUM = 'checksum.exe CLOCK_STM32F103C8T6_WIFI.hex CRC32 SHA256'
+CHECKSUM = 'checksum.exe CLOCK_STM32F103C8T6_WIFI.hex CRC32'
 
 # mdk build
 mdk_build_command = 'D:/Keil_v5/UV4/UV4.exe -j0 -r ./MDK-ARM/CLOCK_STM32F103C8T6_WIFI.uvprojx -o build_log.txt'
