@@ -118,11 +118,11 @@ def mdk_build():
     cp_build_file(mdk_source_file_bin, target_path)
 
 def build_select(para):
-    if para == 'gcc':
+    if para == 'g':
         gcc_build()
-    elif para == 'mdk':
+    elif para == 'm':
         mdk_build()
-    elif para == 'jlink':
+    elif para == 'j':
         jlink_download(jlink_loadfile)
     elif para == 'stlink':
         stlink_download()

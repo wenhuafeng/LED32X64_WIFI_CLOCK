@@ -40,7 +40,7 @@ static void OLED_Task(void *argument)
     LOGI(LOG_TAG, "oled task enter!\r\n");
     init = SSD1306_Init();
     if (init == false) {
-        LOGE(LOG_TAG, "SSD1306 init error!\r\n");
+        LOGE(LOG_TAG, "SSD1306 init!\r\n");
     }
 
     while (1) {
