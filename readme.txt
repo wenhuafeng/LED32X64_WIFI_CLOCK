@@ -14,7 +14,7 @@
 下载说明：
 1，进入source目录。
 2，用JLink，命令行输入“python build.py j”，开始下载固件到芯片。
-3，用ST-Link，命令行输入“python build.py stlink”，开始下载固件到芯片。
+3，用ST-Link，需要用到openocd，命令行输入“python build.py stlink”，开始下载固件到芯片。
 
 
 Function description:
@@ -27,10 +27,10 @@ Function description:
 
 Compilation description:
 1. Enter the source directory.
-2. With MDK, enter "python build. py m" on the command line to start compiling. You need to modify the internal MDK installation path of build.py.
-3. Use GCC and enter "python build. py g" on the command line to start compiling.
+2. With MDK, enter "python build.py m" on the command line to start compiling. You need to modify the internal MDK installation path of build.py.
+3. Use GCC and enter "python build.py g" on the command line to start compiling.
 
 Download instructions:
 1. Enter the source directory.
-2. Use JLink and enter "python build. py j" on the command line to start downloading firmware to the chip.
-3. Use ST Link and enter "python build. py stlink" on the command line to start downloading firmware to the chip.
+2. Use JLink and enter "python build.py j" on the command line to start downloading firmware to the chip.
+3. Use Stlink, you need to use openocd and enter "python build.py stlink" on the command line to start downloading firmware to the chip.
