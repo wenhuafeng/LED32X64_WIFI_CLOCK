@@ -1,11 +1,15 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
 import sys
 import os
 import datetime
 import platform
 import subprocess
 import shutil
+
+YES = 'yes'
+NO = 'no'
+build_and_copy_checksum_tool = NO
 
 CHECKSUM = 'checksum.exe CLOCK_STM32F103C8T6_WIFI.hex CRC32'
 
@@ -18,6 +22,7 @@ gcc_source_file_hex = 'build/CLOCK_STM32F103C8T6_WIFI.hex'
 gcc_source_file_bin = 'build/CLOCK_STM32F103C8T6_WIFI.bin'
 mdk_source_file_hex = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.hex'
 mdk_source_file_bin = 'MDK-ARM/CLOCK_STM32F103C8T6_WIFI/CLOCK_STM32F103C8T6_WIFI.bin'
+tool_checksum_exe   = 'user/tools/checksum/output/checksum.exe'
 target_path = 'user/output'
 
 # openocd define
@@ -103,12 +108,21 @@ def cp_build_file(source, target):
     except:
         print("Unexpected error:", sys.exc_info())
 
+def build_checksum():
+    current_dir = os.getcwd()
+    os.chdir("user/tools/checksum")
+    os.system("python build.py")
+    os.chdir(current_dir)
+
 def gcc_build():
     print("cc type = gcc")
     os.system('make clean')
     os.system('make -j8')
     cp_build_file(gcc_source_file_hex, target_path)
     cp_build_file(gcc_source_file_bin, target_path)
+    if (build_and_copy_checksum_tool == YES):
+        build_checksum()
+        cp_build_file(tool_checksum_exe, target_path)
 
 def mdk_build():
     print("cc type = mdk")
@@ -116,6 +130,9 @@ def mdk_build():
     os.system(mdk_build_log)
     cp_build_file(mdk_source_file_hex, target_path)
     cp_build_file(mdk_source_file_bin, target_path)
+    if (build_and_copy_checksum_tool == YES):
+        build_checksum()
+        cp_build_file(tool_checksum_exe, target_path)
 
 def build_select(para):
     if para == 'g':

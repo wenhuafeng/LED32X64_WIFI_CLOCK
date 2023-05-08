@@ -1,4 +1,4 @@
-[Time]2023-04-15 21:27:45 : Info:  [main] version: v1.0.2 Sep 18 2022 13:11:18
-[Time]2023-04-15 21:27:45 : Info:  [common] CLOCK_STM32F103C8T6_WIFI.hex modify time: 2023-04-15 21:27:38
-[Time]2023-04-15 21:27:45 : Info:  [common] CLOCK_STM32F103C8T6_WIFI.hex file size: 154512
-[Time]2023-04-15 21:27:45 : Info:  [crc32] 44dc3fb7
+[Time]2023-05-08 16:57:31 : Info:  [main] version: v1.0.2 May  8 2023 16:57:30
+[Time]2023-05-08 16:57:31 : Info:  [common] CLOCK_STM32F103C8T6_WIFI.hex modify time: 2023-05-08 16:57:26
+[Time]2023-05-08 16:57:31 : Info:  [common] CLOCK_STM32F103C8T6_WIFI.hex file size: 151957
+[Time]2023-05-08 16:57:31 : Info:  [crc32] 92e74719
