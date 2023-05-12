@@ -85,6 +85,8 @@ user/gps/minmea.c \
 user/oled/fonts.c \
 user/oled/oled_task.c \
 user/oled/ssd1306.c \
+user/SEGGER_RTT_V782c/RTT/SEGGER_RTT_printf.c \
+user/SEGGER_RTT_V782c/RTT/SEGGER_RTT.c \
 user/temp_humi/htu21d_hw.c \
 user/temp_humi/htu21d_iic_sw.c \
 user/temp_humi/htu21d_sw.c \
@@ -164,6 +166,8 @@ C_INCLUDES =  \
 -Iuser/display \
 -Iuser/gps \
 -Iuser/oled \
+-Iuser/SEGGER_RTT_V782c/Config \
+-Iuser/SEGGER_RTT_V782c/RTT \
 -Iuser/temp_humi \
 -Iuser/time \
 -Iuser/trace \

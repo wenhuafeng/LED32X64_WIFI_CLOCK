@@ -156,7 +156,7 @@ def main_func(para):
     start = datetime.datetime.now()
 
     build_select(para)
-    if para == 'gcc' or 'mdk':
+    if para == 'g' or 'm':
         print("\r\n")
         checksum_hex_file()
 

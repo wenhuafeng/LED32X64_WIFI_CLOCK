@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Drivers/CMSIS/RTOS2/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../user/common;../user/display;../user/gps;../user/oled;../user/temp_humi;../user/time;../user/trace;../user/wifi</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Drivers/CMSIS/RTOS2/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../user/common;../user/display;../user/gps;../user/oled;../user/temp_humi;../user/time;../user/trace;../user/wifi;../user/SEGGER_RTT_V782c/Config;../user/SEGGER_RTT_V782c/RTT</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1354,6 +1354,21 @@
               <FileName>ssd1306.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\oled\ssd1306.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>user/SEGGER_RTT_V782c</GroupName>
+          <Files>
+            <File>
+              <FileName>SEGGER_RTT_printf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\SEGGER_RTT_V782c\RTT\SEGGER_RTT_printf.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\SEGGER_RTT_V782c\RTT\SEGGER_RTT.c</FilePath>
             </File>
           </Files>
         </Group>

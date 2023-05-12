@@ -62,7 +62,7 @@ extern "C" {
 #define WIFI_GET_TIME        1
 #define GPS_GET_TIME         0 /* You need to use smt32cubemx configuration to open usart3 */
 #define UNIX_TIME_STAMP      0
-#define SUPPORT_OLED_DISPLAY 1 /* You need to use smt32cubemx configuration to open i2c2 */
+#define SUPPORT_OLED_DISPLAY 0 /* You need to use smt32cubemx configuration to open i2c2 */
 
 #if (GPS_GET_TIME == 1) && (SUPPORT_OLED_DISPLAY == 1)
 #error "The GPS OLED function cannot be turned on at the same time because it shares the same set of IO ports."

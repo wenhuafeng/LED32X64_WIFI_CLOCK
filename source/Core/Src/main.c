@@ -48,7 +48,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "SEGGER_RTT.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -121,6 +121,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_RTC_MspInit(&hrtc);
   HAL_RTCEx_SetSecond_IT(&hrtc);
+  SEGGER_RTT_Init();
   /* USER CODE END 2 */
 
   /* Init scheduler */
