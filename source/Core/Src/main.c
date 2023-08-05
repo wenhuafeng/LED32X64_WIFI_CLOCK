@@ -112,9 +112,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_RTC_Init();
-  MX_TIM4_Init();
   MX_DMA_Init();
+  MX_TIM4_Init();
+  MX_RTC_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_TIM3_Init();
@@ -130,7 +130,6 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
-
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */

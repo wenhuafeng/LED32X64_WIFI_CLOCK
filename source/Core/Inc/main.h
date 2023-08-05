@@ -124,6 +124,7 @@ void Error_Handler(void);
 #define HUB_LAT_GPIO_Port GPIOB
 #define WIFI_POWER_Pin GPIO_PIN_5
 #define WIFI_POWER_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 void SystemClock_Config(void);
 /* USER CODE END Private defines */
